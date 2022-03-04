@@ -64,15 +64,25 @@ class ConsultSuppliers extends Controller
 
     public function consulforPromotional()
     {
-        $cURLConnection = curl_init();
+        // $client = new \GuzzleHttp\Client();
+        // $response = $client->get('https://forpromotional.homelinux.com:9090/WsEstrategia/inventario');
+        // return $response;
+        $ch = curl_init();
+        curl_setopt(
+            $ch,
+            CURLOPT_URL,
+            "https://forpromotional.homelinux.com:9090/WsEstrategia/inventario"
+        );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-        curl_setopt($cURLConnection, CURLOPT_URL, 'https://forpromotional.homelinux.com:9090/WsEstrategia/inventario');
-        curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        // Convertir en array
+        $result = json_decode($result, true);
 
-        $phoneList = curl_exec($cURLConnection);
-        curl_close($cURLConnection);
-
-        $jsonArrayResponse = json_decode($phoneList);
-        return $jsonArrayResponse;
+        // $jsonArrayResponse = json_decode($phoneList);
+        return $result;
     }
 }
