@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConsultSuppliers;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,14 +22,18 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
-Auth::routes();
+// Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 //Route Hooks - Do not delete//
-	Route::view('products', 'livewire.products.index')->middleware('auth');
-	Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth');
-	Route::view('categories', 'livewire.categories.index')->middleware('auth');
-	Route::view('providers', 'livewire.providers.index')->middleware('auth');
+Route::view('products', 'livewire.products.index')->middleware('auth');
+Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth');
+Route::view('categories', 'livewire.categories.index')->middleware('auth');
+Route::view('providers', 'livewire.providers.index')->middleware('auth');
+
+Route::get('/consultInnova', [ConsultSuppliers::class, 'consultInnovation']);
+Route::get('/consultPromoOption', [ConsultSuppliers::class, 'consultPromoOption']);
+Route::get('/consulforPromotional', [ConsultSuppliers::class, 'consulforPromotional']);
