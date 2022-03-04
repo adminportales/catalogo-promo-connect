@@ -28,3 +28,7 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 //Route Hooks - Do not delete//
+	Route::view('products', 'livewire.products.index')->middleware('auth');
+	Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth');
+	Route::view('categories', 'livewire.categories.index')->middleware('auth');
+	Route::view('providers', 'livewire.providers.index')->middleware('auth');

@@ -36,6 +36,18 @@
 					@auth()
                     <ul class="navbar-nav mr-auto">
 						<!--Nav Bar Hooks - Do not delete!!-->
+						<li class="nav-item">
+                            <a href="{{ url('/products') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Products</a> 
+                        </li>
+						<li class="nav-item">
+                            <a href="{{ url('/subcategories') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Subcategories</a> 
+                        </li>
+						<li class="nav-item">
+                            <a href="{{ url('/categories') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Categories</a> 
+                        </li>
+						<li class="nav-item">
+                            <a href="{{ url('/providers') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Providers</a> 
+                        </li>
                     </ul>
 					@endauth()
 					
