@@ -36,4 +36,4 @@ Route::view('providers', 'livewire.providers.index')->middleware('auth');
 
 Route::get('/consultInnova', [ConsultSuppliers::class, 'consultInnovation']);
 Route::get('/consultPromoOption', [ConsultSuppliers::class, 'consultPromoOption']);
-Route::get('/consulforPromotional', [ConsultSuppliers::class, 'consulforPromotional']);
+Route::get('/consultForPromotional', [ConsultSuppliers::class, 'consulforPromotional']);

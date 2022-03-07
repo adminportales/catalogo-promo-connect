@@ -13,8 +13,16 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['provider_id'];
+    protected $fillable = ['sku','name','price','description','stock','type','color','image','offer','discount','provider_id'];
 	
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function productAttributes()
+    {
+        return $this->hasMany('App\Models\ProductAttribute', 'product_id', 'id');
+    }
+    
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

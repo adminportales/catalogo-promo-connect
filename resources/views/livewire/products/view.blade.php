@@ -23,15 +23,25 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="card-body">
 						@include('livewire.products.create')
 						@include('livewire.products.update')
 				<div class="table-responsive">
 					<table class="table table-bordered table-sm">
 						<thead class="thead">
-							<tr> 
-								<td>#</td> 
+							<tr>
+								<td>#</td>
+								<th>Sku</th>
+								<th>Name</th>
+								<th>Price</th>
+								<th>Description</th>
+								<th>Stock</th>
+								<th>Type</th>
+								<th>Color</th>
+								<th>Image</th>
+								<th>Offer</th>
+								<th>Discount</th>
 								<th>Provider Id</th>
 								<td>ACTIONS</td>
 							</tr>
@@ -39,7 +49,17 @@
 						<tbody>
 							@foreach($products as $row)
 							<tr>
-								<td>{{ $loop->iteration }}</td> 
+								<td>{{ $loop->iteration }}</td>
+								<td>{{ $row->sku }}</td>
+								<td>{{ $row->name }}</td>
+								<td>{{ $row->price }}</td>
+								<td>{{ $row->description }}</td>
+								<td>{{ $row->stock }}</td>
+								<td>{{ $row->type }}</td>
+								<td>{{ $row->color }}</td>
+								<td><img src="{{ $row->image }}" class="img-fluid" alt="Sin imagen" srcset=""></td>
+								<td>{{ $row->offer }}</td>
+								<td>{{ $row->discount }}</td>
 								<td>{{ $row->provider_id }}</td>
 								<td width="90">
 								<div class="btn-group">
@@ -47,14 +67,14 @@
 									Actions
 									</button>
 									<div class="dropdown-menu dropdown-menu-right">
-									<a data-toggle="modal" data-target="#updateModal" class="dropdown-item" wire:click="edit({{$row->id}})"><i class="fa fa-edit"></i> Edit </a>							 
-									<a class="dropdown-item" onclick="confirm('Confirm Delete Product id {{$row->id}}? \nDeleted Products cannot be recovered!')||event.stopImmediatePropagation()" wire:click="destroy({{$row->id}})"><i class="fa fa-trash"></i> Delete </a>   
+									<a data-toggle="modal" data-target="#updateModal" class="dropdown-item" wire:click="edit({{$row->id}})"><i class="fa fa-edit"></i> Edit </a>
+									<a class="dropdown-item" onclick="confirm('Confirm Delete Product id {{$row->id}}? \nDeleted Products cannot be recovered!')||event.stopImmediatePropagation()" wire:click="destroy({{$row->id}})"><i class="fa fa-trash"></i> Delete </a>
 									</div>
 								</div>
 								</td>
 							@endforeach
 						</tbody>
-					</table>						
+					</table>
 					{{ $products->links() }}
 					</div>
 				</div>
