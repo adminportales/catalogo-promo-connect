@@ -34,8 +34,11 @@ Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth')
 Route::view('categories', 'livewire.categories.index')->middleware('auth');
 Route::view('providers', 'livewire.providers.index')->middleware('auth');
 
-Route::get('/consultInnova', [ConsultSuppliers::class, 'consultInnovation']);
-Route::get('/consultPromoOption', [ConsultSuppliers::class, 'consultPromoOption']);
-Route::get('/consultForPromotional', [ConsultSuppliers::class, 'consulforPromotional']);
-Route::get('/downloadImageFP', [ConsultSuppliers::class, 'downloadImageFP']);
-Route::get('/downloadFile', [ConsultSuppliers::class, 'downloadFile']);
+Route::get('/getAllProductsInnova', [ConsultSuppliers::class, 'getAllProductsInnova']);
+Route::get('/getStockInnova', [ConsultSuppliers::class, 'getStockInnova']);
+
+Route::get('/getAllProductsPromoOption', [ConsultSuppliers::class, 'getAllProductsPromoOption']);
+Route::get('/getPricePromoOpcion', [ConsultSuppliers::class, 'getPricePromoOpcion']);
+Route::get('/getStockPromoOpcion', [ConsultSuppliers::class, 'getStockPromoOpcion']);
+
+Route::get('/getAllProductsForPromotional', [ConsultSuppliers::class, 'getAllProductsForPromotional']);

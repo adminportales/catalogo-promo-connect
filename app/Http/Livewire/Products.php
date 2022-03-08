@@ -30,18 +30,18 @@ class Products extends Component
 						->orWhere('offer', 'LIKE', $keyWord)
 						->orWhere('discount', 'LIKE', $keyWord)
 						->orWhere('provider_id', 'LIKE', $keyWord)
-						->paginate(10),
+						->paginate(24),
         ]);
     }
-	
+
     public function cancel()
     {
         $this->resetInput();
         $this->updateMode = false;
     }
-	
+
     private function resetInput()
-    {		
+    {
 		$this->sku = null;
 		$this->name = null;
 		$this->price = null;
@@ -61,7 +61,7 @@ class Products extends Component
 		'sku' => 'required',
         ]);
 
-        Product::create([ 
+        Product::create([
 			'sku' => $this-> sku,
 			'name' => $this-> name,
 			'price' => $this-> price,
@@ -74,7 +74,7 @@ class Products extends Component
 			'discount' => $this-> discount,
 			'provider_id' => $this-> provider_id
         ]);
-        
+
         $this->resetInput();
 		$this->emit('closeModal');
 		session()->flash('message', 'Product Successfully created.');
@@ -84,7 +84,7 @@ class Products extends Component
     {
         $record = Product::findOrFail($id);
 
-        $this->selected_id = $id; 
+        $this->selected_id = $id;
 		$this->sku = $record-> sku;
 		$this->name = $record-> name;
 		$this->price = $record-> price;
@@ -96,7 +96,7 @@ class Products extends Component
 		$this->offer = $record-> offer;
 		$this->discount = $record-> discount;
 		$this->provider_id = $record-> provider_id;
-		
+
         $this->updateMode = true;
     }
 
@@ -108,7 +108,7 @@ class Products extends Component
 
         if ($this->selected_id) {
 			$record = Product::find($this->selected_id);
-            $record->update([ 
+            $record->update([
 			'sku' => $this-> sku,
 			'name' => $this-> name,
 			'price' => $this-> price,
