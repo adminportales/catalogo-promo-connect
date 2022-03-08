@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-	use HasFactory;
-	
+    use HasFactory;
+
     public $timestamps = true;
 
     protected $table = 'products';
 
-    protected $fillable = ['sku','name','price','description','stock','type','color','image','offer','discount','provider_id'];
-	
+    protected $fillable = ['sku', 'name', 'price', 'description', 'stock', 'type', 'color', 'image', 'offer', 'discount', 'provider_id'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -22,7 +22,7 @@ class Product extends Model
     {
         return $this->hasMany('App\Models\ProductAttribute', 'product_id', 'id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -30,13 +30,12 @@ class Product extends Model
     {
         return $this->hasMany('App\Models\ProductCategory', 'product_id', 'id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function provider()
     {
-        return $this->hasOne('App\Models\Provider', 'id', 'provider_id');
+        return $this->belongsTo(Provider::class);
     }
-    
 }
