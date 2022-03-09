@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subcategory extends Model
 {
-	use HasFactory;
-	
+    use HasFactory;
+
     public $timestamps = true;
 
     protected $table = 'subcategories';
 
-    protected $fillable = ['subfamily','category_id'];
-	
+    protected $fillable = ['subfamily', 'slug', 'category_id'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
@@ -22,7 +22,7 @@ class Subcategory extends Model
     {
         return $this->hasOne('App\Models\Category', 'id', 'category_id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -30,5 +30,4 @@ class Subcategory extends Model
     {
         return $this->hasMany('App\Models\ProductCategory', 'subcategory_id', 'id');
     }
-    
 }

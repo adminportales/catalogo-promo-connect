@@ -68,7 +68,6 @@ class ConsultSuppliers extends Controller
                 }
             }
         }
-        return $responseData;
         // } catch (Exception $e) {
         //     return   $e->getMessage();
         // }
@@ -126,35 +125,35 @@ class ConsultSuppliers extends Controller
         curl_close($ch);
         // Convertir en array
         $result = json_decode($result, true);
-        if (!$result['error']) {
-            foreach ($result as $product) {
-                $data = [
-                    'sku' => $product['item_code'],
-                    'sku_parent' => $product['parent_code'],
-                    'name' => $product['name'],
-                    'price' =>  0,
-                    'description' => $product['description'],
+        // if (!$result['error']) {
+        foreach ($result as $product) {
+            $data = [
+                'sku' => $product['item_code'],
+                'sku_parent' => $product['parent_code'],
+                'name' => $product['name'],
+                'price' =>  0,
+                'description' => $product['description'],
+                'stock' => 0,
+                'type' => 'Normal',
+                'offer' => false,
+                'discount' => 0,
+                'provider_id' => 2,
+                'image' => $product['img'],
+                'color' => $product['color'],
+            ];
+            $productExist = Product::where('sku', $product['item_code'])->first();
+            if (!$productExist) {
+                $newProduct = Product::create($data);
+            } else {
+                $productExist->update([
+                    'price' => $data['price'],
                     'stock' => 0,
-                    'type' => 'Normal',
-                    'offer' => false,
-                    'discount' => 0,
-                    'provider_id' => 2,
-                    'image' => $product['img'],
-                    'color' => $product['color'],
-                ];
-                $productExist = Product::where('sku', $product['item_code'])->first();
-                if (!$productExist) {
-                    $newProduct = Product::create($data);
-                } else {
-                    $productExist->update([
-                        'price' => $data['price'],
-                        'stock' => 0,
-                    ]);
-                }
+                ]);
             }
-        } else {
-            return $result;
         }
+        // } else {
+        //     return $result;
+        // }
         return $result;
     }
 
@@ -172,7 +171,10 @@ class ConsultSuppliers extends Controller
         foreach ($products as $product) {
             $param = array('CardCode' => $CardCode, 'pass' => $pass, 'ItemCode' => $product->sku);
             $result = $client->call('GetPrice', $param);
-            $price = (float)$result['GetPriceResult']['Precios']['FinalPrice'];
+            $price = null;
+            if (!$result['GetPriceResult'] == "") {
+                $price = (float)$result['GetPriceResult']['Precios']['FinalPrice'];
+            }
             $product->update(['price' => $price]);
         }
     }
@@ -191,9 +193,11 @@ class ConsultSuppliers extends Controller
         foreach ($products as $product) {
             $param = array('codigo' => $product->sku, 'distribuidor' => $CardCode);
             $result = $client->call('existencias', $param);
-            dd($result);
-            $price = (int)$result['GetPriceResult']['Precios']['FinalPrice'];
-            $product->update(['price' => $price]);
+            $stock = null;
+            if (!$result['existenciasResult'] == "") {
+                $stock = (int)$result['existenciasResult']['Existencia']['Stok'];
+            }
+            $product->update(['stock' => $stock]);
         }
     }
 

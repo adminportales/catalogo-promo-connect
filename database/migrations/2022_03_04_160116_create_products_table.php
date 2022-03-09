@@ -15,7 +15,7 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('sku_parent');
+            $table->string('sku_parent')->nullable();
             $table->string('sku');
             $table->string('name')->nullable();
             $table->decimal('price',8,2)->nullable();
@@ -26,20 +26,7 @@ class CreateProductsTable extends Migration
             $table->string('image')->nullable();
             $table->boolean('offer')->nullable();
             $table->integer('discount')->nullable();
-
             $table->foreignId('provider_id')->nullable()->constrained();
-            /*
-            SKU
-            SKU_HIjo
-            NOmbre
-            Precio
-            Descripcion
-            Stock
-            Tipo
-            color
-            imagen
-            offert
-            */
             $table->timestamps();
         });
     }
