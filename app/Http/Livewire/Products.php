@@ -30,7 +30,7 @@ class Products extends Component
 						->orWhere('offer', 'LIKE', $keyWord)
 						->orWhere('discount', 'LIKE', $keyWord)
 						->orWhere('provider_id', 'LIKE', $keyWord)
-						->paginate(24),
+						->paginate(10),
         ]);
     }
 

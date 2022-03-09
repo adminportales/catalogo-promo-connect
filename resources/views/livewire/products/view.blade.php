@@ -44,8 +44,8 @@
                                     <th>Type</th>
                                     <th>Color</th>
                                     <th>Image</th>
-                                    <th>Offer</th>
-                                    <th>Discount</th>
+                                    {{-- <th>Offer</th>
+                                    <th>Discount</th> --}}
                                     <th>Provider Id</th>
                                     <td>ACTIONS</td>
                                 </tr>
@@ -61,10 +61,10 @@
                                         <td>{{ $row->stock }}</td>
                                         <td>{{ $row->type }}</td>
                                         <td>{{ $row->color }}</td>
-                                        <td><img src="{{ $row->image }}" class="img-fluid" alt="Sin imagen" style="max-width: 100px"
-                                                srcset=""></td>
-                                        <td>{{ $row->offer }}</td>
-                                        <td>{{ $row->discount }}</td>
+                                        <td><img src="{{ $row->image }}" class="img-fluid" alt="Sin imagen"
+                                                style="max-width: 60px" srcset=""></td>
+                                        {{-- <td>{{ $row->offer }}</td>
+                                        <td>{{ $row->discount }}</td> --}}
                                         <td>{{ $row->provider->company }}</td>
                                         <td width="90">
                                             <div class="btn-group">
