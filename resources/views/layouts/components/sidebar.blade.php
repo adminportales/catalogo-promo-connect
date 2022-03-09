@@ -36,21 +36,34 @@
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Subcategorias</span></a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/providers') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Proveedores</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/globalAttributes') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Globales</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/users') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Usuarios</span></a>
-        </li>
+        @role('admin')
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/providers') }}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Proveedores</span></a>
+            </li>
+        @endrole
+        @role('admin')
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/globalAttributes') }}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Globales</span></a>
+            </li>
+        @endrole
+        @role('admin')
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/users') }}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Usuarios</span></a>
+            </li>
+        @endrole
+        @role('admin')
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/laratrust') }}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Roles</span></a>
+            </li>
+        @endrole
     @endauth()
 
     <!-- Divider -->

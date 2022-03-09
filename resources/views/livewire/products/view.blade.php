@@ -31,8 +31,6 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="card-body">
                     @include('livewire.products.create')
                     @include('livewire.products.update')
@@ -67,7 +65,7 @@
                                         </td>
                                         <td>{{ $row->sku }}</td>
                                         <td>{{ $row->name }}</td>
-                                        <td>$ {{ $row->price + $row->price * ($utilidad / 100) }}</td>
+                                        <td>$ {{ round($row->price + $row->price * ($utilidad / 100), 2) }}</td>
                                         <td>{{ Str::limit($row->description, 50) }}</td>
                                         <td>{{ $row->stock }}</td>
                                         <td>{{ $row->type }}</td>
