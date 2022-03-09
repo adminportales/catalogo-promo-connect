@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\GlobalAttribute;
 use App\Models\Provider;
-use App\Models\Subcategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -46,6 +46,10 @@ class DatabaseSeeder extends Seeder
             'phone' => '4738647878',
             'contact' => 'Contacto',
             'discount' => 0
+        ]);
+        GlobalAttribute::create([
+            'attribute' => 'Utilidad',
+            'value' => '10',
         ]);
         $category = Category::create([
             'family' => 'Sin Categoria',

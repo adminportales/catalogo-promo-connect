@@ -49,6 +49,7 @@
                                     <th>Tipo</th>
                                     <th>Color</th>
                                     <th>Imagen</th>
+                                    <th>Ecommerce</th>
                                     {{-- <th>Offer</th>
                                     <th>Discount</th> --}}
                                     <th>Proveedor</th>
@@ -58,6 +59,7 @@
                             <tbody>
                                 @php
                                     $counter = $products->perPage() * $products->currentPage() - $products->perPage() + 1;
+                                    $utilidad = (float) $utilidad->value;
                                 @endphp
                                 @foreach ($products as $row)
                                     <tr>
@@ -65,13 +67,14 @@
                                         </td>
                                         <td>{{ $row->sku }}</td>
                                         <td>{{ $row->name }}</td>
-                                        <td>$ {{ $row->price }}</td>
+                                        <td>$ {{ $row->price + $row->price * ($utilidad / 100) }}</td>
                                         <td>{{ Str::limit($row->description, 50) }}</td>
                                         <td>{{ $row->stock }}</td>
                                         <td>{{ $row->type }}</td>
                                         <td>{{ $row->color }}</td>
                                         <td><img src="{{ $row->image }}" class="img-fluid" alt="Sin imagen"
                                                 style="max-width: 60px" srcset=""></td>
+                                        <td>{{ $row->ecommerce }}</td>
                                         {{-- <td>{{ $row->offer }}</td>
                                         <td>{{ $row->discount }}</td> --}}
                                         <td>{{ $row->provider->company }}</td>

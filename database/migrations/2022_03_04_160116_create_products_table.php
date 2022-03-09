@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('sku_parent')->nullable();
             $table->string('sku');
             $table->string('name')->nullable();
-            $table->decimal('price',8,2)->nullable();
+            $table->decimal('price', 8, 2)->nullable();
             $table->text('description')->nullable();
             $table->string('stock')->nullable();
             $table->string('type')->nullable();
@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->string('image')->nullable();
             $table->boolean('offer')->nullable();
             $table->integer('discount')->nullable();
+            $table->boolean('ecommerce')->nullable();
             $table->foreignId('provider_id')->nullable()->constrained();
             $table->timestamps();
         });

@@ -43,6 +43,10 @@
                 <input wire:model="image" type="text" class="form-control" id="image" placeholder="Image">@error('image') <span class="error text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="form-group">
+                <label for="ecommerce">Para ecommerce</label>
+                <input wire:model="ecommerce" type="checkbox" class="form-control" id="ecommerce" placeholder="ecommerce">@error('ecommerce') <span class="error text-danger">{{ $message }}</span> @enderror
+            </div>
+            <div class="form-group">
                 <label for="offer"></label>
                 <input wire:model="offer" type="text" class="form-control" id="offer" placeholder="Offer">@error('offer') <span class="error text-danger">{{ $message }}</span> @enderror
             </div>

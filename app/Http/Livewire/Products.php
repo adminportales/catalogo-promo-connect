@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\GlobalAttribute;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Product;
@@ -11,12 +12,15 @@ class Products extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord, $sku, $name, $price, $description, $stock, $type, $color, $image, $offer, $discount, $provider_id;
+    public $selected_id, $keyWord, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
     public $updateMode = false;
 
     public function render()
     {
         $keyWord = '%' . $this->keyWord . '%';
+
+        $utilidad = GlobalAttribute::find(1);
+
         $products = Product::latest()
             ->orWhere('sku', 'LIKE', $keyWord)
             ->orWhere('name', 'LIKE', $keyWord)
@@ -26,13 +30,14 @@ class Products extends Component
             ->orWhere('type', 'LIKE', $keyWord)
             ->orWhere('color', 'LIKE', $keyWord)
             ->orWhere('image', 'LIKE', $keyWord)
+            ->orWhere('ecommerce', 'LIKE', $keyWord)
             ->orWhere('offer', 'LIKE', $keyWord)
             ->orWhere('discount', 'LIKE', $keyWord)
             ->orWhere('provider_id', 'LIKE', $keyWord)
             ->paginate(10);
         // dd($products);
         return view('livewire.products.view', [
-            'products' => $products,
+            'products' => $products, 'utilidad' => $utilidad
         ]);
     }
 
@@ -52,6 +57,7 @@ class Products extends Component
         $this->type = null;
         $this->color = null;
         $this->image = null;
+        $this->ecommerce = null;
         $this->offer = null;
         $this->discount = null;
         $this->provider_id = null;
@@ -72,6 +78,7 @@ class Products extends Component
             'type' => $this->type,
             'color' => $this->color,
             'image' => $this->image,
+            'ecommerce' => $this->ecommerce,
             'offer' => $this->offer,
             'discount' => $this->discount,
             'provider_id' => $this->provider_id
@@ -95,6 +102,7 @@ class Products extends Component
         $this->type = $record->type;
         $this->color = $record->color;
         $this->image = $record->image;
+        $this->ecommerce = $record->ecommerce;
         $this->offer = $record->offer;
         $this->discount = $record->discount;
         $this->provider_id = $record->provider_id;
@@ -119,6 +127,7 @@ class Products extends Component
                 'type' => $this->type,
                 'color' => $this->color,
                 'image' => $this->image,
+                'ecommerce' => $this->ecommerce,
                 'offer' => $this->offer,
                 'discount' => $this->discount,
                 'provider_id' => $this->provider_id

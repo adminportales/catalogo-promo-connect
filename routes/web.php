@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConsultSuppliers;
+use App\Http\Controllers\SendProductsToEcommerce;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,11 +16,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return redirect('products');
+})->middleware(['auth']);
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect('products');
 })->middleware(['auth'])->name('dashboard');
 
 require __DIR__ . '/auth.php';
@@ -34,6 +35,7 @@ Route::view('products', 'livewire.products.index')->middleware('auth');
 Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth');
 Route::view('categories', 'livewire.categories.index')->middleware('auth');
 Route::view('providers', 'livewire.providers.index')->middleware('auth');
+Route::view('globalAttributes', 'livewire.globalAttributes.index')->middleware('auth');
 
 Route::get('/getAllProductsInnova', [ConsultSuppliers::class, 'getAllProductsInnova']);
 Route::get('/getStockInnova', [ConsultSuppliers::class, 'getStockInnova']);

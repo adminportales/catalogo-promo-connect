@@ -13,7 +13,7 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['sku_parent', 'sku', 'name', 'price', 'description', 'stock', 'type', 'color', 'image', 'offer', 'discount', 'provider_id'];
+    protected $fillable = ['sku_parent', 'sku', 'name', 'price', 'description', 'stock', 'type', 'color', 'image', 'ecommerce', 'offer', 'discount', 'provider_id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

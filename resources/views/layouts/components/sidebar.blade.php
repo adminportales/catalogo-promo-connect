@@ -42,6 +42,11 @@
                 <span>Proveedores</span></a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="{{ url('/globalAttributes') }}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Globales</span></a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{{ url('/users') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Usuarios</span></a>

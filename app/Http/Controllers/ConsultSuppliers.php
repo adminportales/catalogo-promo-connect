@@ -41,6 +41,34 @@ class ConsultSuppliers extends Controller
         }
         // return $responseData;
         foreach ($responseData as $product) {
+            $categoria = null;
+            if (count($product->categorias->categorias) > 0) {
+                $slug = mb_strtolower(str_replace(' ', '-', $product->categorias->categorias[0]->codigo));
+                $categoria = Category::where("slug", $slug)->first();
+                if (!$categoria) {
+                    $categoria = Category::create([
+                        'family' => ucfirst($product->categorias->categorias[0]->nombre), 'slug' => $slug,
+                    ]);
+                }
+            } else {
+                $categoria = Category::find(1);
+            }
+
+            // TODO: Verificar si la subcategoria existe y si no registrarla
+            $subcategoria = null;
+            if (count($product->categorias->subcategorias) > 0) {
+                $slugSub = mb_strtolower(str_replace(' ', '-', $product->categorias->subcategorias[0]->codigo));
+                $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
+
+                if (!$subcategoria) {
+                    $subcategoria = $categoria->subcategories()->create([
+                        'subfamily' => ucfirst($product->categorias->subcategorias[0]->nombre),
+                        'slug' => $slugSub,
+                    ]);
+                }
+            } else {
+                $subcategoria = Subcategory::find(1);
+            }
             $data = [
                 'sku_parent' => $product->codigo,
                 'name' => $product->nombre,
@@ -52,6 +80,7 @@ class ConsultSuppliers extends Controller
                 'discount' => 0,
                 'provider_id' => 3,
             ];
+
             foreach ($product->colores as $color) {
                 $data['sku'] = $color->clave;
                 $data['image'] = $color->image;
@@ -62,6 +91,11 @@ class ConsultSuppliers extends Controller
                 $productExist = Product::where('sku', $color->clave)->first();
                 if (!$productExist) {
                     $newProduct = Product::create($data);
+                    $newProduct->productCategories()->create([
+                        'category_id' => $categoria->id,
+                        'subcategory_id' => $subcategoria->id,
+                    ]);
+                    // dd($newProduct);
                 } else {
                     $productExist->update([
                         'price' => $data['price'],
@@ -86,19 +120,32 @@ class ConsultSuppliers extends Controller
             echo '<h2>Constructor error</h2>' . $err;
             exit();
         }
-
-        $products = Product::where('provider_id', 3)->get();
-        $productsConsulted = [];
-        foreach ($products as $product) {
-            if (!in_array($product->sku_parent, $productsConsulted)) {
-                array_push($productsConsulted, $product->sku_parent);
-                $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'code_product' => $product->sku_parent); //PARAMETROS
-                $response = $client->call('Stock', $params); //MÉTODO STOCK
-                $response = json_decode($response);
-                foreach ($response->data->existencias as $stockProduct) {
-                    $updateProduct = Product::where('sku', $stockProduct->clave);
-                    $updateProduct->update(['stock' => $stockProduct->general_stock]);
+        $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
+        $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
+        $response = json_decode($response, true);
+        $responseData = [];
+        if ($response['response'] === true) {
+            for ($i = 1; $i <= $response['pages']; $i++) {
+                $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
+                $responseProducts = json_decode($client->call('Stock', $params));
+                foreach ($responseProducts->data as $product) {
+                    foreach ($product->existencias as $exist) {
+                        array_push($responseData, $exist);
+                    }
                 }
+            }
+        } else {
+            return $response;
+        }
+        // return $responseData;
+
+        $productsNotFound = [];
+        foreach ($responseData as $product) {
+            $productCatalogo = Product::where('sku', $product->clave)->first();
+            if ($productCatalogo) {
+                $productCatalogo->update(['stock' => $product->general_stock]);
+            } else {
+                array_push($productsNotFound, $product->clave);
             }
         }
     }
@@ -116,7 +163,7 @@ class ConsultSuppliers extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=2"); //Opcional
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
         curl_setopt(
             $ch,
             CURLOPT_URL,
@@ -127,6 +174,7 @@ class ConsultSuppliers extends Controller
         curl_close($ch);
         // Convertir en array
         $result = json_decode($result, true);
+
         // if (!$result['error']) {
         foreach ($result as $product) {
             $data = [
@@ -143,9 +191,26 @@ class ConsultSuppliers extends Controller
                 'image' => $product['img'],
                 'color' => $product['color'],
             ];
+            // Verificar si la categoria existe y si no registrarla
+            $categoria = null;
+            $slug = mb_strtolower(str_replace(' ', '-', $product['family']));
+            $categoria = Category::where("slug", $slug)->first();
+            if (!$categoria) {
+                $categoria = Category::create([
+                    'family' => ucfirst($product['family']), 'slug' => $slug,
+                ]);
+            }
+
+            // Verificar si la subcategoria existe y si no registrarla
+            $subcategoria = Subcategory::find(1);
+
             $productExist = Product::where('sku', $product['item_code'])->first();
             if (!$productExist) {
                 $newProduct = Product::create($data);
+                $newProduct->productCategories()->create([
+                    'category_id' => $categoria->id,
+                    'subcategory_id' => $subcategoria->id,
+                ]);
             } else {
                 $productExist->update([
                     'price' => $data['price'],
@@ -170,37 +235,56 @@ class ConsultSuppliers extends Controller
         $pass = 'DIS00048';
 
         $products = Product::where('provider_id', 2)->get();
+        $errors = [];
         foreach ($products as $product) {
             $param = array('CardCode' => $CardCode, 'pass' => $pass, 'ItemCode' => $product->sku);
             $result = $client->call('GetPrice', $param);
             $price = null;
             if (!$result['GetPriceResult'] == "") {
                 $price = (float)$result['GetPriceResult']['Precios']['FinalPrice'];
+            } else {
+                array_push($errors, ["id" => $product->id, "sku" => $product->sku]);
             }
             $product->update(['price' => $price]);
         }
+        return $errors;
     }
 
     public function getStockPromoOpcion()
     {
-        $client = new \nusoap_client('http://desktop.promoopcion.com:8095/wsFullFilmentMXP/FullFilmentMXP.asmx?wsdl', 'wsdl');
-        $err = $client->getError();
-        if ($err) {
-            echo 'Error en Constructor' . $err;
-        }
-        $CardCode = "DFE4516";
-
-        $products = Product::where('provider_id', 2)->get();
-
-        foreach ($products as $product) {
-            $param = array('codigo' => $product->sku, 'distribuidor' => $CardCode);
-            $result = $client->call('existencias', $param);
-            $stock = null;
-            if (!$result['existenciasResult'] == "") {
-                $stock = (int)$result['existenciasResult']['Existencia']['Stok'];
+        $user = "DFE4516";
+        $xapikey = "ad3bdbcfd679bf6fd0b97b4b13809b22";
+        $headers = array(
+            "user: " . $user,
+            "x-api-key: " . $xapikey,
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
+        curl_setopt(
+            $ch,
+            CURLOPT_URL,
+            "https://www.contenidopromo.com/wsds/mx/existencias/"
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        // Convertir en array
+        $result = json_decode($result, true);
+        $errors = [];
+        foreach ($result as $sku => $stock) {
+            $productCatalogo = Product::where('sku', $sku)->first();
+            if ($productCatalogo) {
+                $productCatalogo->update(['stock' => $stock]);
+            } else {
+                array_push($errors, $sku);
             }
-            $product->update(['stock' => $stock]);
         }
+
+        return $errors;
     }
 
     public function getAllProductsForPromotional()
@@ -239,11 +323,6 @@ class ConsultSuppliers extends Controller
             $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
 
             if (!$subcategoria) {
-                // $data = [
-                //     'subfamily' => ucfirst($product['sub_categoria']),
-                //     'slug' => $slugSub,
-                // ];
-                // dd($data);
                 $subcategoria = $categoria->subcategories()->create([
                     'subfamily' => ucfirst($product['sub_categoria']),
                     'slug' => $slugSub,
@@ -273,6 +352,7 @@ class ConsultSuppliers extends Controller
                     'image' => $image,
                     'offer' => $offer,
                     'discount' => $product['desc_promo'],
+                    'ecommerce' => false,
                     'provider_id' => 1,
                 ]);
                 /*
