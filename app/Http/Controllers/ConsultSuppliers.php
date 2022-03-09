@@ -27,6 +27,7 @@ class ConsultSuppliers extends Controller
         $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
         $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
         $response = json_decode($response, true);
+        // return $response;
         $responseData = [];
         if ($response['response'] === true) {
             for ($i = 1; $i <= $response['pages']; $i++) {
@@ -123,6 +124,7 @@ class ConsultSuppliers extends Controller
         $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
         $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
         $response = json_decode($response, true);
+        // return $response;
         $responseData = [];
         if ($response['response'] === true) {
             for ($i = 1; $i <= $response['pages']; $i++) {
@@ -163,7 +165,7 @@ class ConsultSuppliers extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, 1);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
         curl_setopt(
             $ch,
             CURLOPT_URL,
@@ -174,7 +176,7 @@ class ConsultSuppliers extends Controller
         curl_close($ch);
         // Convertir en array
         $result = json_decode($result, true);
-
+        // return $result;
         // if (!$result['error']) {
         foreach ($result as $product) {
             $data = [
@@ -263,7 +265,7 @@ class ConsultSuppliers extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, 1);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=0"); //Opcional
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
         curl_setopt(
             $ch,
             CURLOPT_URL,
@@ -274,6 +276,7 @@ class ConsultSuppliers extends Controller
         curl_close($ch);
         // Convertir en array
         $result = json_decode($result, true);
+        // return $response;
         $errors = [];
         foreach ($result as $sku => $stock) {
             $productCatalogo = Product::where('sku', $sku)->first();
@@ -298,7 +301,7 @@ class ConsultSuppliers extends Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
+        // dd($ch);
         $result = curl_exec($ch);
         curl_close($ch);
         // Convertir en array
