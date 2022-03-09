@@ -35,14 +35,14 @@
                 <div id="content">
                     @include('layouts.components.navbar')
 
-                    <div class="container-fluid">
 
-                        <!-- Page Heading -->
-                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+                    <!-- Page Heading -->
+                    {{-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
                             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        </div>
-                        <div class="row d-flex flex-column">
-                            <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+                        </div> --}}
+                    <div class="row d-flex flex-column">
+                        {{-- <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
                                 <div class="container">
                                     <a class="navbar-brand" href="{{ url('/') }}">
                                         {{ config('app.name', 'Laravel') }}
@@ -58,6 +58,10 @@
                                         @auth()
                                             <ul class="navbar-nav mr-auto">
                                                 <!--Nav Bar Hooks - Do not delete!!-->
+                                                <li class="nav-item">
+                                                    <a href="{{ url('/users') }}" class="nav-link"><i
+                                                            class="fab fa-laravel text-info"></i> Users</a>
+                                                </li>
                                                 <li class="nav-item">
                                                     <a href="{{ url('/products') }}" class="nav-link"><i
                                                             class="fab fa-laravel text-info"></i> Products</a>
@@ -120,14 +124,14 @@
                                         </ul>
                                     </div>
                                 </div>
-                            </nav>
-                            <main class="py-2">
-                                @yield('content')
-                            </main>
-                        </div>
+                            </nav> --}}
+                        <main class="py-0">
+                            @yield('content')
+                        </main>
                     </div>
-
                 </div>
+
+
 
                 <!-- Logout Modal-->
                 <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
@@ -136,8 +140,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                                <button class="close" type="button" data-dismiss="modal"
-                                    aria-label="Close">
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>
                             </div>
@@ -146,7 +149,7 @@
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                                 <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault();
-                            document.getElementById('logout-form').submit();">
+                    document.getElementById('logout-form').submit();">
                                     {{ __('Logout') }}
                                 </a>
 

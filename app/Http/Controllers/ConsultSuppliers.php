@@ -222,6 +222,12 @@ class ConsultSuppliers extends Controller
         // $jsonArrayResponse = json_decode($phoneList);
         foreach ($products as $product) {
             $productExist = Product::where('sku', $product['id_articulo'])->where('color', $product['color'])->first();
+            // TODO: Verificar si la categoria existe y si no registrarla
+            // Variable Categoria
+
+            // TODO: Verificar si la subcategoria existe y si no registrarla
+            // Variable subCategoria
+
             $precio = ($product['precio'] - ($product['precio'] * 0.25));
             $offer = $product['producto_promocion'] == "SI" ? true : false;
             if ($offer) {
@@ -247,6 +253,11 @@ class ConsultSuppliers extends Controller
                     'discount' => $product['desc_promo'],
                     'provider_id' => 1,
                 ]);
+                /*
+                TODO: Registrar en la tabla product_category el producto, categoria y sub categoria
+
+
+                */
             } else {
                 $productExist->update([
                     'price' => $product['precio'],

@@ -1,29 +1,33 @@
 @section('title', __('Products'))
-<div class="container-fluid">
+<div class="container-fluid ">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-header">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
                             <h4><i class="fab fa-laravel text-info"></i>
                                 Product Listing </h4>
                         </div>
-                        <div wire:poll.60s>
+                        {{-- <div wire:poll.1s>
                             <code>
                                 <h5>{{ now()->format('H:i:s') }} UTC</h5>
                             </code>
-                        </div>
+                        </div> --}}
                         @if (session()->has('message'))
                             <div wire:poll.4s class="btn btn-sm btn-success" style="margin-top:0px; margin-bottom:0px;">
                                 {{ session('message') }} </div>
                         @endif
-                        <div>
-                            <input wire:model='keyWord' type="text" class="form-control" name="search" id="search"
-                                placeholder="Search Products">
-                        </div>
-                        <div class="btn btn-sm btn-info" data-toggle="modal" data-target="#createDataModal">
-                            <i class="fa fa-plus"></i> Add Products
+                        <div style="display: flex; justify-content: space-between;  align-items: center;">
+                            <div class="mx-3">
+                                <input wire:model='keyWord' type="text" class="form-control" name="search" id="search"
+                                    placeholder="Search Products">
+                            </div>
+                            <div>
+                                <div class="btn btn-sm btn-info" data-toggle="modal" data-target="#createDataModal">
+                                    <i class="fa fa-plus"></i> Add Products
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -32,7 +36,7 @@
                     @include('livewire.products.create')
                     @include('livewire.products.update')
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
+                        <table class="table table-bordered table-sm ">
                             <thead class="thead">
                                 <tr>
                                     <td>#</td>
@@ -56,8 +60,8 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $row->sku }}</td>
                                         <td>{{ $row->name }}</td>
-                                        <td>{{ $row->price }}</td>
-                                        <td>{{ $row->description }}</td>
+                                        <td>$ {{ $row->price }}</td>
+                                        <td>{{ Str::limit($row->description, 50) }}</td>
                                         <td>{{ $row->stock }}</td>
                                         <td>{{ $row->type }}</td>
                                         <td>{{ $row->color }}</td>

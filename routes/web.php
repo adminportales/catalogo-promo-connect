@@ -29,6 +29,7 @@ require __DIR__ . '/auth.php';
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 //Route Hooks - Do not delete//
+Route::view('users', 'livewire.users.index')->middleware('auth');
 Route::view('products', 'livewire.products.index')->middleware('auth');
 Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth');
 Route::view('categories', 'livewire.categories.index')->middleware('auth');
