@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Provider;
+use App\Models\Subcategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -45,6 +47,14 @@ class DatabaseSeeder extends Seeder
             'contact' => 'Contacto',
             'discount' => 0
         ]);
-
+        $category = Category::create([
+            'family' => 'Sin Categoria',
+            'slug' => 'sin-categoria'
+        ]);
+        $category->subcategories()->create([
+            'subfamily' => 'Sin Subcategoria',
+            'slug' => 'sin-subcategoria',
+            // 'category_id' => 1
+        ]);
     }
 }

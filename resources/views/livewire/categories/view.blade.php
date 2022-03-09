@@ -36,9 +36,9 @@
                             <thead class="thead">
                                 <tr>
                                     <td>#</td>
-                                    <th>Family</th>
-                                    <th>SubFamilies</th>
-                                    <td>ACTIONS</td>
+                                    <th>Familia</th>
+                                    <th>Sub Familias</th>
+                                    <td>Acciones</td>
                                 </tr>
                             </thead>
                             <tbody>

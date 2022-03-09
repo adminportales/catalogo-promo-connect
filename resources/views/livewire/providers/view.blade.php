@@ -7,7 +7,7 @@
 					<div style="display: flex; justify-content: space-between; align-items: center;">
 						<div class="float-left">
 							<h4><i class="fab fa-laravel text-info"></i>
-							Provider Listing </h4>
+							Lista de Proveedores </h4>
 						</div>
 						<div wire:poll.60s>
 							<code><h5>{{ now()->format('H:i:s') }} UTC</h5></code>
@@ -19,31 +19,31 @@
 							<input wire:model='keyWord' type="text" class="form-control" name="search" id="search" placeholder="Search Providers">
 						</div>
 						<div class="btn btn-sm btn-info" data-toggle="modal" data-target="#createDataModal">
-						<i class="fa fa-plus"></i>  Add Providers
+						<i class="fa fa-plus"></i>  Agregar
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="card-body">
 						@include('livewire.providers.create')
 						@include('livewire.providers.update')
 				<div class="table-responsive">
 					<table class="table table-bordered table-sm">
 						<thead class="thead">
-							<tr> 
-								<td>#</td> 
-								<th>Company</th>
+							<tr>
+								<td>#</td>
+								<th>Empresa</th>
 								<th>Email</th>
-								<th>Phone</th>
-								<th>Contact</th>
-								<th>Discount</th>
-								<td>ACTIONS</td>
+								<th>Telefono</th>
+								<th>Contacto</th>
+								<th>Descuento</th>
+								<td>Acciones</td>
 							</tr>
 						</thead>
 						<tbody>
 							@foreach($providers as $row)
 							<tr>
-								<td>{{ $loop->iteration }}</td> 
+								<td>{{ $loop->iteration }}</td>
 								<td>{{ $row->company }}</td>
 								<td>{{ $row->email }}</td>
 								<td>{{ $row->phone }}</td>
@@ -52,17 +52,17 @@
 								<td width="90">
 								<div class="btn-group">
 									<button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									Actions
+									Acciones
 									</button>
 									<div class="dropdown-menu dropdown-menu-right">
-									<a data-toggle="modal" data-target="#updateModal" class="dropdown-item" wire:click="edit({{$row->id}})"><i class="fa fa-edit"></i> Edit </a>							 
-									<a class="dropdown-item" onclick="confirm('Confirm Delete Provider id {{$row->id}}? \nDeleted Providers cannot be recovered!')||event.stopImmediatePropagation()" wire:click="destroy({{$row->id}})"><i class="fa fa-trash"></i> Delete </a>   
+									<a data-toggle="modal" data-target="#updateModal" class="dropdown-item" wire:click="edit({{$row->id}})"><i class="fa fa-edit"></i> Editar </a>
+									<a class="dropdown-item" onclick="confirm('Confirm Delete Provider id {{$row->id}}? \nDeleted Providers cannot be recovered!')||event.stopImmediatePropagation()" wire:click="destroy({{$row->id}})"><i class="fa fa-trash"></i> Eliminar </a>
 									</div>
 								</div>
 								</td>
 							@endforeach
 						</tbody>
-					</table>						
+					</table>
 					{{ $providers->links() }}
 					</div>
 				</div>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Subcategory;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -217,16 +219,36 @@ class ConsultSuppliers extends Controller
         curl_close($ch);
         // Convertir en array
         $products = json_decode($result, true);
-        // $this->downloadImageFP($products[0][''], $products[0]['nombre_articulo']);
         // return $products;
-        // $jsonArrayResponse = json_decode($phoneList);
+
         foreach ($products as $product) {
             $productExist = Product::where('sku', $product['id_articulo'])->where('color', $product['color'])->first();
             // TODO: Verificar si la categoria existe y si no registrarla
-            // Variable Categoria
+            $categoria = null;
+            $slug = mb_strtolower(str_replace(' ', '-', $product['categoria']));
+            $categoria = Category::where("slug", $slug)->first();
+            if (!$categoria) {
+                $categoria = Category::create([
+                    'family' => ucfirst($product['categoria']), 'slug' => $slug,
+                ]);
+            }
 
             // TODO: Verificar si la subcategoria existe y si no registrarla
-            // Variable subCategoria
+            $subcategoria = null;
+            $slugSub = mb_strtolower(str_replace(' ', '-', $product['sub_categoria']));
+            $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
+
+            if (!$subcategoria) {
+                // $data = [
+                //     'subfamily' => ucfirst($product['sub_categoria']),
+                //     'slug' => $slugSub,
+                // ];
+                // dd($data);
+                $subcategoria = $categoria->subcategories()->create([
+                    'subfamily' => ucfirst($product['sub_categoria']),
+                    'slug' => $slugSub,
+                ]);
+            }
 
             $precio = ($product['precio'] - ($product['precio'] * 0.25));
             $offer = $product['producto_promocion'] == "SI" ? true : false;
@@ -255,9 +277,12 @@ class ConsultSuppliers extends Controller
                 ]);
                 /*
                 TODO: Registrar en la tabla product_category el producto, categoria y sub categoria
-
-
                 */
+                $newProduct->productCategories()->create([
+                    'category_id' => $categoria->id,
+                    'subcategory_id' => $subcategoria->id,
+                ]);
+                // dd($product);
             } else {
                 $productExist->update([
                     'price' => $product['precio'],
