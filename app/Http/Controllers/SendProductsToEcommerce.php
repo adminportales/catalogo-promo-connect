@@ -12,8 +12,6 @@ class SendProductsToEcommerce extends Controller
 {
     public function setAllProducts()
     {
-
-
         $woocommerce = new WooCommerceClient(
             env('STORE_URL', ''), // Your store URL
             env('CONSUMER_KEY', ''), // Your consumer key
@@ -28,7 +26,7 @@ class SendProductsToEcommerce extends Controller
         foreach ($products as $product) {
             $dataProduct = [
                 'name' => $product->name,
-                'sku'=> $product->sku,
+                'sku' => $product->sku,
                 'type' => 'simple',
                 'regular_price' => $product->price * 1.76,
                 'categories' => [
@@ -60,20 +58,25 @@ class SendProductsToEcommerce extends Controller
                 'version' => 'wc/v3' // WooCommerce WP REST API version
             ]
         );
-
-        $products = Product::where('ecommerce', 1)->get();
+        // dd( $woocommerce);
+        // $products = Product::where('ecommerce', 1)->get();
+        $productsWC = $woocommerce->get('products');
         $data = ['update' => []];
-        foreach ($products as $product) {
-            $dataProduct = [
-
-                'id' => $product->id,
-                'regular_price' => $product->price * 1.5
-            ];
-            array_push($data['update'], $dataProduct);
+        foreach ($productsWC as $product) {
+            $productC = Product::where('sku', $product->sku)->first();
+            if ($productC) {
+                $dataProduct = [
+                    'id' => $product->id,
+                    'regular_price' => $productC->price * 1.5
+                ];
+                array_push($data['update'], $dataProduct);
+            } else {
+                echo $product->id . ' No encontrado <br>';
+            }
         }
         echo '<pre>';
         print_r($woocommerce->put('products/batch', $data));
-        print_r($woocommerce->get('products', $data));
+        // print_r();
         echo '</pre>';
     }
 }

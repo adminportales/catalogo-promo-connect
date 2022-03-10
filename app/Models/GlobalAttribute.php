@@ -11,7 +11,7 @@ class GlobalAttribute extends Model
 
     public $timestamps = true;
 
-    protected $table = 'globalAttributes';
+    protected $table = 'globalattributes';
 
     protected $fillable = ['attribute','value'];
 
