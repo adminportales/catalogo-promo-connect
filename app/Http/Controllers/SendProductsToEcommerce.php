@@ -28,6 +28,7 @@ class SendProductsToEcommerce extends Controller
         foreach ($products as $product) {
             $dataProduct = [
                 'name' => $product->name,
+                'sku'=> $product->sku,
                 'type' => 'simple',
                 'regular_price' => $product->price * 1.76,
                 'categories' => [
@@ -50,6 +51,29 @@ class SendProductsToEcommerce extends Controller
     }
     public function updateAllProducts()
     {
-        # code...
+        $woocommerce = new WooCommerceClient(
+            env('STORE_URL', ''), // Your store URL
+            env('CONSUMER_KEY', ''), // Your consumer key
+            env('CONSUMER_SECRET', ''), // Your consumer secret
+            [
+                'wp_api' => true, // Enable the WP REST API integration
+                'version' => 'wc/v3' // WooCommerce WP REST API version
+            ]
+        );
+
+        $products = Product::where('ecommerce', 1)->get();
+        $data = ['update' => []];
+        foreach ($products as $product) {
+            $dataProduct = [
+
+                'id' => $product->id,
+                'regular_price' => $product->price * 1.5
+            ];
+            array_push($data['update'], $dataProduct);
+        }
+        echo '<pre>';
+        print_r($woocommerce->put('products/batch', $data));
+        print_r($woocommerce->get('products', $data));
+        echo '</pre>';
     }
 }
