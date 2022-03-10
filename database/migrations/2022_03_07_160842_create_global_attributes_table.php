@@ -13,7 +13,7 @@ class CreateGlobalAttributesTable extends Migration
      */
     public function up()
     {
-        Schema::create('globalAttributes', function (Blueprint $table) {
+        Schema::create('globalattributes', function (Blueprint $table) {
             $table->id();
             $table->string('attribute');
             $table->string('value');
