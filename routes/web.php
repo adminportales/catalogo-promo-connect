@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConsultSuppliers;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SendProductsToEcommerce;
 use Illuminate\Support\Facades\Route;
 
@@ -15,27 +16,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return redirect('products');
-})->middleware(['auth']);
+Auth::routes(['register'=>false]);
 
-Route::get('/dashboard', function () {
-    return redirect('products');
-})->middleware(['auth'])->name('dashboard');
 
-require __DIR__ . '/auth.php';
+Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');
+Route::get('/catalogo',  [HomeController::class, 'catalogo'])->middleware(['auth']);
 
-// Auth::routes();
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/', [HomeController::class, 'dashboard']);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-//Route Hooks - Do not delete//
-Route::view('users', 'livewire.users.index')->middleware('auth');
-Route::view('products', 'livewire.products.index')->middleware('auth');
-Route::view('subcategories', 'livewire.subcategories.index')->middleware('auth');
-Route::view('categories', 'livewire.categories.index')->middleware('auth');
-Route::view('providers', 'livewire.providers.index')->middleware('auth');
-Route::view('globalAttributes', 'livewire.globalAttributes.index')->middleware('auth');
+    //Route Hooks - Do not delete//
+    Route::view('users', 'livewire.users.index');
+    Route::view('products', 'livewire.products.index');
+    Route::view('subcategories', 'livewire.subcategories.index');
+    Route::view('categories', 'livewire.categories.index');
+    Route::view('providers', 'livewire.providers.index');
+    Route::view('globalAttributes', 'livewire.globalAttributes.index');
+});
 
 Route::get('/getAllProductsInnova', [ConsultSuppliers::class, 'getAllProductsInnova']);
 Route::get('/getStockInnova', [ConsultSuppliers::class, 'getStockInnova']);

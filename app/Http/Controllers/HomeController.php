@@ -23,6 +23,19 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->hasRole('admin')) {
+            return redirect()->action([HomeController::class, 'dashboard']);
+        } else {
+            return redirect()->action([HomeController::class, 'catalogo']);
+        }
+    }
+
+    public function dashboard()
+    {
         return view('home');
+    }
+    public function catalogo()
+    {
+        return view('cotizador.catalogo');
     }
 }

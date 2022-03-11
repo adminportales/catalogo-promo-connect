@@ -21,38 +21,43 @@
     @auth()
         <!--Nav Bar Hooks - Do not delete!!-->
 
+        {{-- <li class="nav-item">
+            <a class="nav-link" href="{{ url('catalogo') }}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Catalogo</span></a>
+        </li> --}}
         <li class="nav-item">
-            <a class="nav-link" href="{{ url('/products') }}">
+            <a class="nav-link" href="{{ url('admin/products') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Productos</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ url('/categories') }}">
+            <a class="nav-link" href="{{ url('admin/categories') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Categorias</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ url('/subcategories') }}">
+            <a class="nav-link" href="{{ url('admin/subcategories') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Subcategorias</span></a>
         </li>
         @role('admin')
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('/providers') }}">
+                <a class="nav-link" href="{{ url('admin/providers') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Proveedores</span></a>
             </li>
         @endrole
         @role('admin')
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('/globalAttributes') }}">
+                <a class="nav-link" href="{{ url('admin/globalAttributes') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Globales</span></a>
             </li>
         @endrole
         @role('admin')
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('/users') }}">
+                <a class="nav-link" href="{{ url('admin/users') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Usuarios</span></a>
             </li>
