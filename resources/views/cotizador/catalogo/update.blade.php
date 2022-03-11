@@ -1,19 +1,16 @@
 <!-- Modal -->
-<div wire:ignore.self class="modal fade" id="createDataModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="createDataModalLabel" aria-hidden="true">
+<div wire:ignore.self class="modal fade" id="updateModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+       <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createDataModalLabel">Create New Product</h5>
+                <h5 class="modal-title" id="updateModalLabel">Update Product</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <span aria-hidden="true close-btn">×</span>
+                    <span wire:click.prevent="cancel()" aria-hidden="true">×</span>
                 </button>
             </div>
-           <div class="modal-body">
-				<form>
-            <div class="form-group">
-                <label for="internal_sku"></label>
-                <input wire:model="internal_sku" type="text" class="form-control" id="internal_sku" placeholder="internal_sku">@error('internal_sku') <span class="error text-danger">{{ $message }}</span> @enderror
-            </div>
+            <div class="modal-body">
+                <form>
+					<input type="hidden" wire:model="selected_id">
             <div class="form-group">
                 <label for="sku"></label>
                 <input wire:model="sku" type="text" class="form-control" id="sku" placeholder="Sku">@error('sku') <span class="error text-danger">{{ $message }}</span> @enderror
@@ -47,8 +44,8 @@
                 <input wire:model="image" type="text" class="form-control" id="image" placeholder="Image">@error('image') <span class="error text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="form-group">
-                <label for="ecommerce">Para ecommerce</label>
-                <input wire:model="ecommerce" type="checkbox" class="form-control" id="ecommerce" placeholder="ecommerce">@error('ecommerce') <span class="error text-danger">{{ $message }}</span> @enderror
+                <label for="offer">Para ecommerce</label>
+                <input wire:model="ecommerce" type="checkbox" class="form-control" id="ecommerce" placeholder="Para ecommerce">@error('ecommerce') <span class="error text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="form-group">
                 <label for="offer"></label>
@@ -66,9 +63,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-btn" data-dismiss="modal">Close</button>
-                <button type="button" wire:click.prevent="store()" class="btn btn-primary close-modal">Save</button>
+                <button type="button" wire:click.prevent="cancel()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" wire:click.prevent="update()" class="btn btn-primary" data-dismiss="modal">Save</button>
             </div>
-        </div>
+       </div>
     </div>
 </div>

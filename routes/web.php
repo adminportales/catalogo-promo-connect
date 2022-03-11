@@ -20,7 +20,6 @@ Auth::routes(['register'=>false]);
 
 
 Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');
-Route::get('/catalogo',  [HomeController::class, 'catalogo'])->middleware(['auth']);
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
@@ -33,6 +32,12 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::view('providers', 'livewire.providers.index');
     Route::view('globalAttributes', 'livewire.globalAttributes.index');
 });
+
+// Rutas del Cotizador
+// Route::get('/catalogo',  [HomeController::class, 'catalogo'])->middleware(['auth']);
+Route::view('/catalogo', 'cotizador.catalogo.index');
+
+// Rutas de la actualizacion de Web Services
 
 Route::get('/getAllProductsInnova', [ConsultSuppliers::class, 'getAllProductsInnova']);
 Route::get('/getStockInnova', [ConsultSuppliers::class, 'getStockInnova']);

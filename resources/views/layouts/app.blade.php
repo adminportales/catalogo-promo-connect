@@ -59,7 +59,7 @@
                                             <ul class="navbar-nav mr-auto">
                                                 <!--Nav Bar Hooks - Do not delete!!-->
 						<li class="nav-item">
-                            <a href="{{ url('/globalAttributes') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> GlobalAttributes</a> 
+                            <a href="{{ url('/globalAttributes') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> GlobalAttributes</a>
                         </li>
                                                 <li class="nav-item">
                                                     <a href="{{ url('/users') }}" class="nav-link"><i
@@ -141,19 +141,13 @@
                     aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">Select "Logout" below if you are ready to end your current
-                                session.</div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <div class="modal-body">Desea salir del catalogo?.
+                                <br>
+                                <br>
+                                <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
                                 <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault();
-                    document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
+                                                                        document.getElementById('logout-form').submit();">
+                                    {{ __('Salir') }}
                                 </a>
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST"
@@ -164,6 +158,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <footer class="sticky-footer bg-white">
                     <div class="container my-auto">

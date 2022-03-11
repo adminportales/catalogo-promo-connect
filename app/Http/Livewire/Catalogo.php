@@ -7,12 +7,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Product;
 
-class Products extends Component
+class Catalogo extends Component
 {
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord,$internal_sku, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
+    public $selected_id, $keyWord, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
     public $updateMode = false;
 
     public function render()
@@ -23,7 +23,6 @@ class Products extends Component
 
         $products = Product::latest()
             ->orWhere('sku', 'LIKE', $keyWord)
-            ->orWhere('internal_sku', 'LIKE', $keyWord)
             ->orWhere('name', 'LIKE', $keyWord)
             ->orWhere('price', 'LIKE', $keyWord)
             ->orWhere('description', 'LIKE', $keyWord)
@@ -35,9 +34,9 @@ class Products extends Component
             ->orWhere('offer', 'LIKE', $keyWord)
             ->orWhere('discount', 'LIKE', $keyWord)
             ->orWhere('provider_id', 'LIKE', $keyWord)
-            ->paginate(10);
+            ->paginate(25);
         // dd($products);
-        return view('livewire.products.view', [
+        return view('cotizador.catalogo.view', [
             'products' => $products, 'utilidad' => $utilidad
         ]);
     }
@@ -50,7 +49,6 @@ class Products extends Component
 
     private function resetInput()
     {
-        $this->internal_sku = null;
         $this->sku = null;
         $this->name = null;
         $this->price = null;
@@ -72,7 +70,6 @@ class Products extends Component
         ]);
 
         Product::create([
-            'internal_sku' => $this->internal_sku,
             'sku' => $this->sku,
             'name' => $this->name,
             'price' => $this->price,
@@ -97,7 +94,6 @@ class Products extends Component
         $record = Product::findOrFail($id);
 
         $this->selected_id = $id;
-        $this->internal_sku = $record->internal_sku;
         $this->sku = $record->sku;
         $this->name = $record->name;
         $this->price = $record->price;
@@ -124,7 +120,6 @@ class Products extends Component
             $record = Product::find($this->selected_id);
             $record->update([
                 'sku' => $this->sku,
-                'internal_sku' => $this->internal_sku,
                 'name' => $this->name,
                 'price' => $this->price,
                 'description' => $this->description,

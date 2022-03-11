@@ -11,10 +11,6 @@
            <div class="modal-body">
 				<form>
             <div class="form-group">
-                <label for="internal_sku"></label>
-                <input wire:model="internal_sku" type="text" class="form-control" id="internal_sku" placeholder="internal_sku">@error('internal_sku') <span class="error text-danger">{{ $message }}</span> @enderror
-            </div>
-            <div class="form-group">
                 <label for="sku"></label>
                 <input wire:model="sku" type="text" class="form-control" id="sku" placeholder="Sku">@error('sku') <span class="error text-danger">{{ $message }}</span> @enderror
             </div>

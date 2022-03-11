@@ -21,11 +21,11 @@
     @auth()
         <!--Nav Bar Hooks - Do not delete!!-->
 
-        {{-- <li class="nav-item">
+        <li class="nav-item">
             <a class="nav-link" href="{{ url('catalogo') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Catalogo</span></a>
-        </li> --}}
+        </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ url('admin/products') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
