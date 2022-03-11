@@ -24,18 +24,8 @@ class Catalogo extends Component
         $products = Product::latest()
             ->orWhere('sku', 'LIKE', $keyWord)
             ->orWhere('name', 'LIKE', $keyWord)
-            ->orWhere('price', 'LIKE', $keyWord)
             ->orWhere('description', 'LIKE', $keyWord)
-            ->orWhere('stock', 'LIKE', $keyWord)
-            ->orWhere('type', 'LIKE', $keyWord)
-            ->orWhere('color', 'LIKE', $keyWord)
-            ->orWhere('image', 'LIKE', $keyWord)
-            ->orWhere('ecommerce', 'LIKE', $keyWord)
-            ->orWhere('offer', 'LIKE', $keyWord)
-            ->orWhere('discount', 'LIKE', $keyWord)
-            ->orWhere('provider_id', 'LIKE', $keyWord)
             ->paginate(25);
-        // dd($products);
         return view('cotizador.catalogo.view', [
             'products' => $products, 'utilidad' => $utilidad
         ]);

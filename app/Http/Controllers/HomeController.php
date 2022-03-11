@@ -26,7 +26,7 @@ class HomeController extends Controller
         if (auth()->user()->hasRole('admin')) {
             return redirect()->action([HomeController::class, 'dashboard']);
         } else {
-            return redirect()->action([HomeController::class, 'catalogo']);
+            return redirect('catalogo');
         }
     }
 
