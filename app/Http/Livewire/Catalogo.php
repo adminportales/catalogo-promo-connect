@@ -6,134 +6,82 @@ use App\Models\GlobalAttribute;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Product;
+use App\Models\Provider;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 class Catalogo extends Component
 {
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
-    public $updateMode = false;
+    // public $selected_id, $keyWord, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
+    public $nombre, $sku, $proveedor, $precioMax, $precioMin, $stockMax, $stockMin;
+
+    public function __construct()
+    {
+        $utilidad = GlobalAttribute::find(1);
+        $utilidad = (float) $utilidad->value;
+        $price = DB::table('products')->max('price');
+        $this->precioMax = round($price + $price * ($utilidad / 100), 2);
+        $this->precioMin = 0;
+        $stock = DB::table('products')->max('stock');
+        $this->stockMax = $stock;
+        $this->stockMin = 0;
+    }
 
     public function render()
     {
-        $keyWord = '%' . $this->keyWord . '%';
-
         $utilidad = GlobalAttribute::find(1);
+        $utilidad = (float) $utilidad->value;
 
-        $products = Product::latest()
-            ->orWhere('sku', 'LIKE', $keyWord)
-            ->orWhere('name', 'LIKE', $keyWord)
-            ->orWhere('description', 'LIKE', $keyWord)
+        $proveedores = Provider::all();
+        $price = DB::table('products')->max('price');
+        $price = round($price + $price * ($utilidad / 100), 2);
+        $stock = DB::table('products')->max('stock');
+
+        $nombre = '%' . $this->nombre . '%';
+        $sku = '%' . $this->sku . '%';
+        $proveedor = '%' . $this->proveedor . '%';
+        $precioMax = $price;
+        if ($this->precioMax != null) {
+            $precioMax =  round($this->precioMax / (($utilidad / 100) + 1), 2);
+        }
+        $precioMin = 0;
+        if ($this->precioMin != null) {
+            $precioMin =  round($this->precioMin / (($utilidad / 100) + 1), 2);
+        }
+        $stockMax =  $this->stockMax;
+        $stockMin =  $this->stockMin;
+        if ($stockMax == null) {
+            $stockMax = $stock;
+        }
+        if ($stockMin == null) {
+            $stockMin = 0;
+        }
+
+        $products = DB::table('products')->latest()
+            ->where('name', 'LIKE', $nombre)
+            ->where('sku', 'LIKE', $sku)
+            ->whereBetween('price', [$precioMin, $precioMax])
+            ->whereBetween('stock', [$stockMin, $stockMax])
+            ->where('provider_id', 'LIKE', $proveedor)
             ->paginate(25);
         return view('cotizador.catalogo.view', [
-            'products' => $products, 'utilidad' => $utilidad
+            'products' => $products,
+            'utilidad' => $utilidad,
+            'proveedores' => $proveedores,
+            'price' => $price,
+            'priceMax' => $precioMax,
+            'priceMin' => $precioMin,
+            'stock' => $stock,
+            'stockMax' => $stockMax,
+            'stockMin' => $stockMin,
         ]);
     }
 
-    public function cancel()
+    public function showProduct(Product $product)
     {
-        $this->resetInput();
-        $this->updateMode = false;
-    }
-
-    private function resetInput()
-    {
-        $this->sku = null;
-        $this->name = null;
-        $this->price = null;
-        $this->description = null;
-        $this->stock = null;
-        $this->type = null;
-        $this->color = null;
-        $this->image = null;
-        $this->ecommerce = null;
-        $this->offer = null;
-        $this->discount = null;
-        $this->provider_id = null;
-    }
-
-    public function store()
-    {
-        $this->validate([
-            'sku' => 'required',
-        ]);
-
-        Product::create([
-            'sku' => $this->sku,
-            'name' => $this->name,
-            'price' => $this->price,
-            'description' => $this->description,
-            'stock' => $this->stock,
-            'type' => $this->type,
-            'color' => $this->color,
-            'image' => $this->image,
-            'ecommerce' => $this->ecommerce,
-            'offer' => $this->offer,
-            'discount' => $this->discount,
-            'provider_id' => $this->provider_id
-        ]);
-
-        $this->resetInput();
-        $this->emit('closeModal');
-        session()->flash('message', 'Product Successfully created.');
-    }
-
-    public function edit($id)
-    {
-        $record = Product::findOrFail($id);
-
-        $this->selected_id = $id;
-        $this->sku = $record->sku;
-        $this->name = $record->name;
-        $this->price = $record->price;
-        $this->description = $record->description;
-        $this->stock = $record->stock;
-        $this->type = $record->type;
-        $this->color = $record->color;
-        $this->image = $record->image;
-        $this->ecommerce = $record->ecommerce;
-        $this->offer = $record->offer;
-        $this->discount = $record->discount;
-        $this->provider_id = $record->provider_id;
-
-        $this->updateMode = true;
-    }
-
-    public function update()
-    {
-        $this->validate([
-            'sku' => 'required',
-        ]);
-
-        if ($this->selected_id) {
-            $record = Product::find($this->selected_id);
-            $record->update([
-                'sku' => $this->sku,
-                'name' => $this->name,
-                'price' => $this->price,
-                'description' => $this->description,
-                'stock' => $this->stock,
-                'type' => $this->type,
-                'color' => $this->color,
-                'image' => $this->image,
-                'ecommerce' => $this->ecommerce,
-                'offer' => $this->offer,
-                'discount' => $this->discount,
-                'provider_id' => $this->provider_id
-            ]);
-
-            $this->resetInput();
-            $this->updateMode = false;
-            session()->flash('message', 'Product Successfully updated.');
-        }
-    }
-
-    public function destroy($id)
-    {
-        if ($id) {
-            $record = Product::where('id', $id);
-            $record->delete();
-        }
+        $this->emit('showProductListener', $product->id);
     }
 }

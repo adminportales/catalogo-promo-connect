@@ -21,7 +21,7 @@ class CreateProductsTable extends Migration
             $table->string('name')->nullable();
             $table->decimal('price', 8, 2)->nullable();
             $table->text('description')->nullable();
-            $table->string('stock')->nullable();
+            $table->integer('stock')->nullable();
             $table->string('type')->nullable();
             $table->string('color')->nullable();
             $table->string('image')->nullable();

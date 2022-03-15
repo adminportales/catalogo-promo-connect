@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes(['register'=>false]);
+Auth::routes(['register' => false]);
 
 
 Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');
@@ -33,9 +33,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::view('globalAttributes', 'livewire.globalAttributes.index');
 });
 
-// Rutas del Cotizador
-// Route::get('/catalogo',  [HomeController::class, 'catalogo'])->middleware(['auth']);
-Route::view('/catalogo', 'cotizador.catalogo.index');
+Route::middleware(['auth'])->group(function () {
+    Route::view('/catalogo', 'cotizador.catalogo.index');
+});
 
 // Rutas de la actualizacion de Web Services
 
