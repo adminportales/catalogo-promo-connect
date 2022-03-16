@@ -22,12 +22,8 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 8, 2)->nullable();
             $table->text('description')->nullable();
             $table->integer('stock')->nullable();
-            $table->string('type')->nullable();
-            $table->string('color')->nullable();
-            $table->string('image')->nullable();
-            $table->boolean('offer')->nullable();
-            $table->integer('discount')->nullable();
-            $table->boolean('ecommerce')->nullable();
+            $table->foreignId('type_id')->nullable()->constrained();
+            $table->foreignId('color_id')->nullable()->constrained();
             $table->foreignId('provider_id')->nullable()->constrained();
             $table->timestamps();
         });

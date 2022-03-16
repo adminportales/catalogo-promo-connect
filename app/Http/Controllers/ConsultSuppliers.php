@@ -41,6 +41,7 @@ class ConsultSuppliers extends Controller
         }
 
         return $responseData;
+
         foreach ($responseData as $product) {
             $categoria = null;
             if (count($product->categorias->categorias) > 0) {

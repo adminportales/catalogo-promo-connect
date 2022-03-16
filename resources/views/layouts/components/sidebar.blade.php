@@ -42,27 +42,26 @@
                 <span>Subcategorias</span></a>
         </li>
         @role('admin')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url('admin/sites') }}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Sitios</span></a>
+        </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('admin/providers') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Proveedores</span></a>
             </li>
-        @endrole
-        @role('admin')
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('admin/globalAttributes') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Globales</span></a>
             </li>
-        @endrole
-        @role('admin')
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('admin/users') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Usuarios</span></a>
             </li>
-        @endrole
-        @role('admin')
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('/laratrust') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
