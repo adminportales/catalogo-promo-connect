@@ -15,8 +15,8 @@ class Catalogo extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    // public $selected_id, $keyWord, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
-    public $nombre, $sku, $proveedor, $precioMax, $precioMin, $stockMax, $stockMin;
+
+    public $nombre, $sku, $proveedor, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
 
     public function __construct()
     {
@@ -60,13 +60,22 @@ class Catalogo extends Component
             $stockMin = 0;
         }
 
-        $products = DB::table('products')->latest()
+        $orderPrice = $this->orderPrice;
+        $orderStock = $this->orderStock;
+        $products  = DB::table('products')
             ->where('name', 'LIKE', $nombre)
             ->where('sku', 'LIKE', $sku)
             ->whereBetween('price', [$precioMin, $precioMax])
             ->whereBetween('stock', [$stockMin, $stockMax])
             ->where('provider_id', 'LIKE', $proveedor)
+            ->when($orderStock !== '', function ($query, $orderStock) {
+                $query->orderBy('stock', $this->orderStock);
+            })
+            ->when($orderPrice !== '', function ($query, $orderPrice) {
+                $query->orderBy('price', $this->orderPrice);
+            })
             ->paginate(25);
+
         return view('cotizador.catalogo.view', [
             'products' => $products,
             'utilidad' => $utilidad,
@@ -77,6 +86,7 @@ class Catalogo extends Component
             'stock' => $stock,
             'stockMax' => $stockMax,
             'stockMin' => $stockMin,
+            'orderStock' => $orderStock,
         ]);
     }
 

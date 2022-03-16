@@ -2,10 +2,6 @@
 <div class="container-fluid ">
     <div class="row">
         <div class="col-md-2">
-            @if (session()->has('message'))
-                <div wire:poll.4s class="btn btn-sm btn-success" style="margin-top:0px; margin-bottom:0px;">
-                    {{ session('message') }} </div>
-            @endif
             <p>Filtros de busqueda</p>
             <input wire:model='nombre' type="text" class="form-control" name="search" id="search" placeholder="Nombre">
             <br>
@@ -35,6 +31,20 @@
                 <input wire:model='stockMax' type="number" class="form-control" placeholder="Stock Maximo"
                     value="{{ $stock }}" max="{{ $stock }}">
             </div>
+            <br>
+            <p class="mb-0">Ordenar por Stock</p>
+            <select wire:model='orderStock' name="orderStock" id="provee" class="form-control">
+                <option value="">Ninguno</option>
+                <option value="ASC">De menor a mayor</option>
+                <option value="DESC">De mayor a menor</option>
+            </select>
+            <br>
+            <p class="mb-0">Ordenar por Precio</p>
+            <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control">
+                <option value="">Ninguno</option>
+                <option value="ASC">De menor a mayor</option>
+                <option value="DESC">De mayor a menor</option>
+            </select>
         </div>
         <div class="col-md-10">
             @php
@@ -72,7 +82,6 @@
                 {{ $products->links() }}
             </div>
             @livewire('product')
-            <!-- Modal -->
         </div>
     </div>
 </div>
