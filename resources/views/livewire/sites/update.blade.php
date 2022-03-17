@@ -15,6 +15,22 @@
                 <label for="name"></label>
                 <input wire:model="name" type="text" class="form-control" id="name" placeholder="Name">@error('name') <span class="error text-danger">{{ $message }}</span> @enderror
             </div>
+            <div class="form-group">
+                <label for="woocommerce"></label>
+                <input wire:model="woocommerce" type="text" class="form-control" id="woocommerce" placeholder="Woocommerce">@error('woocommerce') <span class="error text-danger">{{ $message }}</span> @enderror
+            </div>
+            <div class="form-group">
+                <label for="url"></label>
+                <input wire:model="url" type="text" class="form-control" id="url" placeholder="Url">@error('url') <span class="error text-danger">{{ $message }}</span> @enderror
+            </div>
+            <div class="form-group">
+                <label for="consumer_key"></label>
+                <input wire:model="consumer_key" type="text" class="form-control" id="consumer_key" placeholder="Consumer Key">@error('consumer_key') <span class="error text-danger">{{ $message }}</span> @enderror
+            </div>
+            <div class="form-group">
+                <label for="consumer_secret"></label>
+                <input wire:model="consumer_secret" type="text" class="form-control" id="consumer_secret" placeholder="Consumer Secret">@error('consumer_secret') <span class="error text-danger">{{ $message }}</span> @enderror
+            </div>
 
                 </form>
             </div>

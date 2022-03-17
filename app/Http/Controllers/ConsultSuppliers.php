@@ -128,7 +128,6 @@ class ConsultSuppliers extends Controller
                     } else {
                         $productExist->update([
                             'price' => $data['price'],
-                            'stock' => 0,
                         ]);
                     }
                 }
@@ -273,11 +272,6 @@ class ConsultSuppliers extends Controller
                 ]);
                 $idSku++;
                 // dd($newProduct);
-            } else {
-                $productExist->update([
-                    'price' => $data['price'],
-                    'stock' => 0,
-                ]);
             }
         }
         // } else {
@@ -351,6 +345,7 @@ class ConsultSuppliers extends Controller
         $result = json_decode($result, true);
         // return $response;
         $errors = [];
+
         foreach ($result as $sku => $stock) {
             $productCatalogo = Product::where('sku', $sku)->first();
             if ($productCatalogo) {
@@ -359,12 +354,14 @@ class ConsultSuppliers extends Controller
                 array_push($errors, $sku);
             }
         }
+
         FailedJobsCron::create([
             'name' => 'Promo Opcion',
             'message' => "Productos No encontrados al actualizar el precio: " . implode(",", $errors),
             'status' => 0,
             'type' =>   1
         ]);
+
         return $errors;
     }
 

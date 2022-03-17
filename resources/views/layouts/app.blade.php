@@ -59,6 +59,9 @@
                                             <ul class="navbar-nav mr-auto">
                                                 <!--Nav Bar Hooks - Do not delete!!-->
 						<li class="nav-item">
+                            <a href="{{ url('/sites') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Sites</a> 
+                        </li>
+						<li class="nav-item">
                             <a href="{{ url('/dinamyc_price') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Dinamyc_price</a> 
                         </li>
 						<li class="nav-item">

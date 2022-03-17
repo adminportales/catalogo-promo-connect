@@ -13,8 +13,16 @@ class Site extends Model
 
     protected $table = 'sites';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name','woocommerce','url','consumer_key','consumer_secret'];
 	
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dinamycPrices()
+    {
+        return $this->hasMany('App\Models\DinamycPrice', 'site_id', 'id');
+    }
+    
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
