@@ -14,102 +14,134 @@ class ConsultSuppliers extends Controller
 {
     public function getAllProductsInnova()
     {
-        $responseData = [];
-        $user_api = "frjrEhY602674c12ce2dm586";
-        $api_key = "OM5rkL-820602674c12ce3b6GNoUjiOvnZF8x";
-        $wsdl = "https://ws.innovation.com.mx/index.php?wsdl";
-        $client = new \nusoap_client($wsdl, 'wsdl');
-        $err = $client->getError();
-        if ($err) { //MOSTRAR ERRORES
-            echo '<h2>Constructor error</h2>' . $err;
-            exit();
-        }
-        $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
-        $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
-        $response = json_decode($response, true);
-        return $response;
-        if ($response['response'] === true) {
-            for ($i = 1; $i <= $response['pages']; $i++) {
-                $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
-                $responseProducts = json_decode($client->call('Products', $params));
-                foreach ($responseProducts->data as $product) {
-                    array_push($responseData, $product);
-                }
+        try {
+            $responseData = [];
+            $user_api = "frjrEhY602674c12ce2dm586";
+            $api_key = "OM5rkL-820602674c12ce3b6GNoUjiOvnZF8x";
+            $wsdl = "https://ws.innovation.com.mx/index.php?wsdl";
+            $client = new \nusoap_client($wsdl, 'wsdl');
+            $err = $client->getError();
+            if ($err) { //MOSTRAR ERRORES
+                echo '<h2>Constructor error</h2>' . $err;
+                FailedJobsCron::create([
+                    'name' => 'Innovation',
+                    'message' => $err,
+                    'status' => 0,
+                    'type' =>   1
+                ]);
+                exit();
             }
-        } else {
-            return $response;
-        }
-
-        return $responseData;
-
-        foreach ($responseData as $product) {
-            $categoria = null;
-            if (count($product->categorias->categorias) > 0) {
-                $slug = mb_strtolower(str_replace(' ', '-', $product->categorias->categorias[0]->codigo));
-                $categoria = Category::where("slug", $slug)->first();
-                if (!$categoria) {
-                    $categoria = Category::create([
-                        'family' => ucfirst($product->categorias->categorias[0]->nombre), 'slug' => $slug,
-                    ]);
+            $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
+            $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
+            $response = json_decode($response, true);
+            if ($response['response'] === true) {
+                for ($i = 1; $i <= $response['pages']; $i++) {
+                    $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
+                    $responseProducts = json_decode($client->call('Products', $params));
+                    foreach ($responseProducts->data as $product) {
+                        array_push($responseData, $product);
+                    }
                 }
             } else {
-                $categoria = Category::find(1);
+                return $response;
             }
 
-            // TODO: Verificar si la subcategoria existe y si no registrarla
-            $subcategoria = null;
-            if (count($product->categorias->subcategorias) > 0) {
-                $slugSub = mb_strtolower(str_replace(' ', '-', $product->categorias->subcategorias[0]->codigo));
-                $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
-
-                if (!$subcategoria) {
-                    $subcategoria = $categoria->subcategories()->create([
-                        'subfamily' => ucfirst($product->categorias->subcategorias[0]->nombre),
-                        'slug' => $slugSub,
-                    ]);
-                }
+            $maxSKU = Product::max('internal_sku');
+            $idSku = null;
+            if (!$maxSKU) {
+                $idSku = 1;
             } else {
-                $subcategoria = Subcategory::find(1);
+                $idSku = (int) explode('-', $maxSKU)[1];
+                $idSku++;
             }
-            $data = [
-                'sku_parent' => $product->codigo,
-                'name' => $product->nombre,
-                'price' =>   $product->lista_precios[0]->precio,
-                'description' => $product->descripcion,
-                'stock' => 0,
-                'type' => 'Normal',
-                'ecommerce' => false,
-                'offer' => false,
-                'discount' => 0,
-                'provider_id' => 3,
-            ];
 
-            foreach ($product->colores as $color) {
-                $data['sku'] = $color->clave;
-                $data['image'] = $color->image;
-                $data['color'] = $color->codigo_color;
-                if ($data['image'] == null) {
-                    $data['image'] = $product->images[0]->image;
-                }
-                $productExist = Product::where('sku', $color->clave)->first();
-                if (!$productExist) {
-                    $newProduct = Product::create($data);
-                    $newProduct->productCategories()->create([
-                        'category_id' => $categoria->id,
-                        'subcategory_id' => $subcategoria->id,
-                    ]);
-                    // dd($newProduct);
+            foreach ($responseData as $product) {
+                $categoria = null;
+                if (count($product->categorias->categorias) > 0) {
+                    $slug = mb_strtolower(str_replace(' ', '-', $product->categorias->categorias[0]->codigo));
+                    $categoria = Category::where("slug", $slug)->first();
+                    if (!$categoria) {
+                        $categoria = Category::create([
+                            'family' => ucfirst($product->categorias->categorias[0]->nombre), 'slug' => $slug,
+                        ]);
+                    }
                 } else {
-                    $productExist->update([
-                        'price' => $data['price'],
-                        'stock' => 0,
-                    ]);
+                    $categoria = Category::find(1);
+                }
+
+                // TODO: Verificar si la subcategoria existe y si no registrarla
+                $subcategoria = null;
+                if (count($product->categorias->subcategorias) > 0) {
+                    $slugSub = mb_strtolower(str_replace(' ', '-', $product->categorias->subcategorias[0]->codigo));
+                    $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
+
+                    if (!$subcategoria) {
+                        $subcategoria = $categoria->subcategories()->create([
+                            'subfamily' => ucfirst($product->categorias->subcategorias[0]->nombre),
+                            'slug' => $slugSub,
+                        ]);
+                    }
+                } else {
+                    $subcategoria = Subcategory::find(1);
+                }
+                $data = [
+                    'sku_parent' => $product->codigo,
+                    'name' => $product->nombre,
+                    'price' =>   $product->lista_precios[0]->precio,
+                    'description' => $product->descripcion,
+                    'stock' => 0,
+                    'type_id' => 1,
+                    'provider_id' => 3,
+                ];
+
+                foreach ($product->colores as $colorWS) {
+                    // Verificar si el color existe y si no registrarla
+                    $color = null;
+                    $slug = mb_strtolower(str_replace(' ', '-', $colorWS->codigo_color));
+                    $color = Color::where("slug", $slug)->first();
+                    if (!$color) {
+                        $color = Color::create([
+                            'color' => ucfirst($colorWS->codigo_color), 'slug' => $slug,
+                        ]);
+                    }
+                    $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
+                    $data['sku'] = $colorWS->clave;
+                    $data['image'] = $colorWS->image;
+                    $data['color_id'] = $color->id;
+                    if ($data['image'] == null) {
+                        $data['image'] = $product->images[0]->image;
+                    }
+                    $productExist = Product::where('sku', $colorWS->clave)->first();
+                    if (!$productExist) {
+                        $newProduct = Product::create($data);
+                        $newProduct->productCategories()->create([
+                            'category_id' => $categoria->id,
+                            'subcategory_id' => $subcategoria->id,
+                        ]);
+
+                        $newProduct->images()->create([
+                            'image_url' => $data['image']
+                        ]);
+
+                        $idSku++;
+                        // dd($newProduct);
+                    } else {
+                        $productExist->update([
+                            'price' => $data['price'],
+                            'stock' => 0,
+                        ]);
+                    }
                 }
             }
+        } catch (Exception $e) {
+            FailedJobsCron::create([
+                'name' => 'Innovation',
+                'message' => $e->getMessage(),
+                'status' => 0,
+                'type' =>   1
+            ]);
+            return $e->getMessage();
         }
-        // } catch (Exception $e) {
-        //     return   $e->getMessage();
-        // }
     }
 
     public function getStockInnova()
@@ -134,6 +166,8 @@ class ConsultSuppliers extends Controller
                 $responseProducts = json_decode($client->call('Stock', $params));
                 foreach ($responseProducts->data as $product) {
                     foreach ($product->existencias as $exist) {
+                        print_r($exist);
+                        echo '<br><br>';
                         array_push($responseData, $exist);
                     }
                 }
@@ -141,7 +175,6 @@ class ConsultSuppliers extends Controller
         } else {
             return $response;
         }
-        // return $responseData;
 
         $productsNotFound = [];
         foreach ($responseData as $product) {
@@ -152,6 +185,12 @@ class ConsultSuppliers extends Controller
                 array_push($productsNotFound, $product->clave);
             }
         }
+        FailedJobsCron::create([
+            'name' => 'Innovation',
+            'message' => "Productos No encontrados al actualizar el stock: " . implode(",", $productsNotFound),
+            'status' => 0,
+            'type' =>   1
+        ]);
     }
 
     public function getAllProductsPromoOption()
@@ -167,7 +206,7 @@ class ConsultSuppliers extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, "demo=1"); //Opcional
         curl_setopt(
             $ch,
             CURLOPT_URL,
@@ -180,22 +219,35 @@ class ConsultSuppliers extends Controller
         $result = json_decode($result, true);
         // return $result;
         // if (!$result['error']) {
+        $maxSKU = Product::max('internal_sku');
+        $idSku = null;
+        if (!$maxSKU) {
+            $idSku = 1;
+        } else {
+            $idSku = (int) explode('-', $maxSKU)[1];
+            $idSku++;
+        }
         foreach ($result as $product) {
             $data = [
+                'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
                 'sku' => $product['item_code'],
                 'sku_parent' => $product['parent_code'],
                 'name' => $product['name'],
                 'price' =>  0,
                 'description' => $product['description'],
                 'stock' => 0,
-                'type' => 'Normal',
-                'ecommerce' => false,
-                'offer' => false,
-                'discount' => 0,
+                'type_id' => 1,
                 'provider_id' => 2,
-                'image' => $product['img'],
-                'color' => $product['color'],
             ];
+            $color = null;
+            $slug = mb_strtolower(str_replace(' ', '-', $product['color']));
+            $color = Color::where("slug", $slug)->first();
+            if (!$color) {
+                $color = Color::create([
+                    'color' => ucfirst($product['color']), 'slug' => $slug,
+                ]);
+            }
+            $data['color_id'] = $color->id;
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
             $slug = mb_strtolower(str_replace(' ', '-', $product['family']));
@@ -212,10 +264,15 @@ class ConsultSuppliers extends Controller
             $productExist = Product::where('sku', $product['item_code'])->first();
             if (!$productExist) {
                 $newProduct = Product::create($data);
+                $newProduct->images()->create([
+                    'image_url' => $product['img']
+                ]);
                 $newProduct->productCategories()->create([
                     'category_id' => $categoria->id,
                     'subcategory_id' => $subcategoria->id,
                 ]);
+                $idSku++;
+                // dd($newProduct);
             } else {
                 $productExist->update([
                     'price' => $data['price'],
@@ -239,19 +296,32 @@ class ConsultSuppliers extends Controller
         $CardCode = "DFE4516";
         $pass = 'DIS00048';
 
-        $products = Product::where('provider_id', 2)->get();
+        $products = Product::where('provider_id', 2)->where('price', 0)->get();
+        // dd($products);
         $errors = [];
         foreach ($products as $product) {
             $param = array('CardCode' => $CardCode, 'pass' => $pass, 'ItemCode' => $product->sku);
             $result = $client->call('GetPrice', $param);
-            $price = null;
+            $price = 0;
+            print_r($result);
+            echo '<br>';
+            if ($result == "" or $result == false) {
+                array_push($errors, implode(["id" => $product->id, "sku" => $product->sku]));
+                break;
+            }
             if (!$result['GetPriceResult'] == "") {
                 $price = (float)$result['GetPriceResult']['Precios']['FinalPrice'];
             } else {
-                array_push($errors, ["id" => $product->id, "sku" => $product->sku]);
+                array_push($errors, implode(["id" => $product->id, "sku" => $product->sku]));
             }
             $product->update(['price' => $price]);
         }
+        FailedJobsCron::create([
+            'name' => 'Promo Opcion',
+            'message' => "Productos No encontrados al actualizar el precio: " . implode(",", $errors),
+            'status' => 0,
+            'type' =>   1
+        ]);
         return $errors;
     }
 
@@ -289,7 +359,12 @@ class ConsultSuppliers extends Controller
                 array_push($errors, $sku);
             }
         }
-
+        FailedJobsCron::create([
+            'name' => 'Promo Opcion',
+            'message' => "Productos No encontrados al actualizar el precio: " . implode(",", $errors),
+            'status' => 0,
+            'type' =>   1
+        ]);
         return $errors;
     }
 
@@ -347,8 +422,7 @@ class ConsultSuppliers extends Controller
             }
 
             foreach ($products as $product) {
-                print_r($product);
-                // Verificar si la color existe y si no registrarla
+                // Verificar si el color existe y si no registrarla
                 $color = null;
                 $slug = mb_strtolower(str_replace(' ', '-', $product['color']));
                 $color = Color::where("slug", $slug)->first();

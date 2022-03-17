@@ -43,6 +43,10 @@ class Product extends Model
     {
         return $this->hasMany(Image::class);
     }
+    public function color()
+    {
+        return $this->belongsTo(Color::class);
+    }
 
     public function dinamycPrices()
     {

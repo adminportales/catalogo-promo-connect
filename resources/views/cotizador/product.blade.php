@@ -19,20 +19,30 @@
                         </button>
                     </div>
                     <div class="modal-body px-5">
+                        @php
+                            $price = null;
+                            if ($product->dinamycPrices->where('site_id', null)->first()) {
+                                $price = round($product->price - $product->price * ($product->dinamycPrices->where('site_id', null)->first()->amount / 100), 2);
+                            } else {
+                                $price = $product->price;
+                            }
+                        @endphp
                         <div class="d-flex align-items-center flex-column">
-                            <img src="{{ $product->image }}" class=""
+                            <img src="{{ $product->images[0]->image_url }}" class=""
                                 style="width: 200px; height: auto;" alt="{{ $product->name }}">
-                            <div class="d-flex justify-content-around w-100">
-                                <p><strong>SKU: </strong> {{ $product->sku }}</p>
-                                <p><strong>SKU Padre: </strong> {{ $product->sku_parent }}</p>
+                            <div class="d-flex justify-content-around w-100 align-items-center">
+                                <div class="">
+                                    <p><strong>SKU: </strong> {{ $product->sku }}</p>
+                                    <p><strong>SKU Padre: </strong> {{ $product->sku_parent }}</p>
+                                </div>
                                 <p><strong>SKU Interno: </strong> {{ $product->internal_sku }}</p>
                             </div>
                             <p><strong>Descripcion: </strong> {{ $product->description }}</p>
-                            <p><strong>Color: </strong> {{ $product->color }}</p>
+                            <p><strong>Color: </strong> {{ $product->color->color }}</p>
                             <p><strong>Stock: </strong> {{ $product->stock }}</p>
                             <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
                             <p><strong>Precio: </strong>
-                                {{ round($product->price + $product->price * ($utilidad / 100), 2) }}</p>
+                                $ {{ round($price + $price * ($utilidad / 100), 2) }}</p>
 
                         </div>
                     </div>

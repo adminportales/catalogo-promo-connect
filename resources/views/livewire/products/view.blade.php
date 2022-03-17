@@ -44,12 +44,8 @@
                                     <th>Precio</th>
                                     <th>Descripcion</th>
                                     <th>Stock</th>
-                                    <th>Tipo</th>
                                     <th>Color</th>
                                     <th>Imagen</th>
-                                    <th>Ecommerce</th>
-                                    {{-- <th>Offer</th>
-                                    <th>Discount</th> --}}
                                     <th>Proveedor</th>
                                     <td>Acciones</td>
                                 </tr>
@@ -68,9 +64,8 @@
                                         <td>$ {{ round($row->price + $row->price * ($utilidad / 100), 2) }}</td>
                                         <td>{{ Str::limit($row->description, 50) }}</td>
                                         <td>{{ $row->stock }}</td>
-                                        <td>{{ $row->type }}</td>
-                                        <td>{{ $row->color }}</td>
-                                        <td><img src="{{ $row->image }}" class="img-fluid" alt="Sin imagen"
+                                        <td>{{ $row->color->color }}</td>
+                                        <td><img src="{{ $row->images[0]->image_url }}" class="img-fluid" alt="Sin imagen"
                                                 style="max-width: 60px" srcset=""></td>
                                         <td>{{ $row->ecommerce }}</td>
                                         {{-- <td>{{ $row->offer }}</td>
