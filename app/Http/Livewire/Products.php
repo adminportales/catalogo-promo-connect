@@ -28,12 +28,6 @@ class Products extends Component
             ->orWhere('price', 'LIKE', $keyWord)
             ->orWhere('description', 'LIKE', $keyWord)
             ->orWhere('stock', 'LIKE', $keyWord)
-            ->orWhere('type', 'LIKE', $keyWord)
-            ->orWhere('color', 'LIKE', $keyWord)
-            ->orWhere('image', 'LIKE', $keyWord)
-            ->orWhere('ecommerce', 'LIKE', $keyWord)
-            ->orWhere('offer', 'LIKE', $keyWord)
-            ->orWhere('discount', 'LIKE', $keyWord)
             ->orWhere('provider_id', 'LIKE', $keyWord)
             ->paginate(10);
         // dd($products);

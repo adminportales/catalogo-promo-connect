@@ -13,14 +13,14 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['sku_parent', 'sku', 'internal sku', 'name', 'price', 'description', 'stock', 'type', 'color', 'image', 'ecommerce', 'offer', 'discount', 'provider_id'];
+    protected $fillable = ['sku_parent', 'sku', 'internal_sku', 'name', 'price', 'description', 'stock', 'provider_id', 'color_id', 'type_id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function productAttributes()
     {
-        return $this->hasMany('App\Models\ProductAttribute', 'product_id', 'id');
+        return $this->hasMany(ProductAttribute::class, 'product_id', 'id');
     }
 
     /**
@@ -37,5 +37,15 @@ class Product extends Model
     public function provider()
     {
         return $this->belongsTo(Provider::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+
+    public function dinamycPrices()
+    {
+        return $this->hasMany(DinamycPrice::class);
     }
 }

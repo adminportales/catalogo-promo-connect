@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\GlobalAttribute;
 use App\Models\Provider;
 use App\Models\Role;
+use App\Models\Type;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -68,6 +69,21 @@ class DatabaseSeeder extends Seeder
             'subfamily' => 'Sin Subcategoria',
             'slug' => 'sin-subcategoria',
             // 'category_id' => 1
+        ]);
+
+        Type::create([
+            'type' => 'Normal',
+            'slug' => 'normal',
+        ]);
+
+        Type::create([
+            'type' => 'Premium',
+            'slug' => 'premium',
+        ]);
+
+        Type::create([
+            'type' => 'Oportunidad',
+            'slug' => 'oportunidad',
         ]);
     }
 }

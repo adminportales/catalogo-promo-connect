@@ -25,6 +25,10 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
 
     //Route Hooks - Do not delete//
+	Route::view('dinamyc_price', 'livewire.dinamyc_price.index')->middleware('auth');
+	Route::view('images', 'livewire.images.index')->middleware('auth');
+	Route::view('types', 'livewire.types.index')->middleware('auth');
+	Route::view('colors', 'livewire.colors.index')->middleware('auth');
 	Route::view('sites', 'livewire.sites.index')->middleware('auth');
     Route::view('users', 'livewire.users.index');
     Route::view('products', 'livewire.products.index');

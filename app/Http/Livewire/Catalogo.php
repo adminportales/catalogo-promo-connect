@@ -62,8 +62,7 @@ class Catalogo extends Component
 
         $orderPrice = $this->orderPrice;
         $orderStock = $this->orderStock;
-        $products  = DB::table('products')
-            ->where('name', 'LIKE', $nombre)
+        $products  = Product::where('name', 'LIKE', $nombre)
             ->where('sku', 'LIKE', $sku)
             ->whereBetween('price', [$precioMin, $precioMax])
             ->whereBetween('stock', [$stockMin, $stockMax])

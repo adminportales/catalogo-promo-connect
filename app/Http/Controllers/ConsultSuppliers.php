@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Color;
+use App\Models\FailedJobsCron;
 use App\Models\Product;
 use App\Models\Subcategory;
 use Exception;
 use Illuminate\Http\Request;
-
-include('nusoap/nusoap.php');
 
 class ConsultSuppliers extends Controller
 {
@@ -27,7 +27,7 @@ class ConsultSuppliers extends Controller
         $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
         $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
         $response = json_decode($response, true);
-        // return $response;
+        return $response;
         if ($response['response'] === true) {
             for ($i = 1; $i <= $response['pages']; $i++) {
                 $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
@@ -298,12 +298,16 @@ class ConsultSuppliers extends Controller
         $result = null;
         try {
             $ch = curl_init();
-
             // Check if initialization had gone wrong*
             if ($ch === false) {
+                FailedJobsCron::create([
+                    'name' => 'For Promotional',
+                    'message' => "'failed to initialize'",
+                    'status' => 0,
+                    'type' =>   1
+                ]);
                 throw new Exception('failed to initialize');
             }
-
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
@@ -313,106 +317,121 @@ class ConsultSuppliers extends Controller
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-            $content = curl_exec($ch);
+            $result = curl_exec($ch);
+
+            if (strpos($result, "HTTP Status 404 – Not Found") == true) {
+                FailedJobsCron::create([
+                    'name' => 'For Promotional',
+                    'message' => "HTTP Status 404 – Not Found Metodo No encontrado",
+                    'status' => 0,
+                    'type' =>   1
+                ]);
+                return 'Error';
+            }
 
             // Check the return value of curl_exec(), too
-            if ($content === false) {
+            if ($result === false) {
                 throw new Exception(curl_error($ch), curl_errno($ch));
             }
 
-            $result = $content;
-            // Check HTTP return code, too; might be something else than 200
-            $httpReturnCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            // Convertir en array
+            $products = json_decode($result, true);
 
-            /* Process $content here */
-        } catch (Exception $e) {
-
-            trigger_error(
-                sprintf(
-                    'Curl failed with error #%d: %s',
-                    $e->getCode(),
-                    $e->getMessage()
-                ),
-                E_USER_ERROR
-            );
-        } finally {
-            // Close curl handle unless it failed to initialize
-            if (is_resource($ch)) {
-                curl_close($ch);
-            }
-        }
-
-        if ($result == null) {
-            return 'Error';
-        }
-        // Convertir en array
-        $products = json_decode($result, true);
-        // return $products;
-
-        foreach ($products as $product) {
-            $productExist = Product::where('sku', $product['id_articulo'])->where('color', $product['color'])->first();
-            // TODO: Verificar si la categoria existe y si no registrarla
-            $categoria = null;
-            $slug = mb_strtolower(str_replace(' ', '-', $product['categoria']));
-            $categoria = Category::where("slug", $slug)->first();
-            if (!$categoria) {
-                $categoria = Category::create([
-                    'family' => ucfirst($product['categoria']), 'slug' => $slug,
-                ]);
-            }
-
-            // TODO: Verificar si la subcategoria existe y si no registrarla
-            $subcategoria = null;
-            $slugSub = mb_strtolower(str_replace(' ', '-', $product['sub_categoria']));
-            $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
-
-            if (!$subcategoria) {
-                $subcategoria = $categoria->subcategories()->create([
-                    'subfamily' => ucfirst($product['sub_categoria']),
-                    'slug' => $slugSub,
-                ]);
-            }
-
-            $precio = ($product['precio'] - ($product['precio'] * 0.25));
-            $offer = $product['producto_promocion'] == "SI" ? true : false;
-            if ($offer) {
-                $precio = ($product['precio'] - ($product['precio'] * ($product['desc_promo'] / 100)));
-            }
-            if (!$productExist) {
-                $image = '';
-                foreach ($product['imagenes'] as $imagen) {
-                    if ($imagen['tipo_imagen'] == 'imagen_color') {
-                        $image =  $imagen['url_imagen'];
-                    }
-                }
-                $newProduct = Product::create([
-                    'sku' => $product['id_articulo'],
-                    'name' => $product['nombre_articulo'],
-                    'price' =>  $precio,
-                    'description' => $product['descripcion'],
-                    'stock' => $product['inventario'],
-                    'type' => 'Normal',
-                    'color' => $product['color'],
-                    'image' => $image,
-                    'offer' => $offer,
-                    'discount' => $product['desc_promo'],
-                    'ecommerce' => false,
-                    'provider_id' => 1,
-                ]);
-                /*
-                TODO: Registrar en la tabla product_category el producto, categoria y sub categoria
-                */
-                $newProduct->productCategories()->create([
-                    'category_id' => $categoria->id,
-                    'subcategory_id' => $subcategoria->id,
-                ]);
-                // dd($product);
+            $maxSKU = Product::max('internal_sku');
+            $idSku = null;
+            if (!$maxSKU) {
+                $idSku = 1;
             } else {
-                $productExist->update([
-                    'price' => $product['precio'],
-                    'stock' => $product['inventario'],
-                ]);
+                $idSku = (int) explode('-', $maxSKU)[1];
+                $idSku++;
             }
+
+            foreach ($products as $product) {
+                print_r($product);
+                // Verificar si la color existe y si no registrarla
+                $color = null;
+                $slug = mb_strtolower(str_replace(' ', '-', $product['color']));
+                $color = Color::where("slug", $slug)->first();
+                if (!$color) {
+                    $color = Color::create([
+                        'color' => ucfirst($product['color']), 'slug' => $slug,
+                    ]);
+                }
+
+                // Verificar si la categoria existe y si no registrarla
+                $categoria = null;
+                $slug = mb_strtolower(str_replace(' ', '-', $product['categoria']));
+                $categoria = Category::where("slug", $slug)->first();
+                if (!$categoria) {
+                    $categoria = Category::create([
+                        'family' => ucfirst($product['categoria']), 'slug' => $slug,
+                    ]);
+                }
+
+                // Verificar si la subcategoria existe y si no registrarla
+                $subcategoria = null;
+                $slugSub = mb_strtolower(str_replace(' ', '-', $product['sub_categoria']));
+                $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
+
+                if (!$subcategoria) {
+                    $subcategoria = $categoria->subcategories()->create([
+                        'subfamily' => ucfirst($product['sub_categoria']),
+                        'slug' => $slugSub,
+                    ]);
+                }
+
+                $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 25;
+
+                $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->first();
+                if (!$productExist) {
+                    $newProduct = Product::create([
+                        'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
+                        'sku' => $product['id_articulo'],
+                        'name' => $product['nombre_articulo'],
+                        'price' =>  $product['precio'],
+                        'description' => $product['descripcion'],
+                        'stock' => $product['inventario'],
+                        'provider_id' => 1,
+                        'type_id' => 1,
+                        'color_id' => $color->id,
+                    ]);
+                    foreach (array_reverse($product['imagenes']) as $imagen) {
+                        $newProduct->images()->create([
+                            'image_url' => $imagen['url_imagen']
+                        ]);
+                    }
+
+                    $newProduct->dinamycPrices()->create([
+                        'type' => "PORCENTAJE",
+                        'provider_change' => "PROVEEDOR",
+                        'type_change' => "DESCONTAR",
+                        'amount' => $discount
+                    ]);
+
+                    /*
+                    TODO: Registrar en la tabla product_category el producto, categoria y sub categoria
+                    */
+                    $newProduct->productCategories()->create([
+                        'category_id' => $categoria->id,
+                        'subcategory_id' => $subcategoria->id,
+                    ]);
+                    $idSku++;
+                    // dd($newProduct);
+                } else {
+                    $productExist->update([
+                        'price' => $product['precio'],
+                        'stock' => $product['inventario'],
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            FailedJobsCron::create([
+                'name' => 'For Promotional',
+                'message' => $e->getMessage(),
+                'status' => 0,
+                'type' =>   1
+            ]);
+            return $e->getMessage();
         }
     }
 }

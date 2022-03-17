@@ -62,13 +62,22 @@
                 @foreach ($products as $row)
                     <div class="card mb-4" style="width: 14rem;">
                         <div class="card-body">
-                            <img src="{{ $row->image }}" class="card-img-top" alt="{{ $row->name }}">
+                            @php
+                                $price = null;
+                                if ($row->dinamycPrices->where('site_id', null)->first()) {
+                                    $price = round($row->price - $row->price * ($row->dinamycPrices->where('site_id', null)->first()->amount / 100), 2);
+                                } else {
+                                    $price = $row->price;
+                                }
+                            @endphp
+                            <img src="{{ $row->images[0]->image_url }}" class="card-img-top"
+                                alt="{{ $row->name }}">
                             <h5 class="card-title" style="text-transform: capitalize">{{ $row->name }}</h5>
                             <p class=" m-0 pt-1"><strong>SKU:</strong> {{ $row->sku }}</p>
                             <div class="d-flex justify-content-between">
                                 <p class=" m-0 pt-1">Stock: {{ $row->stock }}</p>
                                 <p class=" m-0 pt-1">$
-                                    {{ round($row->price + $row->price * ($utilidad / 100), 2) }}</p>
+                                    {{ round($price + $price * ($utilidad / 100), 2) }}</p>
                             </div>
                             <button type="button" class="btn btn-primary" data-toggle="modal"
                                 data-target="#modalProduct" wire:click="showProduct({{ $row->id }})">
