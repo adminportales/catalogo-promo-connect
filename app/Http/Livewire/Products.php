@@ -12,25 +12,30 @@ class Products extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord,$internal_sku, $sku, $name, $price, $description, $stock, $type, $color, $image, $ecommerce, $offer, $discount, $provider_id;
+    public $selected_id, $keyWord, $internal_sku, $sku_parent, $sku, $name, $price, $description, $stock, $type_id, $color_id, $provider_id;
     public $updateMode = false;
+    public $showProduct = "d-none";
+    public $showList = "";
+
+    protected $listeners = ['showListListener'];
+
 
     public function render()
     {
         $keyWord = '%' . $this->keyWord . '%';
-
         $utilidad = GlobalAttribute::find(1);
-
         $products = Product::latest()
-            ->orWhere('sku', 'LIKE', $keyWord)
             ->orWhere('internal_sku', 'LIKE', $keyWord)
+            ->orWhere('sku_parent', 'LIKE', $keyWord)
+            ->orWhere('sku', 'LIKE', $keyWord)
             ->orWhere('name', 'LIKE', $keyWord)
             ->orWhere('price', 'LIKE', $keyWord)
             ->orWhere('description', 'LIKE', $keyWord)
             ->orWhere('stock', 'LIKE', $keyWord)
+            ->orWhere('type_id', 'LIKE', $keyWord)
+            ->orWhere('color_id', 'LIKE', $keyWord)
             ->orWhere('provider_id', 'LIKE', $keyWord)
             ->paginate(10);
-        // dd($products);
         return view('livewire.products.view', [
             'products' => $products, 'utilidad' => $utilidad
         ]);
@@ -45,39 +50,34 @@ class Products extends Component
     private function resetInput()
     {
         $this->internal_sku = null;
+        $this->sku_parent = null;
         $this->sku = null;
         $this->name = null;
         $this->price = null;
         $this->description = null;
         $this->stock = null;
-        $this->type = null;
-        $this->color = null;
-        $this->image = null;
-        $this->ecommerce = null;
-        $this->offer = null;
-        $this->discount = null;
+        $this->type_id = null;
+        $this->color_id = null;
         $this->provider_id = null;
     }
 
     public function store()
     {
         $this->validate([
+            'internal_sku' => 'required',
             'sku' => 'required',
         ]);
 
         Product::create([
             'internal_sku' => $this->internal_sku,
+            'sku_parent' => $this->sku_parent,
             'sku' => $this->sku,
             'name' => $this->name,
             'price' => $this->price,
             'description' => $this->description,
             'stock' => $this->stock,
-            'type' => $this->type,
-            'color' => $this->color,
-            'image' => $this->image,
-            'ecommerce' => $this->ecommerce,
-            'offer' => $this->offer,
-            'discount' => $this->discount,
+            'type_id' => $this->type_id,
+            'color_id' => $this->color_id,
             'provider_id' => $this->provider_id
         ]);
 
@@ -92,17 +92,14 @@ class Products extends Component
 
         $this->selected_id = $id;
         $this->internal_sku = $record->internal_sku;
+        $this->sku_parent = $record->sku_parent;
         $this->sku = $record->sku;
         $this->name = $record->name;
         $this->price = $record->price;
         $this->description = $record->description;
         $this->stock = $record->stock;
-        $this->type = $record->type;
-        $this->color = $record->color;
-        $this->image = $record->image;
-        $this->ecommerce = $record->ecommerce;
-        $this->offer = $record->offer;
-        $this->discount = $record->discount;
+        $this->type_id = $record->type_id;
+        $this->color_id = $record->color_id;
         $this->provider_id = $record->provider_id;
 
         $this->updateMode = true;
@@ -111,24 +108,22 @@ class Products extends Component
     public function update()
     {
         $this->validate([
+            'internal_sku' => 'required',
             'sku' => 'required',
         ]);
 
         if ($this->selected_id) {
             $record = Product::find($this->selected_id);
             $record->update([
-                'sku' => $this->sku,
                 'internal_sku' => $this->internal_sku,
+                'sku_parent' => $this->sku_parent,
+                'sku' => $this->sku,
                 'name' => $this->name,
                 'price' => $this->price,
                 'description' => $this->description,
                 'stock' => $this->stock,
-                'type' => $this->type,
-                'color' => $this->color,
-                'image' => $this->image,
-                'ecommerce' => $this->ecommerce,
-                'offer' => $this->offer,
-                'discount' => $this->discount,
+                'type_id' => $this->type_id,
+                'color_id' => $this->color_id,
                 'provider_id' => $this->provider_id
             ]);
 
@@ -144,5 +139,17 @@ class Products extends Component
             $record = Product::where('id', $id);
             $record->delete();
         }
+    }
+    public function showProduct(Product $product)
+    {
+        $this->showList = 'd-none';
+        $this->showProduct = '';
+        $this->emit('showProductListener', $product->id);
+    }
+
+    public function showListListener()
+    {
+        $this->showProduct = 'd-none';
+        $this->showList = '';
     }
 }

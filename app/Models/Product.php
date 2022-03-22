@@ -13,14 +13,38 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['sku_parent', 'sku', 'internal_sku', 'name', 'price', 'description', 'stock', 'provider_id', 'color_id', 'type_id'];
+    protected $fillable = ['internal_sku', 'sku_parent', 'sku', 'name', 'price', 'description', 'stock', 'type_id', 'color_id', 'provider_id'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function color()
+    {
+        return $this->belongsTo(Color::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dinamycPrices()
+    {
+        return $this->hasMany('App\Models\DinamycPrice', 'product_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function images()
+    {
+        return $this->hasMany('App\Models\Image', 'product_id', 'id');
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function productAttributes()
     {
-        return $this->hasMany(ProductAttribute::class, 'product_id', 'id');
+        return $this->hasMany('App\Models\ProductAttribute', 'product_id', 'id');
     }
 
     /**
@@ -36,20 +60,22 @@ class Product extends Model
      */
     public function provider()
     {
-        return $this->belongsTo(Provider::class);
+        return $this->hasOne('App\Models\Provider', 'id', 'provider_id');
     }
 
-    public function images()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function sitesProducts()
     {
-        return $this->hasMany(Image::class);
-    }
-    public function color()
-    {
-        return $this->belongsTo(Color::class);
+        return $this->belongsToMany(Site::class, 'sites_products', 'product_id', 'site_id');
     }
 
-    public function dinamycPrices()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function type()
     {
-        return $this->hasMany(DinamycPrice::class);
+        return $this->hasOne('App\Models\Type', 'id', 'type_id');
     }
 }
