@@ -25,9 +25,29 @@ class SendProductsToEcommerce extends Controller
             ]
         );
         $products = $site->sitesProducts;
+        $productsWC = $woocommerce->get('products');
         $utilidad = GlobalAttribute::find(2);
-        $data = ['create' => []];
+        $categoriesWoocommerce = $woocommerce->get('products/categories');
+        $data = ['create' => [], 'update' => []];
         foreach ($products as $product) {
+            // Primero agregar las categorias en caso de que no existan
+            $categoryProduct =  $product->productCategories[0]->category->slug;
+            $categoryAvailable = false;
+            foreach ($categoriesWoocommerce as $categoryWC) {
+                if ($categoryProduct == $categoryWC->slug) {
+                    $categoryAvailable = $categoryWC;
+                }
+            }
+
+            if ($categoryAvailable === false) {
+                $data = [
+                    'name' => $product->productCategories[0]->category->family,
+                ];
+                $categoryAvailable = $woocommerce->post('products/categories', $data);
+            }
+
+            // Despues de obtener la categoria, calcular el nuevo precio
+
             $price = null;
             if ($product->dinamycPrices->where('site_id', null)->first()) {
                 $price = round($product->price - $product->price * ($product->dinamycPrices->where('site_id', null)->first()->amount / 100), 2);
@@ -38,11 +58,13 @@ class SendProductsToEcommerce extends Controller
             $dataProduct = [
                 'name' => $product->name,
                 'sku' => $product->internal_sku,
+                'stock' => $product->stock,
+                'description' => $product->description,
                 'type' => 'simple',
                 'regular_price' => $price,
                 'categories' => [
                     [
-                        'id' => 59
+                        'id' =>  $categoryAvailable->id
                     ]
                 ],
                 'images' => [
@@ -52,11 +74,14 @@ class SendProductsToEcommerce extends Controller
                 ]
             ];
             array_push($data['create'], $dataProduct);
+            // print_r($dataProduct);
         }
         echo '<pre>';
+        // return;
         print_r($woocommerce->post('products/batch', $data));
         echo '</pre>';
     }
+
     public function updateAllProducts()
     {
         $site = Site::find(1);
