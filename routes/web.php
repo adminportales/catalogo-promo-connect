@@ -52,3 +52,5 @@ Route::get('/getPricePromoOpcion', [ConsultSuppliers::class, 'getPricePromoOpcio
 Route::get('/getStockPromoOpcion', [ConsultSuppliers::class, 'getStockPromoOpcion']);
 
 Route::get('/getAllProductsForPromotional', [ConsultSuppliers::class, 'getAllProductsForPromotional']);
+
+Route::get('/getAllProductsIUSB', [ConsultSuppliers::class, 'getAllProductsIUSB']);

@@ -24,8 +24,7 @@ class Products extends Component
     {
         $keyWord = '%' . $this->keyWord . '%';
         $utilidad = GlobalAttribute::find(1);
-        $products = Product::latest()
-            ->orWhere('internal_sku', 'LIKE', $keyWord)
+        $products = Product::orWhere('internal_sku', 'LIKE', $keyWord)
             ->orWhere('sku_parent', 'LIKE', $keyWord)
             ->orWhere('sku', 'LIKE', $keyWord)
             ->orWhere('name', 'LIKE', $keyWord)

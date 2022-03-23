@@ -8,7 +8,6 @@ use App\Models\FailedJobsCron;
 use App\Models\Product;
 use App\Models\Subcategory;
 use Exception;
-use Illuminate\Http\Request;
 
 class ConsultSuppliers extends Controller
 {
@@ -274,9 +273,7 @@ class ConsultSuppliers extends Controller
                 // dd($newProduct);
             }
         }
-        // } else {
-        //     return $result;
-        // }
+
         return $result;
     }
 
@@ -290,8 +287,7 @@ class ConsultSuppliers extends Controller
         $CardCode = "DFE4516";
         $pass = 'DIS00048';
 
-        $products = Product::where('provider_id', 2)->where('price', 0)->get();
-        // dd($products);
+        $products = Product::where('provider_id', 2)->get();
         $errors = [];
         foreach ($products as $product) {
             $param = array('CardCode' => $CardCode, 'pass' => $pass, 'ItemCode' => $product->sku);
@@ -504,5 +500,15 @@ class ConsultSuppliers extends Controller
             ]);
             return $e->getMessage();
         }
+    }
+
+    public function getAllProductsIUSB()
+    {
+        // Obtener el archivo de IMPORTACIONES USB
+        $fichero = public_path('storage/iusb.csv');
+        // Abre el fichero para obtener el contenido existente
+        $actual = file_get_contents("http://www.sunline.com.mx/sunline2018/existencias.csv");
+        // Escribe el contenido al fichero
+        file_put_contents($fichero, $actual);
     }
 }
