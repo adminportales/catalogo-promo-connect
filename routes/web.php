@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SendProductsToEcommerce;
@@ -25,13 +26,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
 
     //Route Hooks - Do not delete//
-	Route::view('dinamyc_price', 'livewire.dinamyc_price.index')->middleware('auth');
-	Route::view('images', 'livewire.images.index')->middleware('auth');
-	Route::view('types', 'livewire.types.index')->middleware('auth');
-	Route::view('colors', 'livewire.colors.index')->middleware('auth');
-	Route::view('sites', 'livewire.sites.index')->middleware('auth');
-    Route::view('users', 'livewire.users.index');
     Route::view('products', 'livewire.products.index');
+    Route::view('batchInputProducts',  'livewire.products.importProducts');
+    Route::post('batchInputProducts/iusb',  [BatchInputProducts::class, 'updateProductsIUSB'])->name('import.iusb');
+    Route::view('dinamyc_price', 'livewire.dinamyc_price.index')->middleware('auth');
+    Route::view('images', 'livewire.images.index')->middleware('auth');
+    Route::view('types', 'livewire.types.index')->middleware('auth');
+    Route::view('colors', 'livewire.colors.index')->middleware('auth');
+    Route::view('sites', 'livewire.sites.index')->middleware('auth');
+    Route::view('users', 'livewire.users.index');
     Route::view('subcategories', 'livewire.subcategories.index');
     Route::view('categories', 'livewire.categories.index');
     Route::view('providers', 'livewire.providers.index');
@@ -53,4 +56,5 @@ Route::get('/getStockPromoOpcion', [ConsultSuppliers::class, 'getStockPromoOpcio
 
 Route::get('/getAllProductsForPromotional', [ConsultSuppliers::class, 'getAllProductsForPromotional']);
 
-Route::get('/getAllProductsIUSB', [ConsultSuppliers::class, 'getAllProductsIUSB']);
+Route::get('/getStockIUSB', [ConsultSuppliers::class, 'getStockIUSB']);
+// Route::get('/getDoblevela', [ConsultSuppliers::class, 'getDoblevela']);

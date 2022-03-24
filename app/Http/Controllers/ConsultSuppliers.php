@@ -9,6 +9,9 @@ use App\Models\Product;
 use App\Models\Subcategory;
 use Exception;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class ConsultSuppliers extends Controller
 {
     public function getAllProductsInnova()
@@ -502,13 +505,42 @@ class ConsultSuppliers extends Controller
         }
     }
 
-    public function getAllProductsIUSB()
+    public function getStockIUSB()
     {
         // Obtener el archivo de IMPORTACIONES USB
         $fichero = public_path('storage/iusb.csv');
         // Abre el fichero para obtener el contenido existente
-        $actual = file_get_contents("http://www.sunline.com.mx/sunline2018/existencias.csv");
+        $actual = file_get_contents("https://www.iupromo.mx/importacionesusb.csv");
         // Escribe el contenido al fichero
         file_put_contents($fichero, $actual);
+
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
+
+        $spreadsheet = $reader->load($fichero);
+
+        $sheetData = $spreadsheet->getActiveSheet()->toArray();
+        if (!empty($sheetData)) {
+            foreach ($sheetData as $data) {
+                $product = Product::where('provider_id', 4)->where('sku', $data[4])->first();
+                if ($product) {
+                    $product->stock = $data[3];
+                    $product->save();
+                }
+            }
+        }
+    }
+
+    public function getDoblevela()
+    {
+        $client = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?WSDL', 'wsdl');
+        $err = $client->getError();
+        if ($err) {
+            echo 'Error en Constructor' . $err;
+        }
+        $CardCode = "t5jRODOUUIoytCPPk2Nd6Q==";
+        $param = array('token' => $CardCode);
+        $result = $client->call('GetrProdImagenes', $param);
+        dd($result);
+        $products = Product::where('provider_id', 2)->get();
     }
 }

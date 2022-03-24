@@ -32,6 +32,11 @@
                 <span>Productos</span></a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="{{ url('admin/batchInputProducts') }}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Importar Productos</span></a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{{ url('admin/categories') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Categorias</span></a>
@@ -42,11 +47,11 @@
                 <span>Subcategorias</span></a>
         </li>
         @role('admin')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/sites') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Sitios</span></a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('admin/sites') }}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Sitios</span></a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('admin/providers') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
