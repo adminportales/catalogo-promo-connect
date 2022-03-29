@@ -15,7 +15,7 @@ class CreateDinamycPriceTable extends Migration
     {
         Schema::create('dinamyc_price', function (Blueprint $table) {
             $table->id();
-            $table->enum("type", ['PORCENTAJE', "CANTIDAD"]);
+            $table->enum("type", ['PORCENTAJE', "MONTO"]);
             $table->enum("provider_change", ['PROVEEDOR', "INTERNO"]);
             $table->enum("type_change", ['DESCONTAR', "SUMAR"]);
             $table->decimal("amount", 8, 2);

@@ -19,9 +19,13 @@ class CreateProductsTable extends Migration
             $table->string('sku_parent')->nullable();
             $table->string('sku');
             $table->string('name')->nullable();
-            $table->decimal('price', 8, 2)->nullable();
             $table->text('description')->nullable();
+            $table->decimal('price', 8, 2)->nullable();
             $table->integer('stock')->nullable();
+            $table->boolean('producto_promocion')->nullable();
+            $table->boolean('producto_nuevo')->nullable();
+            $table->boolean('precio_unico')->nullable();
+            $table->boolean('disponible')->nullable();
             $table->foreignId('type_id')->nullable()->constrained();
             $table->foreignId('color_id')->nullable()->constrained();
             $table->foreignId('provider_id')->nullable()->constrained();

@@ -17,7 +17,8 @@ class CreateProductAttributesTable extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained();
             $table->string('attribute');
-            $table->string('value');
+            $table->string('slug');
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }

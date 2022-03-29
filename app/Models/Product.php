@@ -13,7 +13,21 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['internal_sku', 'sku_parent', 'sku', 'name', 'price', 'description', 'stock', 'type_id', 'color_id', 'provider_id'];
+    protected $fillable = [
+        'internal_sku',
+        'sku_parent',
+        'sku',
+        'name',
+        'price',
+        'description',
+        'producto_promocion',
+        'producto_nuevo',
+        'precio_unico',
+        'stock',
+        'type_id',
+        'color_id',
+        'provider_id'
+    ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -53,6 +67,11 @@ class Product extends Model
     public function productCategories()
     {
         return $this->hasMany('App\Models\ProductCategory', 'product_id', 'id');
+    }
+
+    public function precios()
+    {
+        return $this->hasMany('App\Models\Price', 'product_id', 'id');
     }
 
     /**

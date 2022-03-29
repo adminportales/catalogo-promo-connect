@@ -73,7 +73,7 @@ class Catalogo extends Component
             ->when($orderPrice !== '', function ($query, $orderPrice) {
                 $query->orderBy('price', $this->orderPrice);
             })
-            ->paginate(0);
+            ->paginate(32);
 
         return view('cotizador.catalogo.view', [
             'products' => $products,

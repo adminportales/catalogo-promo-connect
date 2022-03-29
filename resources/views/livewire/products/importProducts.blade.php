@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('content')
     <div class="container-fluid">
-        <div class="row">
+        @livewire('bath-input')
+        {{-- <div class="row">
             <div class="col-md-12">
                 <h4>Importar Productos</h4>
                 <p>Utiliza el formulario para cada proveedor</p>
@@ -24,6 +25,6 @@
                     <input type="submit" class="btn btn-success" value="Enviar">
                 </form>
             </div>
-        </div>
+        </div> --}}
     </div>
 @endsection

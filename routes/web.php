@@ -26,7 +26,10 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
 
     //Route Hooks - Do not delete//
+	Route::view('prices', 'livewire.prices.index')->middleware('auth');
+	Route::view('product_attributes', 'livewire.product_attributes.index')->middleware('auth');
     Route::view('products', 'livewire.products.index');
+    // Route::view('batchInputProducts', 'livewire.products.index');
     Route::view('batchInputProducts',  'livewire.products.importProducts');
     Route::post('batchInputProducts/iusb',  [BatchInputProducts::class, 'updateProductsIUSB'])->name('import.iusb');
     Route::view('dinamyc_price', 'livewire.dinamyc_price.index')->middleware('auth');
@@ -57,4 +60,3 @@ Route::get('/getStockPromoOpcion', [ConsultSuppliers::class, 'getStockPromoOpcio
 Route::get('/getAllProductsForPromotional', [ConsultSuppliers::class, 'getAllProductsForPromotional']);
 
 Route::get('/getStockIUSB', [ConsultSuppliers::class, 'getStockIUSB']);
-// Route::get('/getDoblevela', [ConsultSuppliers::class, 'getDoblevela']);

@@ -9,9 +9,6 @@ use App\Models\Product;
 use App\Models\Subcategory;
 use Exception;
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 class ConsultSuppliers extends Controller
 {
     public function getAllProductsInnova()
@@ -47,7 +44,6 @@ class ConsultSuppliers extends Controller
             } else {
                 return $response;
             }
-
             $maxSKU = Product::max('internal_sku');
             $idSku = null;
             if (!$maxSKU) {
@@ -71,7 +67,7 @@ class ConsultSuppliers extends Controller
                     $categoria = Category::find(1);
                 }
 
-                // TODO: Verificar si la subcategoria existe y si no registrarla
+                // Verificar si la subcategoria existe y si no registrarla
                 $subcategoria = null;
                 if (count($product->categorias->subcategorias) > 0) {
                     $slugSub = mb_strtolower(str_replace(' ', '-', $product->categorias->subcategorias[0]->codigo));
@@ -92,8 +88,61 @@ class ConsultSuppliers extends Controller
                     'price' =>   $product->lista_precios[0]->precio,
                     'description' => $product->descripcion,
                     'stock' => 0,
+                    'producto_promocion' => false,
+                    'producto_nuevo' => $product->nuevo == "0" ? false : true,
+                    'precio_unico' => false,
                     'type_id' => 1,
                     'provider_id' => 3,
+                ];
+                $data['image'] = [];
+                foreach ($product->images as $image) {
+                    array_push($data['image'], ['image_url' => $image->image]);
+                }
+                $tecnicas = [];
+                foreach ($product->tecnicas_impresion as $tecnica) {
+                    array_push($tecnicas, $tecnica->nombre);
+                }
+                $attributes = [
+                    [
+                        'attribute' => 'Material',
+                        'slug' => 'material',
+                        'value' => $product->material,
+                    ],
+                    [
+                        'attribute' => 'Area de impresion',
+                        'slug' => 'area_impresion',
+                        'value' => $product->area_impresion,
+                    ],
+                    [
+                        'attribute' => 'Medidas del producto',
+                        'slug' => 'medidas_producto',
+                        'value' => $product->medidas_producto,
+                    ],
+                    [
+                        'attribute' => 'Peso del producto',
+                        'slug' => 'peso_producto',
+                        'value' => $product->peso_producto,
+                    ],
+                    [
+                        'attribute' => 'Cantidad por paquete',
+                        'slug' => 'cantidad_por_paquete',
+                        'value' => $product->cantidad_por_paquete,
+                    ],
+                    [
+                        'attribute' => 'Medidas del paquete',
+                        'slug' => 'medidas_paquete',
+                        'value' => $product->medidas_paquete,
+                    ],
+                    [
+                        'attribute' => 'Peso del paquete',
+                        'slug' => 'peso_paquete',
+                        'value' => $product->peso_paquete,
+                    ],
+                    [
+                        'attribute' => 'Tecnica de Impresion',
+                        'slug' => 'tecnicas_impresion',
+                        'value' => implode(', ', $tecnicas),
+                    ],
                 ];
 
                 foreach ($product->colores as $colorWS) {
@@ -108,10 +157,11 @@ class ConsultSuppliers extends Controller
                     }
                     $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
                     $data['sku'] = $colorWS->clave;
-                    $data['image'] = $colorWS->image;
+                    $imagenColor = $colorWS->image;
                     $data['color_id'] = $color->id;
-                    if ($data['image'] == null) {
-                        $data['image'] = $product->images[0]->image;
+                    $imagenes = $data['image'];
+                    if ($data['image'] != null) {
+                        array_unshift($imagenes, ['image_url' => $imagenColor]);
                     }
                     $productExist = Product::where('sku', $colorWS->clave)->first();
                     if (!$productExist) {
@@ -120,14 +170,26 @@ class ConsultSuppliers extends Controller
                             'category_id' => $categoria->id,
                             'subcategory_id' => $subcategoria->id,
                         ]);
+                        foreach ($imagenes as $imagen) {
+                            $newProduct->images()->create($imagen);
+                        }
+                        foreach ($product->lista_precios as $precio) {
+                            $newProduct->precios()->create(
+                                [
+                                    'price' => $precio->mi_precio,
+                                    'escala' => $precio->escala,
+                                ]
+                            );
+                        }
 
-                        $newProduct->images()->create([
-                            'image_url' => $data['image']
-                        ]);
+                        foreach ($attributes as $attr) {
+                            $newProduct->productAttributes()->create($attr);
+                        }
 
                         $idSku++;
-                        // dd($newProduct);
+                        // dd($/newProduct);
                     } else {
+                        // TODO: Actualizar la tabla de precios
                         $productExist->update([
                             'price' => $data['price'],
                         ]);
@@ -167,8 +229,8 @@ class ConsultSuppliers extends Controller
                 $responseProducts = json_decode($client->call('Stock', $params));
                 foreach ($responseProducts->data as $product) {
                     foreach ($product->existencias as $exist) {
-                        print_r($exist);
-                        echo '<br><br>';
+                        // print_r($exist);
+                        // echo '<br><br>';
                         array_push($responseData, $exist);
                     }
                 }
@@ -237,6 +299,9 @@ class ConsultSuppliers extends Controller
                 'price' =>  0,
                 'description' => $product['description'],
                 'stock' => 0,
+                'producto_promocion' => false,
+                'producto_nuevo' => false,
+                'precio_unico' => true,
                 'type_id' => 1,
                 'provider_id' => 2,
             ];
@@ -258,6 +323,33 @@ class ConsultSuppliers extends Controller
                     'family' => ucfirst($product['family']), 'slug' => $slug,
                 ]);
             }
+            $attributes = [
+                [
+                    'attribute' => 'Tamaño',
+                    'slug' => 'size',
+                    'value' => $product['size'],
+                ],
+                [
+                    'attribute' => 'Material',
+                    'slug' => 'material',
+                    'value' => $product['material'],
+                ],
+                [
+                    'attribute' => 'Capacidad',
+                    'slug' => 'capacity',
+                    'value' => $product['capacity'],
+                ],
+                [
+                    'attribute' => 'Impresion',
+                    'slug' => 'printing',
+                    'value' => $product['printing'],
+                ],
+                [
+                    'attribute' => 'Area de impresion',
+                    'slug' => 'printing_area',
+                    'value' => $product['printing_area'],
+                ],
+            ];
 
             // Verificar si la subcategoria existe y si no registrarla
             $subcategoria = Subcategory::find(1);
@@ -272,6 +364,9 @@ class ConsultSuppliers extends Controller
                     'category_id' => $categoria->id,
                     'subcategory_id' => $subcategoria->id,
                 ]);
+                foreach ($attributes as $attr) {
+                    $newProduct->productAttributes()->create($attr);
+                }
                 $idSku++;
                 // dd($newProduct);
             }
@@ -296,22 +391,24 @@ class ConsultSuppliers extends Controller
             $param = array('CardCode' => $CardCode, 'pass' => $pass, 'ItemCode' => $product->sku);
             $result = $client->call('GetPrice', $param);
             $price = 0;
+            $promocion = false;
             print_r($result);
             echo '<br>';
             if ($result == "" or $result == false) {
-                array_push($errors, implode(["id" => $product->id, "sku" => $product->sku]));
+                array_push($errors, json_encode(["id" => $product->id, "sku" => $product->sku]));
                 break;
             }
             if (!$result['GetPriceResult'] == "") {
                 $price = (float)$result['GetPriceResult']['Precios']['FinalPrice'];
+                $promocion = $result['GetPriceResult']['Precios']['promocion'] == 'Y' ? true : false;
             } else {
-                array_push($errors, implode(["id" => $product->id, "sku" => $product->sku]));
+                array_push($errors, json_encode(["id" => $product->id, "sku" => $product->sku]));
             }
-            $product->update(['price' => $price]);
+            $product->update(['price' => $price, 'producto_promocion' => $promocion]);
         }
         FailedJobsCron::create([
             'name' => 'Promo Opcion',
-            'message' => "Productos No encontrados al actualizar el precio: " . implode(",", $errors),
+            'message' => "Productos No encontrados al actualizar el precio: " . implode(", ", $errors),
             'status' => 0,
             'type' =>   1
         ]);
@@ -461,6 +558,9 @@ class ConsultSuppliers extends Controller
                         'price' =>  $product['precio'],
                         'description' => $product['descripcion'],
                         'stock' => $product['inventario'],
+                        'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
+                        'producto_nuevo' => $product['producto_nuevo'] == "SI" ? true : false,
+                        'precio_unico' => true,
                         'provider_id' => 1,
                         'type_id' => 1,
                         'color_id' => $color->id,
@@ -479,12 +579,63 @@ class ConsultSuppliers extends Controller
                     ]);
 
                     /*
-                    TODO: Registrar en la tabla product_category el producto, categoria y sub categoria
+                    Registrar en la tabla product_category el producto, categoria y sub categoria
                     */
                     $newProduct->productCategories()->create([
                         'category_id' => $categoria->id,
                         'subcategory_id' => $subcategoria->id,
                     ]);
+
+                    $attributes = [
+                        [
+                            'attribute' => 'Alto del Producto',
+                            'slug' => 'medida_producto_alto',
+                            'value' => $product['medida_producto_alto'],
+                        ],
+                        [
+                            'attribute' => 'Ancho del Producto',
+                            'slug' => 'medida_producto_ancho',
+                            'value' => $product['medida_producto_ancho'],
+                        ],
+                        [
+                            'attribute' => 'Area de Impresion',
+                            'slug' => 'area_impresion',
+                            'value' => $product['area_impresion'],
+                        ],
+                        [
+                            'attribute' => 'Impresion',
+                            'slug' => 'metodos_impresion',
+                            'value' => $product['metodos_impresion'],
+                        ],
+                        [
+                            'attribute' => 'Alto de la caja',
+                            'slug' => 'alto_caja',
+                            'value' => $product['alto_caja'],
+                        ],
+                        [
+                            'attribute' => 'Ancho de la caja',
+                            'slug' => 'ancho_caja',
+                            'value' => $product['ancho_caja'],
+                        ],
+                        [
+                            'attribute' => 'Largo de la caja',
+                            'slug' => 'largo_caja',
+                            'value' => $product['largo_caja'],
+                        ],
+                        [
+                            'attribute' => 'Peso de la caja',
+                            'slug' => 'peso_caja',
+                            'value' => $product['peso_caja'],
+                        ],
+                        [
+                            'attribute' => 'Piezas de la caja',
+                            'slug' => 'piezas_caja',
+                            'value' => $product['piezas_caja'],
+                        ],
+                    ];
+                    foreach ($attributes as $attr) {
+                        $newProduct->productAttributes()->create($attr);
+                    }
                     $idSku++;
                     // dd($newProduct);
                 } else {
@@ -505,7 +656,7 @@ class ConsultSuppliers extends Controller
         }
     }
 
-    public function getStockIUSB()
+    /* public function getStockIUSB()
     {
         // Obtener el archivo de IMPORTACIONES USB
         $fichero = public_path('storage/iusb.csv');
@@ -542,5 +693,5 @@ class ConsultSuppliers extends Controller
         $result = $client->call('GetrProdImagenes', $param);
         dd($result);
         $products = Product::where('provider_id', 2)->get();
-    }
+    } */
 }
