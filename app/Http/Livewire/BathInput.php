@@ -12,10 +12,16 @@ class BathInput extends Component
 {
     use WithFileUploads;
 
-    public $fileLayout;
+    public $fileLayout, $tipo;
     public $rutaArchivo;
     public $archivo;
-    public $columns = [];
+
+    public function __construct()
+    {
+        $this->columnsToProduct = [
+            'nombre' => ''
+        ];
+    }
 
     public function render()
     {
@@ -38,7 +44,7 @@ class BathInput extends Component
         $letraMayorDeColumna = $hojaActual->getHighestColumn(); // Letra
         $numeroMayorDeColumna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($letraMayorDeColumna);
         for ($indiceColumna = 1; $indiceColumna <= $numeroMayorDeColumna; $indiceColumna++) {
-            array_push($this->columns,   $hojaActual->getCellByColumnAndRow($indiceColumna, 1)->getValue());
+            // array_push($this->columns,   $hojaActual->getCellByColumnAndRow($indiceColumna, 1)->getValue());
         }
     }
 }
