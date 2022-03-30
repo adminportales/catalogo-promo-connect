@@ -37,9 +37,10 @@
                                 <tr>
                                     <td>#</td>
                                     <th>Name</th>
+                                    <th>Utility</th>
                                     <th>Woocommerce</th>
                                     <th>Url</th>
-                                    <td>Actions</td>
+                                    <td>ACTIONS</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,6 +48,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $row->name }}</td>
+                                        <td>{{ $row->utility }}</td>
                                         <td>{{ $row->woocommerce }}</td>
                                         <td>{{ $row->url }}</td>
                                         <td width="90">

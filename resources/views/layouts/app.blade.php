@@ -59,28 +59,28 @@
                                             <ul class="navbar-nav mr-auto">
                                                 <!--Nav Bar Hooks - Do not delete!!-->
 						<li class="nav-item">
-                            <a href="{{ url('/prices') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Prices</a> 
+                            <a href="{{ url('/prices') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Prices</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/product_attributes') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Product_attributes</a> 
+                            <a href="{{ url('/product_attributes') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Product_attributes</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/sites') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Sites</a> 
+                            <a href="{{ url('/sites') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Sites</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/dinamyc_price') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Dinamyc_price</a> 
+                            <a href="{{ url('/dinamyc_price') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Dinamyc_price</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/images') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Images</a> 
+                            <a href="{{ url('/images') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Images</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/types') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Types</a> 
+                            <a href="{{ url('/types') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Types</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/colors') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Colors</a> 
+                            <a href="{{ url('/colors') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Colors</a>
                         </li>
 						<li class="nav-item">
-                            <a href="{{ url('/sites') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Sites</a> 
+                            <a href="{{ url('/sites') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Sites</a>
                         </li>
 						<li class="nav-item">
                             <a href="{{ url('/globalAttributes') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> GlobalAttributes</a>

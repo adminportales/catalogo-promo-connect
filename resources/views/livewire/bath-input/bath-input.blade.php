@@ -1,5 +1,4 @@
 <div>
-
     <div wire:loading wire:target="fileLayout">
         <div class="p-5 d-flex justify-content-center w-100">
             <div class="spinner-border text-primary" role="status">
@@ -52,6 +51,7 @@
                     @enderror
                 </div>
                 <div class="w-100 text-center">
+
                 </div>
             @endif
         </div>

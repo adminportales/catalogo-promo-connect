@@ -32,8 +32,16 @@ class BathInput extends Component
     {
         $this->validate([
             'fileLayout' => 'required', // 1MB Max
+            'tipo' => 'required', // 1MB Max
         ]);
-
+        if ($this->tipo == 'create') {
+            $this->createProductos();
+        } else if ($this->tipo == 'update') {
+            $this->updateProductos();
+        }
+    }
+    public function createProductos()
+    {
         $path = time() . $this->fileLayout->getClientOriginalName();
         $this->fileLayout->storeAs('public/imports', $path);
         $this->rutaArchivo = public_path('storage/imports/' . $path);
@@ -44,7 +52,11 @@ class BathInput extends Component
         $letraMayorDeColumna = $hojaActual->getHighestColumn(); // Letra
         $numeroMayorDeColumna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($letraMayorDeColumna);
         for ($indiceColumna = 1; $indiceColumna <= $numeroMayorDeColumna; $indiceColumna++) {
-            // array_push($this->columns,   $hojaActual->getCellByColumnAndRow($indiceColumna, 1)->getValue());
+
         }
+    }
+    public function updateProductos()
+    {
+        # code...
     }
 }

@@ -11,7 +11,7 @@ class Sites extends Component
     use WithPagination;
 
 	protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord, $name, $woocommerce, $url, $consumer_key, $consumer_secret;
+    public $selected_id, $keyWord, $name, $utility, $woocommerce, $url, $consumer_key, $consumer_secret;
     public $updateMode = false;
 
     public function render()
@@ -20,6 +20,7 @@ class Sites extends Component
         return view('livewire.sites.view', [
             'sites' => Site::latest()
 						->orWhere('name', 'LIKE', $keyWord)
+						->orWhere('utility', 'LIKE', $keyWord)
 						->orWhere('woocommerce', 'LIKE', $keyWord)
 						->orWhere('url', 'LIKE', $keyWord)
 						->orWhere('consumer_key', 'LIKE', $keyWord)
@@ -37,6 +38,7 @@ class Sites extends Component
     private function resetInput()
     {		
 		$this->name = null;
+		$this->utility = null;
 		$this->woocommerce = null;
 		$this->url = null;
 		$this->consumer_key = null;
@@ -47,14 +49,13 @@ class Sites extends Component
     {
         $this->validate([
 		'name' => 'required',
+		'utility' => 'required',
 		'woocommerce' => 'required',
-		'url' => 'required',
-		'consumer_key' => 'required',
-		'consumer_secret' => 'required',
         ]);
 
         Site::create([ 
 			'name' => $this-> name,
+			'utility' => $this-> utility,
 			'woocommerce' => $this-> woocommerce,
 			'url' => $this-> url,
 			'consumer_key' => $this-> consumer_key,
@@ -72,6 +73,7 @@ class Sites extends Component
 
         $this->selected_id = $id; 
 		$this->name = $record-> name;
+		$this->utility = $record-> utility;
 		$this->woocommerce = $record-> woocommerce;
 		$this->url = $record-> url;
 		$this->consumer_key = $record-> consumer_key;
@@ -84,16 +86,15 @@ class Sites extends Component
     {
         $this->validate([
 		'name' => 'required',
+		'utility' => 'required',
 		'woocommerce' => 'required',
-		'url' => 'required',
-		'consumer_key' => 'required',
-		'consumer_secret' => 'required',
         ]);
 
         if ($this->selected_id) {
 			$record = Site::find($this->selected_id);
             $record->update([ 
 			'name' => $this-> name,
+			'utility' => $this-> utility,
 			'woocommerce' => $this-> woocommerce,
 			'url' => $this-> url,
 			'consumer_key' => $this-> consumer_key,

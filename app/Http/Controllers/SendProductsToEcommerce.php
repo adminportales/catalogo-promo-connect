@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GlobalAttribute;
 use Automattic\WooCommerce\Client as WooCommerceClient;
 
-use App\Models\Product;
 use App\Models\Site;
-use Illuminate\Http\Request;
 
 
 class SendProductsToEcommerce extends Controller
@@ -48,7 +45,7 @@ class SendProductsToEcommerce extends Controller
         $categoriesWoocommerce = $woocommerce->get('products/categories');
         $productsWC = $woocommerce->get('products');
 
-        $utilidad = GlobalAttribute::find(2);
+        $utilidad = $site->utility;
         $data = ['create' => [], 'update' => []];
         foreach ($products as $product) {
             // Primero agregar las categorias en caso de que no existan

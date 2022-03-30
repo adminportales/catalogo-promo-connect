@@ -43,12 +43,23 @@
                             <div class="d-flex justify-content-center">
                                 <div id="carouselExampleControls" class="carousel slide w-50" data-ride="carousel">
                                     <div class="carousel-inner">
+                                        @php
+                                            $active = 0;
+                                        @endphp
                                         @foreach ($product->images as $image)
                                             @if ($image->image_url != null)
-                                                <div class="carousel-item  {{ $loop->index == 0 ? 'active' : '' }}">
+                                                @if ($active == 0)
+                                                    @php
+                                                        $active = 1;
+                                                    @endphp
+                                                @endif
+                                                <div class="carousel-item  {{ $active == 1 ? 'active' : '' }}">
                                                     <img src="{{ $image->image_url }}" class="d-block w-100"
                                                         alt="{{ $image->image_url }}">
                                                 </div>
+                                                @php
+                                                    $active = 2;
+                                                @endphp
                                             @endif
                                         @endforeach
                                     </div>

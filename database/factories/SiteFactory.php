@@ -14,6 +14,7 @@ class SiteFactory extends Factory
     {
         return [
 			'name' => $this->faker->name,
+			'utility' => $this->faker->name,
 			'woocommerce' => $this->faker->name,
 			'url' => $this->faker->name,
 			'consumer_key' => $this->faker->name,

@@ -16,10 +16,11 @@ class CreateSitesTable extends Migration
         Schema::create('sites', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->decimal('utility', 8, 2);
             $table->boolean('woocommerce');
-            $table->text('url');
-            $table->text('consumer_key');
-            $table->text('consumer_secret');
+            $table->text('url')->nullable();
+            $table->text('consumer_key')->nullable();
+            $table->text('consumer_secret')->nullable();
             $table->timestamps();
         });
     }
