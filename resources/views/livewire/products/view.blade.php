@@ -61,7 +61,7 @@
                                         <td>$ {{ round($row->price + $row->price * ($utilidad / 100), 2) }}</td>
                                         <td>{{ Str::limit($row->description, 50) }}</td>
                                         <td>{{ $row->stock }}</td>
-                                        <td><img src="{{ $row->images[0]->image_url }}" class="img-fluid"
+                                        <td><img src="{{ $row->firstImage->image_url }}" class="img-fluid"
                                                 alt="Sin imagen" style="max-width: 60px" srcset=""></td>
                                         <td>{{ $row->color->color }}</td>
                                         <td>{{ $row->provider->company }}</td>

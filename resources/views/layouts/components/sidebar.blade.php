@@ -31,11 +31,11 @@
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Productos</span></a>
         </li>
-        {{-- <li class="nav-item">
+        <li class="nav-item">
             <a class="nav-link" href="{{ url('admin/batchInputProducts') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Importar Productos</span></a>
-        </li> --}}
+        </li>
         {{-- <li class="nav-item">
             <a class="nav-link" href="{{ url('admin/categories') }}">
                 <i class="fas fa-fw fa-chart-area"></i>

@@ -53,6 +53,11 @@ class Product extends Model
         return $this->hasMany('App\Models\Image', 'product_id', 'id');
     }
 
+    public function firstImage()
+    {
+        return $this->hasOne('App\Models\Image', 'product_id', 'id')->oldestOfMany();
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

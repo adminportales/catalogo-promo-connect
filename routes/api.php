@@ -21,5 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Rutas de la actualizacion de Web WooCommerce
-Route::get('/setAllProductsToEcommerce', [SendProductsToEcommerce::class, 'setAllProducts']);
-Route::get('/updateAllProductsToEcommerce', [SendProductsToEcommerce::class, 'updateAllProducts']);
+Route::get('/setProductsToGoodIN', [SendProductsToEcommerce::class, 'setProductsToGoodIN']);

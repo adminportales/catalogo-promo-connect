@@ -71,7 +71,7 @@
                                         $price = $row->price;
                                     }
                                 @endphp
-                                <img src="{{ $row->images[0]->image_url == null ? $row->images[1]->image_url : $row->images[0]->image_url }}"
+                                <img src="{{ $row->firstImage->image_url }}"
                                     class="card-img-top" alt="{{ $row->name }}">
                                 <h5 class="card-title" style="text-transform: capitalize">{{ $row->name }}</h5>
                                 <p class=" m-0 pt-1"><strong>SKU:</strong> {{ $row->sku }}</p>
