@@ -28,15 +28,15 @@ class Sites extends Component
 						->paginate(10),
         ]);
     }
-	
+
     public function cancel()
     {
         $this->resetInput();
         $this->updateMode = false;
     }
-	
+
     private function resetInput()
-    {		
+    {
 		$this->name = null;
 		$this->utility = null;
 		$this->woocommerce = null;
@@ -53,7 +53,7 @@ class Sites extends Component
 		'woocommerce' => 'required',
         ]);
 
-        Site::create([ 
+        Site::create([
 			'name' => $this-> name,
 			'utility' => $this-> utility,
 			'woocommerce' => $this-> woocommerce,
@@ -61,7 +61,7 @@ class Sites extends Component
 			'consumer_key' => $this-> consumer_key,
 			'consumer_secret' => $this-> consumer_secret
         ]);
-        
+
         $this->resetInput();
 		$this->emit('closeModal');
 		session()->flash('message', 'Site Successfully created.');
@@ -71,14 +71,14 @@ class Sites extends Component
     {
         $record = Site::findOrFail($id);
 
-        $this->selected_id = $id; 
+        $this->selected_id = $id;
 		$this->name = $record-> name;
 		$this->utility = $record-> utility;
 		$this->woocommerce = $record-> woocommerce;
 		$this->url = $record-> url;
 		$this->consumer_key = $record-> consumer_key;
 		$this->consumer_secret = $record-> consumer_secret;
-		
+
         $this->updateMode = true;
     }
 
@@ -92,7 +92,7 @@ class Sites extends Component
 
         if ($this->selected_id) {
 			$record = Site::find($this->selected_id);
-            $record->update([ 
+            $record->update([
 			'name' => $this-> name,
 			'utility' => $this-> utility,
 			'woocommerce' => $this-> woocommerce,
@@ -113,5 +113,10 @@ class Sites extends Component
             $record = Site::where('id', $id);
             $record->delete();
         }
+    }
+
+    public function showProductsBySite(Site $site)
+    {
+        $this->emit('showProductsBySite', $site->id);
     }
 }

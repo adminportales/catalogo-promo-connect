@@ -58,7 +58,7 @@
                                         {{-- <td>{{ $row->sku_parent }}</td> --}}
                                         <td>{{ $row->sku }}</td>
                                         <td>{{ $row->name }}</td>
-                                        <td>$ {{ round($row->price + $row->price * ($utilidad / 100), 2) }}</td>
+                                        <td>$ {{ $row->price }}</td>
                                         <td>{{ Str::limit($row->description, 50) }}</td>
                                         <td>{{ $row->stock }}</td>
                                         <td><img src="{{ $row->firstImage->image_url }}" class="img-fluid"

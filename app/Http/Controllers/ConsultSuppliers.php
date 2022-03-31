@@ -85,7 +85,7 @@ class ConsultSuppliers extends Controller
                 $data = [
                     'sku_parent' => $product->codigo,
                     'name' => $product->nombre,
-                    'price' =>   $product->lista_precios[0]->precio,
+                    'price' =>   $product->lista_precios[0]->mi_precio,
                     'description' => $product->descripcion,
                     'stock' => 0,
                     'producto_promocion' => false,
@@ -547,7 +547,7 @@ class ConsultSuppliers extends Controller
                     ]);
                 }
 
-                $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 25;
+                $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 0;
 
                 $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->first();
                 if (!$productExist) {
@@ -559,6 +559,7 @@ class ConsultSuppliers extends Controller
                         'description' => $product['descripcion'],
                         'stock' => $product['inventario'],
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
+                        'descuento' => $discount,
                         'producto_nuevo' => $product['producto_nuevo'] == "SI" ? true : false,
                         'precio_unico' => true,
                         'provider_id' => 1,
@@ -570,14 +571,6 @@ class ConsultSuppliers extends Controller
                             'image_url' => $imagen['url_imagen']
                         ]);
                     }
-
-                    $newProduct->dinamycPrices()->create([
-                        'type' => "PORCENTAJE",
-                        'provider_change' => "PROVEEDOR",
-                        'type_change' => "DESCONTAR",
-                        'amount' => $discount
-                    ]);
-
                     /*
                     Registrar en la tabla product_category el producto, categoria y sub categoria
                     */
@@ -642,9 +635,12 @@ class ConsultSuppliers extends Controller
                     $productExist->update([
                         'price' => $product['precio'],
                         'stock' => $product['inventario'],
+                        'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
+                        'descuento' => $discount,
                     ]);
                 }
             }
+            return $products;
         } catch (Exception $e) {
             FailedJobsCron::create([
                 'name' => 'For Promotional',

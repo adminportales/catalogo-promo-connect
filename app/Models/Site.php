@@ -18,14 +18,6 @@ class Site extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function dinamycPrices()
-    {
-        return $this->hasMany('App\Models\DinamycPrice', 'site_id', 'id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function sitesProducts()
     {
         return $this->belongsToMany(Product::class, 'sites_products', 'site_id', 'product_id');

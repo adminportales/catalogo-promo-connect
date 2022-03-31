@@ -38,9 +38,8 @@ class SendProductsToEcommerce extends Controller
 
             if ($categoryAvailable === false) {
                 $data = [
-                    'name' =>  ucwords(strtolower($product->productCategories[0]->category->family)),
+                    'name' =>  ucwords(strtolower($this->eliminar_tildes($product->productCategories[0]->category->family))),
                 ];
-
                 $categoryAvailable = $woocommerce->post('products/categories', $data);
                 $categoriesWoocommerce = $woocommerce->get('products/categories?per_page=100');
             }
@@ -63,12 +62,25 @@ class SendProductsToEcommerce extends Controller
 
             // Despues de obtener la categoria, calcular el nuevo precio
             $price = null;
-            if ($product->dinamycPrices->where('site_id', null)->first()) {
-                $price = round($product->price - $product->price * ($product->dinamycPrices->where('site_id', null)->first()->amount / 100), 2);
+            $priceProduct = null;
+            if ($product->precio_unico) {
+                $priceProduct = $product->price;
             } else {
-                $price = $product->price;
+                $priceProduct = $product->precios[0]->price;
             }
-            $price = round($price + $price * ($utilidadPL->value / 100), 2);
+
+            // Aplicamos descuentos si el producto tiene promocion
+            // EL descuento asignado por el proveedor si no tiene promocion
+            if ($product->producto_promocion) {
+                $priceProduct = round($priceProduct - $priceProduct * ($product->descuento / 100), 2);
+            } else {
+                $priceProduct = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
+            }
+
+            // Agregar Utilidad de Promo Life
+            $price = round($priceProduct + $priceProduct * ($utilidadPL->value / 100), 2);
+
+            // Agregar Utilidad de Ecommerce
             $price = round($price + $price * ($utilidad / 100), 2);
 
             // Revisar si el producto ya existe en Woocomerce
@@ -115,8 +127,8 @@ class SendProductsToEcommerce extends Controller
             }
         }
         echo '<pre>';
-        // print_r($data);
-        print_r($woocommerce->post('products/batch', $data));
+        print_r($data);
+        // print_r($woocommerce->post('products/batch', $data));
         echo '</pre>';
     }
     public function eliminar_tildes($cadena)

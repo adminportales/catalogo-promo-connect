@@ -23,6 +23,7 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 8, 2)->nullable();
             $table->integer('stock')->nullable();
             $table->boolean('producto_promocion')->nullable();
+            $table->decimal('descuento', 8, 2)->default(0.00);
             $table->boolean('producto_nuevo')->nullable();
             $table->boolean('precio_unico')->nullable();
             $table->boolean('disponible')->nullable();

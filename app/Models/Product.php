@@ -21,6 +21,7 @@ class Product extends Model
         'price',
         'description',
         'producto_promocion',
+        'descuento',
         'producto_nuevo',
         'precio_unico',
         'stock',
@@ -35,14 +36,6 @@ class Product extends Model
     public function color()
     {
         return $this->belongsTo(Color::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function dinamycPrices()
-    {
-        return $this->hasMany('App\Models\DinamycPrice', 'product_id', 'id');
     }
 
     /**
@@ -84,7 +77,7 @@ class Product extends Model
      */
     public function provider()
     {
-        return $this->hasOne('App\Models\Provider', 'id', 'provider_id');
+        return $this->belongsTo('App\Models\Provider');
     }
 
     /**

@@ -177,9 +177,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
-                @livewire('dinamyc-prices', ['product' => $product])
-            </div>
         </div>
     @endif
 </div>

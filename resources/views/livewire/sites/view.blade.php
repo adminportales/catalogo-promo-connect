@@ -51,6 +51,8 @@
                                         <td>{{ $row->utility }}</td>
                                         <td>{{ $row->woocommerce }}</td>
                                         <td>{{ $row->url }}</td>
+                                        <td> <button class="btn btn-primary" data-toggle="modal" data-target="#productsModal"
+                                                wire:click="showProductsBySite({{ $row->id }})">Ver Productos</button> </td>
                                         <td width="90">
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-info btn-sm dropdown-toggle"
@@ -77,4 +79,5 @@
             </div>
         </div>
     </div>
+    @livewire('products-by-site')
 </div>

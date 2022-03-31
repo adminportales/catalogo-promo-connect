@@ -30,13 +30,8 @@
                     <div class="modal-body px-2 py-0">
                         @if ($product->precio_unico)
                             @php
-                                $price = null;
-                                $dinamycPrice = $product->dinamycPrices->where('site_id', null)->first();
-                                if ($dinamycPrice) {
-                                    $price = round($product->price - $product->price * ($dinamycPrice->amount / 100), 2);
-                                } else {
-                                    $price = $product->price;
-                                }
+                                $priceProduct = $product->price;
+                                $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
                             @endphp
                         @endif
                         <div class="d-flex align-items-center flex-column">
@@ -108,17 +103,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @php
-                                                    $dinamycPrice = $product->dinamycPrices->where('site_id', null)->first();
-                                                @endphp
                                                 @foreach ($product->precios as $precio)
                                                     @php
-                                                        $price = null;
-                                                        if ($dinamycPrice) {
-                                                            $price = round($precio->price - $precio->price * ($dinamycPrice->amount / 100), 2);
-                                                        } else {
-                                                            $price = $precio->price;
-                                                        }
+                                                        $priceProduct = $product->price;
+                                                        $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
                                                         $precioFinal = round($price + $price * ($utilidad / 100), 2);
                                                     @endphp
                                                     <tr>
