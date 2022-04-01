@@ -131,6 +131,7 @@ class SendProductsToEcommerce extends Controller
         // print_r($woocommerce->post('products/batch', $data));
         echo '</pre>';
     }
+
     public function eliminar_tildes($cadena)
     {
 

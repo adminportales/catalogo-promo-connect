@@ -32,9 +32,6 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     // Route::view('batchInputProducts', 'livewire.products.index');
     Route::view('batchInputProducts',  'livewire.products.importProducts');
     Route::post('batchInputProducts/iusb',  [BatchInputProducts::class, 'updateProductsIUSB'])->name('import.iusb');
-    Route::view('images', 'livewire.images.index')->middleware('auth');
-    Route::view('types', 'livewire.types.index')->middleware('auth');
-    Route::view('colors', 'livewire.colors.index')->middleware('auth');
     Route::view('sites', 'livewire.sites.index')->middleware('auth');
     Route::view('users', 'livewire.users.index');
     Route::view('subcategories', 'livewire.subcategories.index');
