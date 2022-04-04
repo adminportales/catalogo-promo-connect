@@ -9,7 +9,6 @@
                         <h5><span class="text-center fa fa-home"></span> @yield('title')</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-danger">Datos ilustrativos</p>
                         <div class="row w-100">
                             <div class="col-md-6">
                                 <h5>Mensajes en la actualizacion de proveedores</h5>
@@ -23,12 +22,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>For Promotional</td>
-                                            <td>Error al actualizar el producto U 3S3D</td>
-                                            <td><a href="#" class="btn btn-sm btn-success">Completo</a></td>
-                                        </tr>
+                                        @foreach ($erroresWC as $item)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $item->name }}</td>
+                                                <td>{{ $item->message }}</td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -38,16 +38,19 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Sitio</th>
                                             <th>Mensaje</th>
                                             <th>#</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Id de producto no valido</td>
-                                            <td><a href="#" class="btn btn-sm btn-success">Completo</a></td>
-                                        </tr>
+                                        @foreach ($erroresWC as $item)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $item->name }}</td>
+                                                <td>{{ $item->message }}</td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FailedJobsCron;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -32,7 +33,9 @@ class HomeController extends Controller
 
     public function dashboard()
     {
-        return view('home');
+        $erroresPV = FailedJobsCron::where('type',1);
+        $erroresWC = FailedJobsCron::where('type',2);
+        return view('home', compact('erroresPV', 'erroresWC'));
     }
     public function catalogo()
     {

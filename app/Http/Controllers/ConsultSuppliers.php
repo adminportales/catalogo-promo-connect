@@ -652,7 +652,7 @@ class ConsultSuppliers extends Controller
         }
     }
 
-    /* public function getStockIUSB()
+    public function getStockIUSB()
     {
         // Obtener el archivo de IMPORTACIONES USB
         $fichero = public_path('storage/iusb.csv');
@@ -677,7 +677,7 @@ class ConsultSuppliers extends Controller
         }
     }
 
-    public function getDoblevela()
+    /* public function getDoblevela()
     {
         $client = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?WSDL', 'wsdl');
         $err = $client->getError();
