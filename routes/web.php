@@ -56,3 +56,7 @@ Route::get('/getStockPromoOpcion', [ConsultSuppliers::class, 'getStockPromoOpcio
 Route::get('/getAllProductsForPromotional', [ConsultSuppliers::class, 'getAllProductsForPromotional']);
 
 Route::get('/getStockIUSB', [ConsultSuppliers::class, 'getStockIUSB']);
+
+Route::get('/getAllProductosDoblevela', [ConsultSuppliers::class, 'getAllProductosDoblevela']);
+
+Route::get('/getImagesDoblevela', [ConsultSuppliers::class, 'getImagesDoblevela']);

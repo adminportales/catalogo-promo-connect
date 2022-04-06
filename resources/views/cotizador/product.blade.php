@@ -41,22 +41,24 @@
                                         @php
                                             $active = 0;
                                         @endphp
-                                        @foreach ($product->images as $image)
-                                            @if ($image->image_url != null)
-                                                @if ($active == 0)
+                                        @if ($product->images)
+                                            @foreach ($product->images as $image)
+                                                @if ($image->image_url != null)
+                                                    @if ($active == 0)
+                                                        @php
+                                                            $active = 1;
+                                                        @endphp
+                                                    @endif
+                                                    <div class="carousel-item  {{ $active == 1 ? 'active' : '' }}">
+                                                        <img src="{{ $image->image_url }}" class="d-block w-100"
+                                                            alt="{{ $image->image_url }}">
+                                                    </div>
                                                     @php
-                                                        $active = 1;
+                                                        $active = 2;
                                                     @endphp
                                                 @endif
-                                                <div class="carousel-item  {{ $active == 1 ? 'active' : '' }}">
-                                                    <img src="{{ $image->image_url }}" class="d-block w-100"
-                                                        alt="{{ $image->image_url }}">
-                                                </div>
-                                                @php
-                                                    $active = 2;
-                                                @endphp
-                                            @endif
-                                        @endforeach
+                                            @endforeach
+                                        @endif
                                     </div>
                                     <a class="carousel-control-prev" href="#carouselExampleControls" role="button"
                                         data-slide="prev">
@@ -127,24 +129,26 @@
                                             categoria:</strong>
                                         {{ $product->productCategories[0]->subcategory->subfamily }}
                                     </p>
-
-                                    <h5><strong>Otros Atributos</strong></h5>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Atributo</th>
-                                                <th>Valor</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($product->productAttributes as $attr)
+                                    @if (count($product->productAttributes)>0)
+                                        <h5><strong>Otros Atributos</strong></h5>
+                                        <table class="table">
+                                            <thead>
                                                 <tr>
-                                                    <td class="p-0">{{ $attr->attribute }}</td>
-                                                    <td class="p-0">{{ $attr->value }}</td>
+                                                    <th>Atributo</th>
+                                                    <th>Valor</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+
+                                                @foreach ($product->productAttributes as $attr)
+                                                    <tr>
+                                                        <td class="p-0">{{ $attr->attribute }}</td>
+                                                        <td class="p-0">{{ $attr->value }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    @endif
                                 </div>
                             </div>
 

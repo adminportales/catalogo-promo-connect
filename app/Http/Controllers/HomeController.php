@@ -33,8 +33,8 @@ class HomeController extends Controller
 
     public function dashboard()
     {
-        $erroresPV = FailedJobsCron::where('type',1);
-        $erroresWC = FailedJobsCron::where('type',2);
+        $erroresPV = FailedJobsCron::where('type',1)->get();
+        $erroresWC = FailedJobsCron::where('type',2)->get();
         return view('home', compact('erroresPV', 'erroresWC'));
     }
     public function catalogo()

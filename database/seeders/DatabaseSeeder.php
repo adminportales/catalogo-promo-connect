@@ -64,6 +64,13 @@ class DatabaseSeeder extends Seeder
             'contact' => 'Contacto',
             'discount' => 0
         ]);
+        Provider::create([
+            'company' => 'Doble Vela',
+            'email' => 'doblevela@promotional',
+            'phone' => '4738647878',
+            'contact' => 'Contacto',
+            'discount' => 0
+        ]);
         GlobalAttribute::create([
             'attribute' => 'Utilidad',
             'value' => '10',
