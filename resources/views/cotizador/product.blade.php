@@ -82,6 +82,14 @@
                             </div>
                             <div class="row w-100">
                                 <div class="col-md-6">
+                                    @php
+                                        $priceProduct = $product->price;
+                                        if ($product->producto_promocion) {
+                                            $priceProduct = round($priceProduct - $priceProduct * ($product->descuento / 100), 2);
+                                        } else {
+                                            $priceProduct = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
+                                        }
+                                    @endphp
                                     <h5><strong>Informacion</strong></h5>
                                     <p><strong>Descripcion: </strong> {{ $product->description }}</p>
                                     <p><strong>Color: </strong> {{ $product->color->color }}</p>
@@ -89,7 +97,7 @@
                                     <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
                                     @if ($product->precio_unico)
                                         <p><strong>Precio: </strong>
-                                            $ {{ round($price + $price * ($utilidad / 100), 2) }}</p>
+                                            $ {{ round($priceProduct + $price * ($utilidad / 100), 2) }}</p>
                                     @endif
                                     <p><strong>Producto Nuevo: </strong> {{ $product->producto_nuevo ? 'SI' : 'NO' }}
                                     </p>
@@ -129,7 +137,7 @@
                                             categoria:</strong>
                                         {{ $product->productCategories[0]->subcategory->subfamily }}
                                     </p>
-                                    @if (count($product->productAttributes)>0)
+                                    @if (count($product->productAttributes) > 0)
                                         <h5><strong>Otros Atributos</strong></h5>
                                         <table class="table">
                                             <thead>

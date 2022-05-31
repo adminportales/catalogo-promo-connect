@@ -3,6 +3,11 @@
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Providers\DobleVelaController;
+use App\Http\Controllers\Providers\ForPromotionalController;
+use App\Http\Controllers\Providers\InnovationController;
+use App\Http\Controllers\Providers\IUSBController;
+use App\Http\Controllers\Providers\PromoOpcionController;
 use App\Http\Controllers\SendProductsToEcommerce;
 use Illuminate\Support\Facades\Route;
 
@@ -46,17 +51,21 @@ Route::middleware(['auth'])->group(function () {
 
 // Rutas de la actualizacion de Web Services
 
-Route::get('/getAllProductsInnova', [ConsultSuppliers::class, 'getAllProductsInnova']);
-Route::get('/getStockInnova', [ConsultSuppliers::class, 'getStockInnova']);
+// Innova
+Route::get('/getAllProductsInnova', [InnovationController::class, 'getAllProductsInnova']);
+Route::get('/getStockInnova', [InnovationController::class, 'getStockInnova']);
 
-Route::get('/getAllProductsPromoOption', [ConsultSuppliers::class, 'getAllProductsPromoOption']);
-Route::get('/getPricePromoOpcion', [ConsultSuppliers::class, 'getPricePromoOpcion']);
-Route::get('/getStockPromoOpcion', [ConsultSuppliers::class, 'getStockPromoOpcion']);
+// PromoOpcion
+Route::get('/getAllProductsPromoOption', [PromoOpcionController::class, 'getAllProductsPromoOption']);
+Route::get('/getPricePromoOpcion', [PromoOpcionController::class, 'getPricePromoOpcion']);
+Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromoOpcion']);
 
-Route::get('/getAllProductsForPromotional', [ConsultSuppliers::class, 'getAllProductsForPromotional']);
+// ForPromotional
+Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
 
-Route::get('/getStockIUSB', [ConsultSuppliers::class, 'getStockIUSB']);
+// IUSB
+Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 
-Route::get('/getAllProductosDoblevela', [ConsultSuppliers::class, 'getAllProductosDoblevela']);
-
-Route::get('/getImagesDoblevela', [ConsultSuppliers::class, 'getImagesDoblevela']);
+// Doble Vela
+Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
+Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
