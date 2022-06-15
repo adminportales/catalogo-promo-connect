@@ -7,7 +7,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Product;
 use App\Models\Provider;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 class Catalogo extends Component

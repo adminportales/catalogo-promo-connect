@@ -3,6 +3,7 @@
 use App\Http\Controllers\SendProductsToEcommerce;
 use App\Models\Category;
 use App\Models\Color;
+use App\Models\GlobalAttribute;
 use App\Models\Image;
 use App\Models\Price;
 use App\Models\Product;
@@ -43,6 +44,7 @@ Route::get('/getAllProductos', function () {
     $productAttribute = ProductAttribute::all();
     $images = Image::all();
     $prices = Price::all();
+    $globalAttribute = GlobalAttribute::all();
     return response()->json([
         'providers' => $providers,
         'categories' => $categories,
@@ -54,5 +56,6 @@ Route::get('/getAllProductos', function () {
         'productAttribute' => $productAttribute,
         'images' => $images,
         'prices' => $prices,
+        'globalAttribute' => $globalAttribute,
     ], 200);
 });
