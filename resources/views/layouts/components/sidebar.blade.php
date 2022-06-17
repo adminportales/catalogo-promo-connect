@@ -18,60 +18,53 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
-    @auth()
-        <!--Nav Bar Hooks - Do not delete!!-->
+    <!--Nav Bar Hooks - Do not delete!!-->
 
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('catalogo') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Catalogo</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/products') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Productos</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/batchInputProducts') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Importar Productos</span></a>
-        </li>
-        {{-- <li class="nav-item">
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('catalogo') }}" target="_blank">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Ver Catalogo</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('admin/products') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Productos</span></a>
+    </li>
+    {{-- <li class="nav-item">
             <a class="nav-link" href="{{ url('admin/categories') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Categorias</span></a>
         </li> --}}
-        {{-- <li class="nav-item">
+    {{-- <li class="nav-item">
             <a class="nav-link" href="{{ url('admin/subcategories') }}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Subcategorias</span></a>
         </li> --}}
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/sites') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Sitios</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/providers') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Proveedores</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/globalAttributes') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Globales</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('admin/users') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Usuarios</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/laratrust') }}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Roles</span></a>
-        </li>
-    @endauth()
+    {{-- <li class="nav-item">
+        <a class="nav-link" href="{{ url('admin/sites') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Sitios</span></a>
+    </li> --}}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('admin/providers') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Proveedores</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('admin/globalAttributes') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Globales</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('admin/users') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Usuarios</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('/laratrust') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Roles</span></a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

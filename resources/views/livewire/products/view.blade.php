@@ -9,21 +9,20 @@
                             <h4><i class="fab fa-laravel text-info"></i>
                                 Productos </h4>
                         </div>
-                        <div wire:poll.60s>
-                            <code>
-                                <h5>{{ now()->format('H:i:s') }} UTC</h5>
-                            </code>
-                        </div>
                         @if (session()->has('message'))
                             <div wire:poll.4s class="btn btn-sm btn-success" style="margin-top:0px; margin-bottom:0px;">
                                 {{ session('message') }} </div>
                         @endif
-                        <div>
-                            <input wire:model='keyWord' type="text" class="form-control" name="search" id="search"
-                                placeholder="Search Products">
-                        </div>
-                        <div class="btn btn-sm btn-info" data-toggle="modal" data-target="#createDataModal">
-                            <i class="fa fa-plus"></i> Agregar
+                        <div class="d-flex aling-items-center">
+                            <div>
+                                <input wire:model='keyWord' type="text" class="form-control" name="search"
+                                    id="search" placeholder="Search Products">
+                            </div>
+                            <div>
+                                <a class="btn btn-info ml-3" href="{{ url('admin/batchInputProducts') }}">
+                                    <span>Importar Productos</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -38,7 +37,7 @@
                                     <th>Sku</th>
                                     <th>Name</th>
                                     <th>Price</th>
-                                    <th>Description</th>
+                                    {{-- <th>Description</th> --}}
                                     <th>Stock</th>
                                     <th>Imagen</th>
                                     <th>Color</th>
@@ -59,7 +58,7 @@
                                         <td>{{ $row->sku }}</td>
                                         <td>{{ $row->name }}</td>
                                         <td>$ {{ $row->price }}</td>
-                                        <td>{{ Str::limit($row->description, 50) }}</td>
+                                        {{-- <td>{{ Str::limit($row->description, 50) }}</td> --}}
                                         <td>{{ $row->stock }}</td>
                                         <td><img src="{{ $row->firstImage->image_url }}" class="img-fluid"
                                                 alt="Sin imagen" style="max-width: 60px" srcset=""></td>

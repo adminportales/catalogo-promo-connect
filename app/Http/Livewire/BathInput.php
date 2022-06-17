@@ -200,9 +200,9 @@ class BathInput extends Component
 
     public function updateProductos()
     {
-        $this->validate([
+        /*  $this->validate([
             'SKU_interno' => 'required',
-        ]);
+        ]); */
 
         $documento = IOFactory::load($this->rutaArchivo);
         $hojaActual = $documento->getSheet(0);
@@ -245,7 +245,7 @@ class BathInput extends Component
             }
 
 
-            $productExist = ModelProduct::where('internal_sku', $hojaActual->getCellByColumnAndRow(1, $indiceFila)->getValue())->first();
+            $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow(1, $indiceFila)->getValue()))->first();
             if ($productExist) {
                 $dataProduct = [];
 
