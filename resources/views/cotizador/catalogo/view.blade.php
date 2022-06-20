@@ -62,7 +62,7 @@
                 @foreach ($products as $row)
                     <div class="col-md-3 d-flex justify-content-center">
                         <div class="card mb-4" style="width: 14rem;">
-                            <div class="card-body">
+                            <div class="card-body text-center">
                                 @php
                                     $priceProduct = $row->price;
                                     if ($row->producto_promocion) {
@@ -72,7 +72,7 @@
                                     }
                                 @endphp
                                 <img src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
-                                    class="card-img-top" alt="{{ $row->name }}">
+                                    class="card-img-top " alt="{{ $row->name }}" style="max-width: 100%; max-height: 150px; width: auto">
                                 <h5 class="card-title" style="text-transform: capitalize">{{ $row->name }}</h5>
                                 <p class=" m-0 pt-1"><strong>SKU:</strong> {{ $row->sku }}</p>
                                 <div class="d-flex justify-content-between">
@@ -80,6 +80,7 @@
                                     <p class=" m-0 pt-1">$
                                         {{ round($priceProduct + $priceProduct * ($utilidad / 100), 2) }}</p>
                                 </div>
+                                <br>
                                 <button type="button" class="btn btn-primary" data-toggle="modal"
                                     data-target="#modalProduct" wire:click="showProduct({{ $row->id }})">
                                     Vista Rapida

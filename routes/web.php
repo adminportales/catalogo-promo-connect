@@ -8,6 +8,7 @@ use App\Http\Controllers\Providers\ForPromotionalController;
 use App\Http\Controllers\Providers\InnovationController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
+use App\Http\Controllers\Providers\StockSurController;
 use App\Http\Controllers\SendProductsToEcommerce;
 use Illuminate\Support\Facades\Route;
 
@@ -31,10 +32,10 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
 
     //Route Hooks - Do not delete//
-	Route::view('prices', 'livewire.prices.index')->middleware('auth');
-	Route::view('product_attributes', 'livewire.product_attributes.index')->middleware('auth');
+    Route::view('prices', 'livewire.prices.index')->middleware('auth');
+    Route::view('product_attributes', 'livewire.product_attributes.index')->middleware('auth');
     Route::view('products', 'livewire.products.index');
-    
+
     Route::view('batchInputProducts',  'livewire.products.importProducts');
     Route::post('batchInputProducts/iusb',  [BatchInputProducts::class, 'updateProductsIUSB'])->name('import.iusb');
     Route::view('sites', 'livewire.sites.index')->middleware('auth');
@@ -69,3 +70,6 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 // Doble Vela
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
 Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
+
+// StockSur
+Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);

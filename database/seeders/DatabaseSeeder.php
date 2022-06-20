@@ -71,9 +71,16 @@ class DatabaseSeeder extends Seeder
             'contact' => 'Contacto',
             'discount' => 0
         ]);
+        Provider::create([
+            'company' => 'Stock Sur',
+            'email' => 'stocksur@promotional',
+            'phone' => '4738637878',
+            'contact' => 'Contacto',
+            'discount' => 0
+        ]);
         GlobalAttribute::create([
             'attribute' => 'Utilidad',
-            'value' => '10',
+            'value' => '0',
         ]);
         $category = Category::create([
             'family' => 'Sin Categoria',

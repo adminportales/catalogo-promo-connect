@@ -6,7 +6,6 @@
             border-radius: 15px !important;
             padding: 2px
         }
-
     </style>
     <div wire:ignore.self class="modal fade" id="modalProduct" tabindex="-1" aria-labelledby="modalProductLabel"
         aria-hidden="true">
@@ -129,14 +128,16 @@
                                     @endif
                                 </div>
                                 <div class="col-md-6">
-                                    <h5><strong>Categorias</strong></h5>
-                                    <p><strong>Categoria:</strong>
-                                        {{ $product->productCategories[0]->category->family }}
-                                    </p>
-                                    <p><strong>Sub
-                                            categoria:</strong>
-                                        {{ $product->productCategories[0]->subcategory->subfamily }}
-                                    </p>
+                                    @if (count($product->productCategories) > 0)
+                                        <h5><strong>Categorias</strong></h5>
+                                        <p><strong>Categoria:</strong>
+                                            {{ $product->productCategories[0]->category->family }}
+                                        </p>
+                                        <p><strong>Sub
+                                                categoria:</strong>
+                                            {{ $product->productCategories[0]->subcategory->subfamily }}
+                                        </p>
+                                    @endif
                                     @if (count($product->productAttributes) > 0)
                                         <h5><strong>Otros Atributos</strong></h5>
                                         <table class="table">
