@@ -262,11 +262,12 @@ class ForPromotionalController extends Controller
                 ]);
                 throw new Exception('failed to initialize');
             }
-            $url_server = 'https://dev-intranet.promolife.lat/';
+            $url_server = 'https://dev-catalogo.promolife.lat';
+            $url="{$url_server}/api/getProductsFP";
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
-                "{$url_server}/api/getProductsFP"
+                $url
             );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -291,7 +292,6 @@ class ForPromotionalController extends Controller
 
             // Convertir en array
             $products = json_decode($result, true);
-
             $maxSKU = Product::max('internal_sku');
             $idSku = null;
             if (!$maxSKU) {
