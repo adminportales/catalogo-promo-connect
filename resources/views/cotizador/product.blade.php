@@ -49,7 +49,7 @@
                                                         @endphp
                                                     @endif
                                                     <div class="carousel-item  {{ $active == 1 ? 'active' : '' }}">
-                                                        <img src="{{ $image->image_url }}" class="d-block w-100"
+                                                        <img src="{{ $image->image_url }}" class="d-block w-100" style="max-width: 100%; max-height: 850px; width: auto"
                                                             alt="{{ $image->image_url }}">
                                                     </div>
                                                     @php

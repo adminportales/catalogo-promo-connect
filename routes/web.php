@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Auth::routes();
+Route::get('/loginEmail', [LoginController::class, 'loginWithLink'])->name('loginWithLink');
 
 
 Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');
@@ -63,6 +64,7 @@ Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromo
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
+Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
 
 // IUSB
 Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);

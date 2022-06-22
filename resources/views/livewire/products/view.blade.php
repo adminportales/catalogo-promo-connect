@@ -60,8 +60,11 @@
                                         <td>$ {{ $row->price }}</td>
                                         {{-- <td>{{ Str::limit($row->description, 50) }}</td> --}}
                                         <td>{{ $row->stock }}</td>
-                                        <td><img src="{{ $row->firstImage->image_url }}" class="img-fluid"
-                                                alt="Sin imagen" style="max-width: 60px" srcset=""></td>
+                                        <td class="text-center"><img
+                                                src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
+                                                class="img-fluid" alt="Sin imagen"
+                                                style="max-width: 100%; max-height: 150px; width: auto" srcset="">
+                                        </td>
                                         <td>{{ $row->color->color }}</td>
                                         <td>{{ $row->provider->company }}</td>
                                         <td width="90">

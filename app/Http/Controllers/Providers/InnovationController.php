@@ -191,10 +191,15 @@ class InnovationController extends Controller
                         $idSku++;
                         // dd($/newProduct);
                     } else {
-                        // TODO: Actualizar la tabla de precios
-                        $productExist->update([
-                            'price' => $data['price'],
-                        ]);
+                        $productExist->precios()->delete();
+                        foreach ($product->lista_precios as $precio) {
+                            $productExist->precios()->create(
+                                [
+                                    'price' => $precio->mi_precio,
+                                    'escala' => $precio->escala,
+                                ]
+                            );
+                        }
                     }
                 }
             }

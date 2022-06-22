@@ -93,11 +93,16 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Type::create([
-            'type' => 'Normal',
-            'slug' => 'normal',
+            'type' => 'Catalogo',
+            'slug' => 'catalogo',
         ]);
 
         Type::create([
+            'type' => 'Importacion',
+            'slug' => 'importacion',
+        ]);
+
+        /* Type::create([
             'type' => 'Premium',
             'slug' => 'premium',
         ]);
@@ -105,6 +110,6 @@ class DatabaseSeeder extends Seeder
         Type::create([
             'type' => 'Oportunidad',
             'slug' => 'oportunidad',
-        ]);
+        ]); */
     }
 }

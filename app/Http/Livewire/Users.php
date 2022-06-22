@@ -5,6 +5,8 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
+use Exception;
+use Illuminate\Support\Str;
 
 class Users extends Component
 {
@@ -90,6 +92,35 @@ class Users extends Component
         if ($id) {
             $record = User::where('id', $id);
             $record->delete();
+        }
+    }
+
+    public function syncUsers()
+    {
+        try {
+            $urlIntranet = env("URL_INTRANET", "https://intranet.promolife.lat");
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlIntranet . "/api/getAllUsers");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $res = curl_exec($ch);
+            curl_close($ch);
+            $res = json_decode($res);
+            foreach ($res as $user) {
+                $searchUser = User::where('email', $user->email)->first();
+                if ($searchUser === null) {
+                    $newUser = User::create([
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'email_verified_at' => now(),
+                        'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+                        'remember_token' => Str::random(10),
+                    ]);
+                }
+            }
+            return redirect()->route('users.index')
+                ->with('success', 'User sync successfully');
+        } catch (Exception $e) {
+            return $e;
         }
     }
 }

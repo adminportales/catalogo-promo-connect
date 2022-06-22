@@ -200,9 +200,9 @@ class BathInput extends Component
 
     public function updateProductos()
     {
-        /*  $this->validate([
-            'SKU_interno' => 'required',
-        ]); */
+        if ($this->SKU == trim('') && $this->SKU_interno == trim('')) {
+            return;
+        }
 
         $documento = IOFactory::load($this->rutaArchivo);
         $hojaActual = $documento->getSheet(0);
@@ -243,9 +243,12 @@ class BathInput extends Component
                     'slug' => $slugSub,
                 ]);
             }
-
-
-            $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow(1, $indiceFila)->getValue()))->first();
+            $productExist = '';
+            if ($this->SKU == trim('')) {
+                $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
+            } else {
+                $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue()))->first();
+            }
             if ($productExist) {
                 $dataProduct = [];
 

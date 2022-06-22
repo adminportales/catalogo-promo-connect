@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Providers\ForPromotionalController;
 use App\Http\Controllers\SendProductsToEcommerce;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,3 +26,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/getAllProductos',  [ApiController::class, 'getAllProducts']);
 Route::get('/getPricePromoOpcion',  [ApiController::class, 'getPricePromoOpcion']);
+
+Route::get('/getProductsFP',  [ForPromotionalController::class, 'apiGetProductsFP']);

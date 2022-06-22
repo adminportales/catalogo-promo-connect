@@ -18,6 +18,9 @@
                                 <input wire:model='keyWord' type="text" class="form-control" name="search"
                                     id="search" placeholder="Buscar usuarios">
                             </div>
+                            <div class="btn btn-info ml-3" wire:click="syncUsers">
+                                <i class="fa fa-plus"></i> Sincronizar Usuarios
+                            </div>
                             <div class="btn btn-info ml-3" data-toggle="modal" data-target="#createDataModal">
                                 <i class="fa fa-plus"></i> Agregar
                             </div>

@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Product;
 use App\Models\Provider;
+use App\Models\Type;
 use Illuminate\Support\Facades\DB;
 
 class Catalogo extends Component
@@ -15,7 +16,7 @@ class Catalogo extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    public $nombre, $sku, $proveedor, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
+    public $nombre, $sku, $proveedor, $type, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
 
     public function __construct()
     {
@@ -35,6 +36,7 @@ class Catalogo extends Component
         $utilidad = (float) $utilidad->value;
 
         $proveedores = Provider::all();
+        $types = Type::all();
         $price = DB::table('products')->max('price');
         $price = round($price + $price * ($utilidad / 100), 2);
         $stock = DB::table('products')->max('stock');
@@ -42,6 +44,7 @@ class Catalogo extends Component
         $nombre = '%' . $this->nombre . '%';
         $sku = '%' . $this->sku . '%';
         $proveedor = '%' . $this->proveedor . '%';
+        $type = '%' . $this->type . '%';
         $precioMax = $price;
         if ($this->precioMax != null) {
             $precioMax =  round($this->precioMax / (($utilidad / 100) + 1), 2);
@@ -66,6 +69,7 @@ class Catalogo extends Component
             ->whereBetween('price', [$precioMin, $precioMax])
             ->whereBetween('stock', [$stockMin, $stockMax])
             ->where('provider_id', 'LIKE', $proveedor)
+            ->where('type_id', 'LIKE', $type)
             ->when($orderStock !== '', function ($query, $orderStock) {
                 $query->orderBy('stock', $this->orderStock);
             })
@@ -78,6 +82,7 @@ class Catalogo extends Component
             'products' => $products,
             'utilidad' => $utilidad,
             'proveedores' => $proveedores,
+            'types' => $types,
             'price' => $price,
             'priceMax' => $precioMax,
             'priceMin' => $precioMin,

@@ -14,6 +14,13 @@
                 @endforeach
             </select>
             <br>
+            <select wire:model='type' name="types" id="type" class="form-control">
+                <option value="">Importacion o Catalogo...</option>
+                @foreach ($types as $type)
+                    <option value="{{ $type->id }}">{{ $type->type }}</option>
+                @endforeach
+            </select>
+            <br>
             <p class="mb-0">Precio</p>
             <div class="d-flex align-items-center">
                 <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
