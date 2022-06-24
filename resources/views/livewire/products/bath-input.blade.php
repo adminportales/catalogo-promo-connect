@@ -42,8 +42,8 @@
             @elseif (count($columns) > 0 && count($productsImporteds) == 0)
                 @if ($tipo == 'create')
                     <form wire:submit.prevent="createProductos()" class="w-100">
-                @elseif($tipo == 'update')
-                    <form wire:submit.prevent="updateProductos()" class="w-100">
+                    @elseif($tipo == 'update')
+                        <form wire:submit.prevent="updateProductos()" class="w-100">
                 @endif
                 <div class="row justify-content-center">
                     <div class="col-md-5">
@@ -59,6 +59,12 @@
                                             <input type="text" wire:model="SKU_interno" class="form-control p-0 m-0">
                                         </div>
                                     </div>
+                                    @error('SKU_interno')
+                                        <span class="error">
+                                            <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                            </p>
+                                        </span>
+                                    @enderror
                                 </li>
                             @endif
                             <li class="list-group-item py-1">
@@ -70,6 +76,11 @@
                                         <input type="text" wire:model="SKU" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('SKU')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -80,6 +91,11 @@
                                         <input type="text" wire:model="SKU_Padre" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('SKU_Padre')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -90,6 +106,11 @@
                                         <input type="text" wire:model="Nombre" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Nombre')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -100,6 +121,11 @@
                                         <input type="text" wire:model="Descripcion" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Descripcion')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -110,6 +136,11 @@
                                         <input type="text" wire:model="Precio" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Precio')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -120,6 +151,11 @@
                                         <input type="text" wire:model="Stock" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Stock')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -130,6 +166,11 @@
                                         <input type="text" wire:model="Promocion" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Promocion')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -140,6 +181,11 @@
                                         <input type="text" wire:model="Descuento" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Descuento')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -147,9 +193,16 @@
                                         <label for="">Producto Nuevo</label>
                                     </div>
                                     <div class="w-50">
-                                        <input type="text" wire:model="Nuevo_Producto" class="form-control p-0 m-0">
+                                        <input type="text" wire:model="Nuevo_Producto"
+                                            class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Nuevo_Producto')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -160,6 +213,12 @@
                                         <input type="text" wire:model="Precio_Unico" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Precio_Unico')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -170,6 +229,12 @@
                                         <input type="text" wire:model="Tipo" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Tipo')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -180,6 +245,12 @@
                                         <input type="text" wire:model="Color" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Color')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -190,6 +261,12 @@
                                         <input type="text" wire:model="Proveedor" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Proveedor')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -200,6 +277,12 @@
                                         <input type="text" wire:model="Familia" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Familia')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -210,6 +293,12 @@
                                         <input type="text" wire:model="SubFamilia" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('SubFamilia')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -220,6 +309,12 @@
                                         <input type="text" wire:model="Imagenes" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Imagenes')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -230,6 +325,12 @@
                                         <input type="text" wire:model="Escalas" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Escalas')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                             <li class="list-group-item py-1">
                                 <div class="d-flex align-items-center">
@@ -240,6 +341,12 @@
                                         <input type="text" wire:model="Atributos" class="form-control p-0 m-0">
                                     </div>
                                 </div>
+                                @error('Atributos')
+                                    <span class="error">
+                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
+                                        </p>
+                                    </span>
+                                @enderror
                             </li>
                         </ul>
                     </div>

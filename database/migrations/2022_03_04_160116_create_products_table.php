@@ -26,7 +26,6 @@ class CreateProductsTable extends Migration
             $table->decimal('descuento', 8, 2)->default(0.00);
             $table->boolean('producto_nuevo')->nullable();
             $table->boolean('precio_unico')->nullable();
-            $table->boolean('disponible')->nullable();
             $table->foreignId('type_id')->nullable()->constrained();
             $table->foreignId('color_id')->nullable()->constrained();
             $table->foreignId('provider_id')->nullable()->constrained();

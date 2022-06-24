@@ -66,23 +66,12 @@ class BathInput extends Component
     {
         $this->validate([
             'SKU' => 'required',
-            'SKU_Padre' => 'required',
             'Nombre' => 'required',
             'Descripcion' => 'required',
-            'Precio' => 'required',
-            'Stock' => 'required',
-            'Promocion' => 'required',
-            'Descuento' => 'required',
-            'Nuevo_Producto' => 'required',
             'Precio_Unico' => 'required',
             'Tipo' => 'required',
-            'Color' => 'required',
             'Proveedor' => 'required',
-            'Familia' => 'required',
-            'SubFamilia' => 'required',
             'Imagenes' => 'required',
-            'Escalas' => 'required',
-            'Atributos' => 'required',
         ]);
 
         $documento = IOFactory::load($this->rutaArchivo);
@@ -104,35 +93,40 @@ class BathInput extends Component
         for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
             // Verificar si el color existe y si no registrarla
             $color = null;
-            $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()));
-            $color = Color::where("slug", $slug)->first();
-            if (!$color) {
-                $color = Color::create([
-                    'color' => ucfirst($hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()), 'slug' => $slug,
-                ]);
+            if (trim($this->Color) != '') {
+                $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()));
+                $color = Color::where("slug", $slug)->first();
+                if (!$color) {
+                    $color = Color::create([
+                        'color' => ucfirst($hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()), 'slug' => $slug,
+                    ]);
+                }
             }
 
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
-            $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()));
-            $categoria = Category::where("slug", $slug)->first();
-            if (!$categoria) {
-                $categoria = Category::create([
-                    'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
-                ]);
+            if (trim($this->Familia) != '') {
+                $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()));
+                $categoria = Category::where("slug", $slug)->first();
+                if (!$categoria) {
+                    $categoria = Category::create([
+                        'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
+                    ]);
+                }
             }
 
             $subcategoria = null;
+            if (trim($this->SubFamilia) != '') {
+                // Verificar si la subcategoria existe y si no registrarla
+                $slugSub = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()));
+                $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
 
-            // Verificar si la subcategoria existe y si no registrarla
-            $slugSub = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()));
-            $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
-
-            if (!$subcategoria) {
-                $subcategoria = $categoria->subcategories()->create([
-                    'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
-                    'slug' => $slugSub,
-                ]);
+                if (!$subcategoria) {
+                    $subcategoria = $categoria->subcategories()->create([
+                        'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
+                        'slug' => $slugSub,
+                    ]);
+                }
             }
 
 
@@ -146,15 +140,18 @@ class BathInput extends Component
                 $dataProduct['name'] = $hojaActual->getCellByColumnAndRow($this->Nombre, $indiceFila)->getValue();
                 $dataProduct['description'] = $hojaActual->getCellByColumnAndRow($this->Descripcion, $indiceFila)->getValue();
                 $dataProduct['price'] = $hojaActual->getCellByColumnAndRow($this->Precio, $indiceFila)->getValue();
-                $dataProduct['stock'] = $hojaActual->getCellByColumnAndRow($this->Stock, $indiceFila)->getValue();
+                $dataProduct['stock'] = $hojaActual->getCellByColumnAndRow($this->Stock, $indiceFila)->getValue() != null
+                    ? $hojaActual->getCellByColumnAndRow($this->Stock, $indiceFila)->getValue()
+                    : 0;
                 $dataProduct['producto_promocion'] = $hojaActual->getCellByColumnAndRow($this->Promocion, $indiceFila)->getValue();
-                $dataProduct['descuento'] = $hojaActual->getCellByColumnAndRow($this->Descuento, $indiceFila)->getValue();
+                $dataProduct['descuento'] = $hojaActual->getCellByColumnAndRow($this->Descuento, $indiceFila)->getValue() != null
+                    ? $hojaActual->getCellByColumnAndRow($this->Descuento, $indiceFila)->getValue()
+                    : 0.00;
                 $dataProduct['producto_nuevo'] = $hojaActual->getCellByColumnAndRow($this->Nuevo_Producto, $indiceFila)->getValue();
                 $dataProduct['precio_unico'] = $hojaActual->getCellByColumnAndRow($this->Precio_Unico, $indiceFila)->getValue();
                 $dataProduct['provider_id'] = $hojaActual->getCellByColumnAndRow($this->Proveedor, $indiceFila)->getValue();
                 $dataProduct['type_id'] = $hojaActual->getCellByColumnAndRow($this->Tipo, $indiceFila)->getValue();
                 $dataProduct['color_id'] = $color ? $color->id : null;
-
                 $newProduct = ModelProduct::create($dataProduct);
                 foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Imagenes, $indiceFila)->getValue()) as $img) {
                     $newProduct->images()->create([
@@ -181,15 +178,15 @@ class BathInput extends Component
                         ]);
                     }
                 }
-
-
                 /*
                 Registrar en la tabla product_category el producto, categoria y sub categoria
                 */
-                $newProduct->productCategories()->create([
-                    'category_id' => $categoria->id,
-                    'subcategory_id' => $subcategoria->id,
-                ]);
+                if ($categoria != null) {
+                    $newProduct->productCategories()->create([
+                        'category_id' => $categoria->id,
+                        'subcategory_id' => $subcategoria->id,
+                    ]);
+                }
                 $idSku++;
 
                 array_push($productosImportados, $newProduct);
@@ -213,38 +210,45 @@ class BathInput extends Component
         for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
             // Verificar si el color existe y si no registrarla
             $color = null;
-            $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()));
-            $color = Color::where("slug", $slug)->first();
-            if (!$color) {
-                $color = Color::create([
-                    'color' => ucfirst($hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()), 'slug' => $slug,
-                ]);
+            if (trim($this->Color)) {
+                $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()));
+                $color = Color::where("slug", $slug)->first();
+                if (!$color) {
+                    $color = Color::create([
+                        'color' => ucfirst($hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()), 'slug' => $slug,
+                    ]);
+                }
             }
 
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
-            $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()));
-            $categoria = Category::where("slug", $slug)->first();
-            if (!$categoria) {
-                $categoria = Category::create([
-                    'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
-                ]);
+            if (trim($this->Familia)) {
+                $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()));
+                $categoria = Category::where("slug", $slug)->first();
+                if (!$categoria) {
+                    $categoria = Category::create([
+                        'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
+                    ]);
+                }
             }
 
             $subcategoria = null;
+            if (trim($this->SubFamilia)) {
+                // Verificar si la subcategoria existe y si no registrarla
+                $slugSub = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()));
+                $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
 
-            // Verificar si la subcategoria existe y si no registrarla
-            $slugSub = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()));
-            $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
-
-            if (!$subcategoria) {
-                $subcategoria = $categoria->subcategories()->create([
-                    'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
-                    'slug' => $slugSub,
-                ]);
+                if (!$subcategoria) {
+                    $subcategoria = $categoria->subcategories()->create([
+                        'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
+                        'slug' => $slugSub,
+                    ]);
+                }
             }
             $productExist = '';
-            if ($this->SKU == trim('')) {
+            if ($this->SKU_interno != trim('')) {
+                $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
+            } else if ($this->SKU == trim('')) {
                 $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
             } else {
                 $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue()))->first();
@@ -295,6 +299,7 @@ class BathInput extends Component
                 $productExist->update($dataProduct);
                 if ($this->Imagenes) {
                     foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Imagenes, $indiceFila)->getValue()) as $img) {
+                        $productExist->images()->delete();
                         $productExist->images()->create([
                             'image_url' => $img
                         ]);
@@ -305,6 +310,7 @@ class BathInput extends Component
                     if ($this->Escalas) {
                         foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Escalas, $indiceFila)->getValue()) as $esc) {
                             $dataEscala = explode(':', $esc);
+                            $productExist->precios()->delete();
                             $productExist->precios()->create([
                                 'escala' => $dataEscala[0],
                                 'precio' => $dataEscala[1],
@@ -317,6 +323,7 @@ class BathInput extends Component
                     if ($hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue() != "") {
                         foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue()) as $att) {
                             $dataAttr = explode(':', $att);
+                            $productExist->productAttributes()->delete();
                             $productExist->productAttributes()->create([
                                 'attribute' => trim($dataAttr[0]),
                                 'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),

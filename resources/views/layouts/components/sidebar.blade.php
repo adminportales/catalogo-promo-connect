@@ -61,6 +61,11 @@
             <span>Usuarios</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{ url('admin/media') }}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Medios</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{ url('/laratrust') }}">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Roles</span></a>

@@ -49,7 +49,8 @@
                                                         @endphp
                                                     @endif
                                                     <div class="carousel-item  {{ $active == 1 ? 'active' : '' }}">
-                                                        <img src="{{ $image->image_url }}" class="d-block w-100" style="max-width: 100%; max-height: 850px; width: auto"
+                                                        <img src="{{ $image->image_url }}" class="d-block w-100"
+                                                            style="max-width: 100%; max-height: 850px; width: auto"
                                                             alt="{{ $image->image_url }}">
                                                     </div>
                                                     @php
@@ -91,7 +92,8 @@
                                     @endphp
                                     <h5><strong>Informacion</strong></h5>
                                     <p><strong>Descripcion: </strong> {{ $product->description }}</p>
-                                    <p><strong>Color: </strong> {{ $product->color->color }}</p>
+                                    <p><strong>Color: </strong>
+                                        {{ $product->color ? $product->color->color : 'Sin Color' }}</p>
                                     <p><strong>Stock: </strong> {{ $product->stock }}</p>
                                     <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
                                     @if ($product->precio_unico)
@@ -160,7 +162,6 @@
                                     @endif
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     <div class="modal-footer">

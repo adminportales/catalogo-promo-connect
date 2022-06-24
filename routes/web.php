@@ -33,6 +33,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
 
     //Route Hooks - Do not delete//
+	Route::view('media', 'livewire.mediums.index')->middleware('auth')->name('media.index');
     Route::view('prices', 'livewire.prices.index')->middleware('auth');
     Route::view('product_attributes', 'livewire.product_attributes.index')->middleware('auth');
     Route::view('products', 'livewire.products.index');
@@ -71,7 +72,6 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 
 // Doble Vela
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
-Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);

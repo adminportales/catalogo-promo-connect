@@ -9,40 +9,44 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>
-    @hasSection('title') @yield('title') | @endif {{ config('app.name', 'Laravel') }}
-</title>
+        @hasSection('title')
+            @yield('title') |
+        @endif {{ config('app.name', 'Laravel') }}
+    </title>
 
-<!-- Fonts -->
-<link rel="dns-prefetch" href="//fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-<link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-<!-- Styles -->
-<link href="{{ asset('css/app.css') }}" rel="stylesheet">
-<link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
-@livewireStyles
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @yield('styles')
+    @livewireStyles
 </head>
 
 <body>
-<div id="app">
-    <div id="page-top">
+    <div id="app">
+        <div id="page-top">
 
-        <div id="wrapper">
-            {{-- Sidebar --}}
-            @include('layouts.components.sidebar')
+            <div id="wrapper">
+                {{-- Sidebar --}}
+                @include('layouts.components.sidebar')
 
-            <div id="content-wrapper" class="d-flex flex-column">
+                <div id="content-wrapper" class="d-flex flex-column">
 
-                <div id="content">
-                    @include('layouts.components.navbar')
+                    <div id="content">
+                        @include('layouts.components.navbar')
 
 
 
-                    <!-- Page Heading -->
-                    {{-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <!-- Page Heading -->
+                        {{-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
                             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
                         </div> --}}
-                    <div class="row d-flex flex-column">
-                        {{-- <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+                        <div class="row d-flex flex-column">
+                            {{-- <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
                                 <div class="container">
                                     <a class="navbar-brand" href="{{ url('/') }}">
                                         {{ config('app.name', 'Laravel') }}
@@ -58,6 +62,9 @@
                                         @auth()
                                             <ul class="navbar-nav mr-auto">
                                                 <!--Nav Bar Hooks - Do not delete!!-->
+						<li class="nav-item">
+                            <a href="{{ url('/media') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Media</a>
+                        </li>
 						<li class="nav-item">
                             <a href="{{ url('/prices') }}" class="nav-link"><i class="fab fa-laravel text-info"></i> Prices</a>
                         </li>
@@ -149,67 +156,69 @@
                                     </div>
                                 </div>
                             </nav> --}}
-                        <main class="py-0">
-                            @yield('content')
-                        </main>
+                            <main class="py-0">
+                                @yield('content')
+                            </main>
+                        </div>
                     </div>
-                </div>
 
 
 
-                <!-- Logout Modal-->
-                <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
-                    aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-body">Desea salir del catalogo?.
-                                <br>
-                                <br>
-                                <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
-                                <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault();
+                    <!-- Logout Modal-->
+                    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">Desea salir del catalogo?.
+                                    <br>
+                                    <br>
+                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
+                                    <a class="btn btn-primary" href="{{ route('logout') }}"
+                                        onclick="event.preventDefault();
                                                                         document.getElementById('logout-form').submit();">
-                                    {{ __('Salir') }}
-                                </a>
+                                        {{ __('Salir') }}
+                                    </a>
 
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                    class="d-none">
-                                    @csrf
-                                </form>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        class="d-none">
+                                        @csrf
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+
+                    <footer class="sticky-footer bg-white">
+                        <div class="container my-auto">
+                            <div class="copyright text-center my-auto">
+                                <span>Copyright &copy; Your Website 2021</span>
+                            </div>
+                        </div>
+                    </footer>
                 </div>
 
-
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>Copyright &copy; Your Website 2021</span>
-                        </div>
-                    </div>
-                </footer>
             </div>
-
         </div>
     </div>
-</div>
-@livewireScripts
-<!-- Bootstrap core JavaScript-->
-<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    @livewireScripts
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-<!-- Core plugin JavaScript-->
-<script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
-<!-- Custom scripts for all pages-->
-<script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
-<script type="text/javascript">
-    window.livewire.on('closeModal', () => {
-        $('#createDataModal').modal('hide');
-    });
-</script>
-<!-- Scripts -->
-<script src="{{ asset('js/app.js') }}" defer></script>
+    <!-- Custom scripts for all pages-->
+    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+    <script type="text/javascript">
+        window.livewire.on('closeModal', () => {
+            $('#createDataModal').modal('hide');
+        });
+    </script>
+    <!-- Scripts -->
+    <script src="{{ asset('js/app.js') }}" defer></script>
+    @yield('scripts')
 </body>
 
 </html>
