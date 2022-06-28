@@ -173,11 +173,13 @@ class BathInput extends Component
                 if ($hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue() != "") {
                     foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue()) as $att) {
                         $dataAttr = explode(':', $att);
-                        $newProduct->productAttributes()->create([
-                            'attribute' => trim($dataAttr[0]),
-                            'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),
-                            'value' => $dataAttr[1],
-                        ]);
+                        if (count($dataAttr) > 0) {
+                            $newProduct->productAttributes()->create([
+                                'attribute' => trim($dataAttr[0]),
+                                'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),
+                                'value' => $dataAttr[1],
+                            ]);
+                        }
                     }
                 }
                 /*

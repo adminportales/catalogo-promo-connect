@@ -45,9 +45,9 @@ class Catalogo extends Component
 
         $nombre = '%' . $this->nombre . '%';
         $sku = '%' . $this->sku . '%';
-        $proveedor = $this->proveedor;
-        $color = $this->color;
-        $type =  $this->type;
+        $proveedor = $this->proveedor == "" ? null : $this->proveedor;
+        $color = $this->color == "" ? null : $this->color;
+        $type =  $this->type == "" ? null : $this->type;
         $precioMax = $price;
         if ($this->precioMax != null) {
             $precioMax =  round($this->precioMax / (($utilidad / 100) + 1), 2);
