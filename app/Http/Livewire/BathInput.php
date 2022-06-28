@@ -70,6 +70,8 @@ class BathInput extends Component
             'Descripcion' => 'required',
             'Precio_Unico' => 'required',
             'Tipo' => 'required',
+            'Stock' => 'required',
+            'Precio' => 'required',
             'Proveedor' => 'required',
             'Imagenes' => 'required',
         ]);

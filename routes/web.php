@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
 use App\Http\Controllers\HomeController;
@@ -23,8 +24,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes();
 Route::get('/loginEmail', [LoginController::class, 'loginWithLink'])->name('loginWithLink');
+Auth::routes();
 
 
 Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');

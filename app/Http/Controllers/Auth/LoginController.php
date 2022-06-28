@@ -42,6 +42,6 @@ class LoginController extends Controller
     public function loginWithLink(Request $request)
     {
         $this->login($request);
-        return redirect('/home');
+        return redirect('/catalogo');
     }
 }
