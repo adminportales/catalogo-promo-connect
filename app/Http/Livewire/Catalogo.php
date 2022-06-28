@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Color;
 use App\Models\GlobalAttribute;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -16,7 +17,7 @@ class Catalogo extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    public $nombre, $sku, $proveedor, $type, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
+    public $nombre, $sku, $proveedor, $color, $type, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
 
     public function __construct()
     {
@@ -36,6 +37,7 @@ class Catalogo extends Component
         $utilidad = (float) $utilidad->value;
 
         $proveedores = Provider::all();
+        $colores = Color::all();
         $types = Type::all();
         $price = DB::table('products')->max('price');
         $price = round($price + $price * ($utilidad / 100), 2);
@@ -43,8 +45,9 @@ class Catalogo extends Component
 
         $nombre = '%' . $this->nombre . '%';
         $sku = '%' . $this->sku . '%';
-        $proveedor = '%' . $this->proveedor . '%';
-        $type = '%' . $this->type . '%';
+        $proveedor = $this->proveedor;
+        $color = $this->color;
+        $type =  $this->type;
         $precioMax = $price;
         if ($this->precioMax != null) {
             $precioMax =  round($this->precioMax / (($utilidad / 100) + 1), 2);
@@ -70,6 +73,7 @@ class Catalogo extends Component
             ->whereBetween('stock', [$stockMin, $stockMax])
             ->where('provider_id', 'LIKE', $proveedor)
             ->where('type_id', 'LIKE', $type)
+            ->where('color_id', 'LIKE', $color)
             ->when($orderStock !== '', function ($query, $orderStock) {
                 $query->orderBy('stock', $this->orderStock);
             })
@@ -82,6 +86,7 @@ class Catalogo extends Component
             'products' => $products,
             'utilidad' => $utilidad,
             'proveedores' => $proveedores,
+            'colores' => $colores,
             'types' => $types,
             'price' => $price,
             'priceMax' => $precioMax,

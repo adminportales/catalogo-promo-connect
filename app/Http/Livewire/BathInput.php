@@ -291,10 +291,10 @@ class BathInput extends Component
                 if ($this->Proveedor) {
                     $dataProduct['provider_id'] = $hojaActual->getCellByColumnAndRow($this->Proveedor, $indiceFila)->getValue();
                 }
-                if ($this->Proveedor) {
+                if ($this->Tipo) {
                     $dataProduct['type_id'] = $hojaActual->getCellByColumnAndRow($this->Tipo, $indiceFila)->getValue();
                 }
-                if ($this->Tipo) {
+                if ($this->Color) {
                     $dataProduct['color_id'] = $color ? $color->id : null;
                 }
 

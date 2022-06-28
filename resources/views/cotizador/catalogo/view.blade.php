@@ -4,12 +4,18 @@
         <div class="col-md-2">
             <p>Filtros de busqueda</p>
             <input wire:model='nombre' type="text" class="form-control mb-2" name="search" id="search"
-                placeholder="Nombre o SKU">
-            <input wire:model='sku' type="text" class="form-control" name="search" id="search" placeholder="SKU">
+                placeholder="Nombre">
+            <input wire:model='sku' type="text" class="form-control mb-2" name="search" id="search" placeholder="SKU">
             <select wire:model='proveedor' name="proveedores" id="provee" class="form-control mb-2">
                 <option value="">Seleccione Proveedor...</option>
                 @foreach ($proveedores as $provider)
                     <option value="{{ $provider->id }}">{{ $provider->company }}</option>
+                @endforeach
+            </select>
+            <select wire:model='color' name="colores" id="provee" class="form-control mb-2">
+                <option value="">Seleccione color...</option>
+                @foreach ($colores as $color)
+                    <option value="{{ $color->id }}">{{ $color->color }}</option>
                 @endforeach
             </select>
             <select wire:model='type' name="types" id="type" class="form-control mb-2">
