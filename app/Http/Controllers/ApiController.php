@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
-    public function getAllProductos()
+    public function getAllProducts()
     {
         $providers = Provider::all();
         $categories = Category::all();
