@@ -17,7 +17,7 @@ class Catalogo extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    public $nombre, $sku, $proveedor, $color, $type, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
+    public $nombre, $sku, $proveedor, $color, $category, $type, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
 
     public function __construct()
     {
@@ -37,7 +37,6 @@ class Catalogo extends Component
         $utilidad = (float) $utilidad->value;
 
         $proveedores = Provider::all();
-        $colores = Color::all();
         // Agrupar Colores similares
         $types = Type::all();
         $price = DB::table('products')->max('price');
@@ -46,7 +45,8 @@ class Catalogo extends Component
 
         $nombre = '%' . $this->nombre . '%';
         $sku = '%' . $this->sku . '%';
-        $color = '%' . $this->color . '%';
+        $color = $this->color;
+        $category = $this->category;
         $proveedor = $this->proveedor == "" ? null : $this->proveedor;
         $type =  $this->type == "" ? null : $this->type;
         $precioMax = $price;
@@ -68,11 +68,12 @@ class Catalogo extends Component
 
         $orderPrice = $this->orderPrice;
         $orderStock = $this->orderStock;
-        // join('colors', 'products.color_id', 'colors.id')->
 
-        $products  = Product::select('products.*')->join('colors', 'products.color_id', 'colors.id')->where('products.name', 'LIKE', $nombre)
+        $products  = Product::leftjoin('product_category', 'product_category.product_id', 'products.id')
+            ->leftjoin('categories', 'product_category.category_id', 'categories.id')
+            ->leftjoin('colors', 'products.color_id', 'colors.id')
+            ->where('products.name', 'LIKE', $nombre)
             ->where('products.sku', 'LIKE', $sku)
-            ->where('colors.color', 'LIKE', $color)
             ->whereBetween('products.price', [$precioMin, $precioMax])
             ->whereBetween('products.stock', [$stockMin, $stockMax])
             ->where('products.provider_id', 'LIKE', $proveedor)
@@ -83,7 +84,16 @@ class Catalogo extends Component
             ->when($orderPrice !== '', function ($query, $orderPrice) {
                 $query->orderBy('products.price', $this->orderPrice);
             })
-            ->orderBy('products.created_at', 'ASC')
+            ->when($color !== '' && $color !== null, function ($query, $color) {
+                $newColor  = $this->color . '%';
+                $query->where('colors.color', 'LIKE', $newColor);
+            })
+            ->when($category !== '' && $category !== null, function ($query, $category) {
+                $newCat  = '%' . $this->category . '%';
+                $query->where('categories.family', 'LIKE', $newCat);
+            })
+            ->orderBy('products.id', 'ASC')
+            ->select('products.*')
             ->paginate(32);
 
         return view('cotizador.catalogo.view', [

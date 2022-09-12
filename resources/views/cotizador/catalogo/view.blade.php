@@ -9,6 +9,8 @@
                 placeholder="SKU">
             <input wire:model='color' type="text" class="form-control mb-2" name="color" id="color"
                 placeholder="Ingrese el color">
+            <input wire:model='category' type="text" class="form-control mb-2" name="category" id="category"
+                placeholder="Ingrese la familia">
             <select wire:model='proveedor' name="proveedores" id="provee" class="form-control mb-2">
                 <option value="">Seleccione Proveedor...</option>
                 @foreach ($proveedores as $provider)
@@ -70,7 +72,7 @@
             @endif
             <div class="row">
                 @foreach ($products as $row)
-                {{-- {{ $row->firstImage->image_url }} --}}
+                    {{-- {{ $row->firstImage->image_url }} --}}
                     <div class="col-md-3 d-flex justify-content-center">
                         <div class="card mb-4" style="width: 14rem;">
                             <div class="card-body text-center">
