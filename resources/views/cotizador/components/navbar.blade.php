@@ -3,27 +3,16 @@
         <!-- Nav Item - User Information -->
         <li class="nav-item no-arrow">
             <div class="nav-link text-dark">
-                <h5>Catalogo</h5>
+                <img class="img-fluid h-100" src="{{ asset('/img/logo.png') }}" alt="bhtrade"></a>
             </div>
         </li>
         <div class="topbar-divider d-none d-sm-block"></div>
+        <li class="nav-item">
+            <div class="nav-link text-dark">
+                <h5>Promo Connect</h5>
+            </div>
+        </li>
     </ul>
-    <div class="w-100 py-2 h-100">
-        <ul class="d-flex justify-content-around align-items-center h-100 m-0 p-0">
-            <li class="p-0 m-0 h-100" style="list-style: none">
-                <img class="h-100 img-fluid" src="{{ asset('/img/bhtrade.png') }}" alt="bhtrade"></a>
-            </li>
-            <li class="p-0 m-0 h-100" style="list-style: none">
-                <img class="h-100 img-fluid" src="{{ asset('/img/promolife.png') }}" alt="promolife"></a>
-            </li>
-            <li class="p-0 m-0 h-100" style="list-style: none">
-                <img class="h-100  w-auto img-fluid" src="{{ asset('/img/promodreams.png') }}" alt="promodreams"></a>
-            </li>
-            <li class="p-0 m-0 h-100" style="list-style: none">
-                <img class="h-100 img-fluid" src="{{ asset('/img/trademarket.png') }}" alt="trademarket"></a>
-            </li>
-        </ul>
-    </div>
 
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
@@ -70,7 +59,8 @@
                 <br>
                 <br>
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
-                <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault();
+                <a class="btn btn-primary" href="{{ route('logout') }}"
+                    onclick="event.preventDefault();
         document.getElementById('logout-form').submit();">
                     {{ __('Salir') }}
                 </a>
