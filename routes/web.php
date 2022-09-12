@@ -66,7 +66,7 @@ Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromo
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
-Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
+// Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
 
 // IUSB
 Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);

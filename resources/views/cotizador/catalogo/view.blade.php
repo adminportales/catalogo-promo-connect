@@ -5,19 +5,22 @@
             <p>Filtros de busqueda</p>
             <input wire:model='nombre' type="text" class="form-control mb-2" name="search" id="search"
                 placeholder="Nombre">
-            <input wire:model='sku' type="text" class="form-control mb-2" name="search" id="search" placeholder="SKU">
+            <input wire:model='sku' type="text" class="form-control mb-2" name="search" id="search"
+                placeholder="SKU">
+            <input wire:model='color' type="text" class="form-control mb-2" name="color" id="color"
+                placeholder="Ingrese el color">
             <select wire:model='proveedor' name="proveedores" id="provee" class="form-control mb-2">
                 <option value="">Seleccione Proveedor...</option>
                 @foreach ($proveedores as $provider)
                     <option value="{{ $provider->id }}">{{ $provider->company }}</option>
                 @endforeach
             </select>
-            <select wire:model='color' name="colores" id="provee" class="form-control mb-2">
+            {{-- <select wire:model='color' name="colores" id="provee" class="form-control mb-2">
                 <option value="">Seleccione color...</option>
                 @foreach ($colores as $color)
                     <option value="{{ $color->id }}">{{ $color->color }}</option>
                 @endforeach
-            </select>
+            </select> --}}
             <select wire:model='type' name="types" id="type" class="form-control mb-2">
                 <option value="">Importacion o Catalogo...</option>
                 @foreach ($types as $type)
@@ -67,6 +70,7 @@
             @endif
             <div class="row">
                 @foreach ($products as $row)
+                {{-- {{ $row->firstImage->image_url }} --}}
                     <div class="col-md-3 d-flex justify-content-center">
                         <div class="card mb-4" style="width: 14rem;">
                             <div class="card-body text-center">

@@ -22,7 +22,7 @@ class Catalogo extends Component
     public function __construct()
     {
         $utilidad = GlobalAttribute::find(1);
-        $utilidad = (float) $utilidad->value;
+        $utilidad = 50;
         $price = DB::table('products')->max('price');
         $this->precioMax = round($price + $price * ($utilidad / 100), 2);
         $this->precioMin = 0;
@@ -38,6 +38,7 @@ class Catalogo extends Component
 
         $proveedores = Provider::all();
         $colores = Color::all();
+        // Agrupar Colores similares
         $types = Type::all();
         $price = DB::table('products')->max('price');
         $price = round($price + $price * ($utilidad / 100), 2);
@@ -45,8 +46,8 @@ class Catalogo extends Component
 
         $nombre = '%' . $this->nombre . '%';
         $sku = '%' . $this->sku . '%';
+        $color = '%' . $this->color . '%';
         $proveedor = $this->proveedor == "" ? null : $this->proveedor;
-        $color = $this->color == "" ? null : $this->color;
         $type =  $this->type == "" ? null : $this->type;
         $precioMax = $price;
         if ($this->precioMax != null) {
@@ -67,26 +68,28 @@ class Catalogo extends Component
 
         $orderPrice = $this->orderPrice;
         $orderStock = $this->orderStock;
-        $products  = Product::where('name', 'LIKE', $nombre)
-            ->where('sku', 'LIKE', $sku)
-            ->whereBetween('price', [$precioMin, $precioMax])
-            ->whereBetween('stock', [$stockMin, $stockMax])
-            ->where('provider_id', 'LIKE', $proveedor)
-            ->where('type_id', 'LIKE', $type)
-            ->where('color_id', 'LIKE', $color)
+        // join('colors', 'products.color_id', 'colors.id')->
+
+        $products  = Product::select('products.*')->join('colors', 'products.color_id', 'colors.id')->where('products.name', 'LIKE', $nombre)
+            ->where('products.sku', 'LIKE', $sku)
+            ->where('colors.color', 'LIKE', $color)
+            ->whereBetween('products.price', [$precioMin, $precioMax])
+            ->whereBetween('products.stock', [$stockMin, $stockMax])
+            ->where('products.provider_id', 'LIKE', $proveedor)
+            ->where('products.type_id', 'LIKE', $type)
             ->when($orderStock !== '', function ($query, $orderStock) {
-                $query->orderBy('stock', $this->orderStock);
+                $query->orderBy('products.stock', $this->orderStock);
             })
             ->when($orderPrice !== '', function ($query, $orderPrice) {
-                $query->orderBy('price', $this->orderPrice);
+                $query->orderBy('products.price', $this->orderPrice);
             })
+            ->orderBy('products.created_at', 'ASC')
             ->paginate(32);
 
         return view('cotizador.catalogo.view', [
             'products' => $products,
             'utilidad' => $utilidad,
             'proveedores' => $proveedores,
-            'colores' => $colores,
             'types' => $types,
             'price' => $price,
             'priceMax' => $precioMax,
