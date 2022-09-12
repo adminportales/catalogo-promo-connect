@@ -13,7 +13,7 @@
     <div class="wrapper fadeInDown">
         <div id="formContent">
             <!-- Tabs Titles -->
-            <h1 class="active" style="margin-bottom: 0">Catalogo de Productos</h1>
+            <h1 class="active" style="margin-bottom: 0">Promo Connect</h1>
             <br>
             <h2 class="active" style="margin-top: 0"> Ingresar </h2>
             <!-- Login Form -->

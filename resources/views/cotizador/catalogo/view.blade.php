@@ -58,19 +58,28 @@
                 <option value="DESC">De mayor a menor</option>
             </select>
         </div>
-        <div class="col-md-10">
+        <div class="products col-md-10">
             @php
                 $counter = $products->perPage() * $products->currentPage() - $products->perPage() + 1;
             @endphp
-            @if (count($products) <= 0)
-                <div class="d-flex flex-wrap justify-content-center align-items-center flex-column">
-                    <p>No hay resultados de busqueda en la pagina actual</p>
-                    @if (count($products->items()) == 0 && $products->currentPage() > 1)
-                        <p>Click en la paginacion para ver mas resultados</p>
-                    @endif
+            <div wire:loading.block>
+                <div class="loading w-100 d-flex justify-content-center align-items-center" style="height: 85vh;">
+                    <div class="w-25">
+                        <img src="{{ asset('img/load.gif') }}" alt="" srcset="" class="w-100">
+                    </div>
                 </div>
-            @endif
-            <div class="row">
+            </div>
+            <div class="row" wire:loading.class='products-content'>
+                @if (count($products) <= 0)
+                    <div class="col-md-12">
+                        <div class="d-flex flex-wrap justify-content-center align-items-center flex-column">
+                            <p>No hay resultados de busqueda en la pagina actual</p>
+                            @if (count($products->items()) == 0 && $products->currentPage() > 1)
+                                <p>Click en la paginacion para ver mas resultados</p>
+                            @endif
+                        </div>
+                    </div>
+                @endif
                 @foreach ($products as $row)
                     {{-- {{ $row->firstImage->image_url }} --}}
                     <div class="col-md-3 d-flex justify-content-center">
@@ -110,4 +119,19 @@
             @livewire('product')
         </div>
     </div>
+    <style>
+        .products {
+            position: relative;
+        }
+
+        .products-content {
+            opacity: .3;
+        }
+
+        .loading {
+            z-index: 100;
+            position: absolute;
+            opacity: 1;
+        }
+    </style>
 </div>
