@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Color;
+use App\Models\Image;
 use App\Models\Medium;
 use App\Models\Product;
 use App\Models\Provider;
@@ -66,5 +67,12 @@ class ShowAndEditProduct extends Component
             $this->urlImage = '';
         }
         $this->images = $this->product->images;
+    }
+    public function elimiarImagen($id)
+    {
+        $img = Image::find($id);
+        if ($img) {
+            $img->delete();
+        }
     }
 }

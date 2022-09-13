@@ -139,10 +139,17 @@
                     <div class="card-header">
                         <h5>Imagenes del Producto</h5>
                     </div>
-                    <div class="card-body w-100">
-                        @foreach ($images as $imagen)
-                            <img src="{{ $imagen->image_url }}" alt="" class="w-25 img-thumbnail">
-                        @endforeach
+                    <div class="card-body ">
+                        <div class="w-100 row">
+                            @foreach ($images as $imagen)
+                                <div class="col-md-4">
+                                    <div class="img-thumbnail mb-2">
+                                        <img src="{{ $imagen->image_url }}" alt="" class="w-100">
+                                        <div class="btn btn-sm btn-danger btn-block" wire:click="elimiarImagen({{ $imagen->id }})">x</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                         <hr>
                         <div class="d-flex justify-content-between">
                             <p>Agregar Imagen</p>
