@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Providers\DobleVelaController;
 use App\Http\Controllers\Providers\ForPromotionalController;
 use App\Http\Controllers\Providers\InnovationController;
@@ -38,6 +39,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::view('prices', 'livewire.prices.index')->middleware('auth');
     Route::view('product_attributes', 'livewire.product_attributes.index')->middleware('auth');
     Route::view('products', 'livewire.products.index');
+    Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
     Route::view('batchInputProducts',  'livewire.products.importProducts');
     Route::post('batchInputProducts/iusb',  [BatchInputProducts::class, 'updateProductsIUSB'])->name('import.iusb');

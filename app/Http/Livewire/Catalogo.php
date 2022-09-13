@@ -22,7 +22,7 @@ class Catalogo extends Component
     public function __construct()
     {
         $utilidad = GlobalAttribute::find(1);
-        $utilidad = 50;
+        $utilidad =$utilidad->value;
         $price = DB::table('products')->max('price');
         $this->precioMax = round($price + $price * ($utilidad / 100), 2);
         $this->precioMin = 0;

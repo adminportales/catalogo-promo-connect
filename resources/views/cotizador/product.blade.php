@@ -11,13 +11,13 @@
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div wire:loading>
+                {{-- <div wire:loading>
                     <div class="p-5 d-flex justify-content-center w-100">
                         <div class="spinner-border text-primary" role="status">
                             <span class="sr-only">Loading...</span>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 @if ($product)
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalProductLabel">{{ $product->name }}</h5>

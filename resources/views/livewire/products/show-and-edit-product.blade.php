@@ -1,5 +1,4 @@
 <div>
-
     @if (!$product)
         <div wire:loading>
             <div class="p-5 d-flex justify-content-center w-100">
@@ -15,7 +14,7 @@
                 <h3>Editar Producto</h3>
             </div>
             <div>
-                <button class="btn btn-warning" wire:click="showList()">Regresar</button>
+                <a href="/admin/products" class="btn btn-warning">Regresar</a>
             </div>
         </div>
         <div class="row">
@@ -32,10 +31,9 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Sitios en donde se comparte</h5>
+                        <h5>Informacion del producto</h5>
                     </div>
                     <div class="card-body">
-                        <h5>Informacion del producto</h5>
                         <form>
                             <div class="form-group py-1">
                                 <div class="d-flex align-items-center">
@@ -136,9 +134,31 @@
                     </div>
                 </div>
             </div>
-            {{-- <div class="col-md-4">
-                <h5>Imagenes del Producto</h5>
-            </div> --}}
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Imagenes del Producto</h5>
+                    </div>
+                    <div class="card-body w-100">
+                        @foreach ($images as $imagen)
+                            <img src="{{ $imagen->image_url }}" alt="" class="w-25 img-thumbnail">
+                        @endforeach
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <p>Agregar Imagen</p>
+                            <div wire:loading.block>
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="url" class="form-control mb-2" wire:model="urlImage"
+                            placeholder="Ingrese la url de la imagen">
+                        <input type="file" class="form-control mb-2" wire:model="fileImage">
+                        <input type="submit" class="btn btn-sm btn-info btn-block   mb-2" wire:click="saveImage">
+                    </div>
+                </div>
+            </div>
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -171,12 +191,14 @@
                             @endforeach
                         </ul>
                         @if (session()->has('updateSites'))
-                            <div wire:poll.3s class="btn btn-sm btn-success" style="margin-top:0px; margin-bottom:0px;">
+                            <div wire:poll.3s class="btn btn-sm btn-success"
+                                style="margin-top:0px; margin-bottom:0px;">
                                 {{ session('updateSites') }} </div>
                         @endif
                     </div>
                 </div>
             </div>
+
         </div>
     @endif
 </div>

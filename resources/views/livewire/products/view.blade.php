@@ -75,7 +75,7 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-right">
                                                     <a class="dropdown-item"
-                                                        wire:click="showProduct({{ $row->id }})"><i
+                                                        href="{{ route('products.show', ['product' => $row->id]) }}"><i
                                                             class="fa fa-edit"></i> Ver Detalles </a>
                                                     <a class="dropdown-item"
                                                         onclick="confirm('Confirm Delete Product id {{ $row->id }}? \nDeleted Products cannot be recovered!')||event.stopImmediatePropagation()"
@@ -92,8 +92,5 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="{{ $showProduct }}">
-        @livewire('show-and-edit-product')
     </div>
 </div>
