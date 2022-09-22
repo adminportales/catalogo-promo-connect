@@ -9,7 +9,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>
-        @hasSection('title') @yield('title') | @endif {{ config('app.name', 'Laravel') }}
+        @hasSection('title')
+            @yield('title') |
+        @endif {{ config('app.name', 'Laravel') }}
     </title>
 
     <!-- Fonts -->
@@ -19,6 +21,42 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #58CAE6;
+            color: white;
+        }
+
+        .Drop-shadow {
+            float: right;
+        }
+
+        .Drop-shadow img {
+            filter: drop-shadow(1px 1px 1px #fff);
+        }
+
+        .btn-primary {
+            background-color: #41C4E3;
+            border-color: #41C4E3;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:active,
+        .btn-primary:focus {
+            background-color: #1FAFD3 !important;
+            border-color: #1FAFD3 !important;
+        }
+
+        p,
+        .table {
+            color: #18839E !important;
+        }
+
+        .card-title,
+        h5 {
+            color: #0D4654 !important;
+        }
+    </style>
     @livewireStyles
 </head>
 

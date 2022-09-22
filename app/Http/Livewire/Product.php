@@ -21,6 +21,10 @@ class Product extends Component
     {
         $utilidad = GlobalAttribute::find(1);
         $utilidad = (float) $utilidad->value;
+
+        if (auth()->user()->settingsUser) {
+            $utilidad = (float)(auth()->user()->settingsUser->utility > 0 ?  auth()->user()->settingsUser->utility :  $utilidad);
+        }
         return view('cotizador.product', ['product' => $this->product, 'utilidad' => $utilidad]);
     }
     public function clear()

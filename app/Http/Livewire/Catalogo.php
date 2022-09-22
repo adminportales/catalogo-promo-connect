@@ -22,7 +22,12 @@ class Catalogo extends Component
     public function __construct()
     {
         $utilidad = GlobalAttribute::find(1);
-        $utilidad =$utilidad->value;
+        $utilidad = (float) $utilidad->value;
+
+        if (auth()->user()->settingsUser) {
+            $utilidad = (float)(auth()->user()->settingsUser->utility > 0 ?  auth()->user()->settingsUser->utility :  $utilidad);
+        }
+
         $price = DB::table('products')->max('price');
         $this->precioMax = round($price + $price * ($utilidad / 100), 2);
         $this->precioMin = 0;
@@ -36,7 +41,10 @@ class Catalogo extends Component
         $utilidad = GlobalAttribute::find(1);
         $utilidad = (float) $utilidad->value;
 
-        $proveedores = Provider::all();
+        if (auth()->user()->settingsUser) {
+            $utilidad = (float)(auth()->user()->settingsUser->utility > 0 ?  auth()->user()->settingsUser->utility :  $utilidad);
+        }
+        $proveedores = auth()->user()->roles()->first()->providers;
         // Agrupar Colores similares
         $types = Type::all();
         $price = DB::table('products')->max('price');
@@ -76,6 +84,7 @@ class Catalogo extends Component
             ->where('products.sku', 'LIKE', $sku)
             ->whereBetween('products.price', [$precioMin, $precioMax])
             ->whereBetween('products.stock', [$stockMin, $stockMax])
+            //TODO: Limitar Proveedores
             ->where('products.provider_id', 'LIKE', $proveedor)
             ->where('products.type_id', 'LIKE', $type)
             ->when($orderStock !== '', function ($query, $orderStock) {

@@ -1,15 +1,15 @@
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand topbar mb-4 static-top shadow">
     <ul class="navbar-nav mr-auto">
         <!-- Nav Item - User Information -->
-        <li class="nav-item no-arrow">
-            <div class="nav-link text-dark">
-                <img class="img-fluid h-100" src="{{ asset('/img/logo.png') }}" alt="bhtrade"></a>
+        <li class="nav-item no-arrow Drop-shadow">
+            <div class="nav-link text-light">
+                <img class="imagen img-fluid h-100" src="{{ asset('/img/logo.png') }}" alt="bhtrade"></a>
             </div>
         </li>
         <div class="topbar-divider d-none d-sm-block"></div>
         <li class="nav-item">
-            <div class="nav-link text-dark">
-                <h5>Promo Connect</h5>
+            <div class="nav-link">
+                <h5 style="color: #000 !important; font-weight: bold;">Promo Connect</h5>
             </div>
         </li>
     </ul>
@@ -44,9 +44,7 @@
                 </div>
             </li>
         @endauth
-
     </ul>
-
 </nav>
 
 

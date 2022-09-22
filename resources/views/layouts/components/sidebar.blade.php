@@ -66,9 +66,18 @@
             <span>Medios</span></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{{ url('/laratrust') }}">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Roles</span></a>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRoles"
+            aria-expanded="true" aria-controls="collapseRoles">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Roles</span>
+        </a>
+        <div id="collapseRoles" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Gestor de Roles:</h6>
+                <a class="collapse-item" href="{{ url('/laratrust') }}">General</a>
+                <a class="collapse-item" href="{{ url('/admin/roles-providers') }}">Proveedores</a>
+            </div>
+        </div>
     </li>
 
     <!-- Divider -->

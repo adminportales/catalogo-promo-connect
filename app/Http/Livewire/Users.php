@@ -13,7 +13,7 @@ class Users extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord, $name, $email;
+    public $selected_id, $keyWord, $name, $email, $utilidad;
     public $updateMode = false;
 
     public function render()
@@ -36,6 +36,7 @@ class Users extends Component
     {
         $this->name = null;
         $this->email = null;
+        $this->utilidad = null;
     }
 
     public function store()
@@ -45,11 +46,15 @@ class Users extends Component
             'email' => 'required',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $this->name,
             'email' => $this->email,
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
         ]);
+
+        if ((int)$this->utilidad > 0) {
+            $user->settingsUser()->create(['utility' => $this->utilidad]);
+        }
 
         $this->resetInput();
         $this->emit('closeModal');
@@ -63,7 +68,7 @@ class Users extends Component
         $this->selected_id = $id;
         $this->name = $record->name;
         $this->email = $record->email;
-
+        $this->utilidad = $record->settingsUser ? $record->settingsUser->utility : null;
         $this->updateMode = true;
     }
 
@@ -80,6 +85,16 @@ class Users extends Component
                 'name' => $this->name,
                 'email' => $this->email
             ]);
+
+
+            if ((int)$this->utilidad > 0) {
+                $record->settingsUser()->updateOrCreate(['user_id' => $record->id], ['utility' => $this->utilidad]);
+            } else {
+                $this->utilidad = 0;
+                if ($record->settingsUser()) {
+                    $record->settingsUser()->update(['utility' => $this->utilidad]);
+                }
+            }
 
             $this->resetInput();
             $this->updateMode = false;

@@ -12,6 +12,7 @@ use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
 use App\Http\Controllers\Providers\StockSurController;
 use App\Http\Controllers\SendProductsToEcommerce;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,7 +36,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
 
     //Route Hooks - Do not delete//
-	Route::view('media', 'livewire.mediums.index')->middleware('auth')->name('media.index');
+    Route::view('media', 'livewire.mediums.index')->middleware('auth')->name('media.index');
     Route::view('prices', 'livewire.prices.index')->middleware('auth');
     Route::view('product_attributes', 'livewire.product_attributes.index')->middleware('auth');
     Route::view('products', 'livewire.products.index');
@@ -49,6 +50,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::view('categories', 'livewire.categories.index');
     Route::view('providers', 'livewire.providers.index');
     Route::view('globalAttributes', 'livewire.globalAttributes.index');
+
+    Route::view('roles-providers', 'livewire.roles-providers.index');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -78,3 +81,5 @@ Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProd
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
+
+Route::get('/setRoles', [SettingsController::class, 'setRoles']);

@@ -74,10 +74,12 @@
 
                             </div>
                             <div class="d-flex justify-content-around w-100 align-items-center">
-                                <div class="">
-                                    <p><strong>SKU: </strong> {{ $product->sku }}</p>
-                                    <p><strong>SKU Padre: </strong> {{ $product->sku_parent }}</p>
-                                </div>
+                                @permission('ver-sku-s-de-proveedores')
+                                    <div class="">
+                                        <p><strong>SKU: </strong> {{ $product->sku }}</p>
+                                        <p><strong>SKU Padre: </strong> {{ $product->sku_parent }}</p>
+                                    </div>
+                                @endpermission
                                 <p><strong>SKU Interno: </strong> {{ $product->internal_sku }}</p>
                             </div>
                             <div class="row w-100">
@@ -94,11 +96,16 @@
                                     <p><strong>Descripcion: </strong> {{ $product->description }}</p>
                                     <p><strong>Color: </strong>
                                         {{ $product->color ? $product->color->color : 'Sin Color' }}</p>
-                                    <p><strong>Stock: </strong> {{ $product->stock }}</p>
-                                    <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
+
+                                    @permission('ver-stock')
+                                        <p><strong>Stock: </strong> {{ $product->stock }}</p>
+                                    @endpermission
+                                    @permission('ver-proveedores')
+                                        <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
+                                    @endpermission
                                     @if ($product->precio_unico)
                                         <p><strong>Precio: </strong>
-                                            $ {{ round($priceProduct + $price * ($utilidad / 100), 2) }}</p>
+                                            $ {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
                                     @endif
                                     <p><strong>Producto Nuevo: </strong> {{ $product->producto_nuevo ? 'SI' : 'NO' }}
                                     </p>
@@ -118,7 +125,7 @@
                                                     @php
                                                         $priceProduct = $product->price;
                                                         $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
-                                                        $precioFinal = round($price + $price * ($utilidad / 100), 2);
+                                                        $precioFinal = round($price / ((100 - $utilidad) / 100), 2);
                                                     @endphp
                                                     <tr>
                                                         <td class="p-0">{{ $precio->escala }}</td>
