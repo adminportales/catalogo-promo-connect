@@ -248,8 +248,11 @@
                     </div>
                 @endforeach
             </div>
-            <div class="d-flex justify-content-center">
-                {{ $products->onEachSide(1)->links() }}
+            <div class="d-flex d-sm-none  justify-content-center">
+                {{ $products->onEachSide(0)->links() }}
+            </div>
+            <div class="d-none d-sm-flex justify-content-center">
+                {{ $products->onEachSide(3)->links() }}
             </div>
             @livewire('product')
         </div>
