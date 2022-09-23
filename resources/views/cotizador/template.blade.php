@@ -22,8 +22,22 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Myriad Pro Regular';
+            font-style: normal;
+            font-weight: normal;
+            src: local('Myriad Pro Regular'), url('fonts/myriadpro/MYRIADPRO-REGULAR.woff') format('woff');
+        }
+
+
+        @font-face {
+            font-family: 'Myriad Pro Bold';
+            font-style: normal;
+            font-weight: normal;
+            src: local('Myriad Pro Bold'), url('fonts/myriadpro/MYRIADPRO-BOLD.woff') format('woff');
+        }
         .navbar {
-            background-color: #58CAE6;
+            background-color: #09343F;
             color: white;
         }
 

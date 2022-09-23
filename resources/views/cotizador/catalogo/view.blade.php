@@ -1,7 +1,11 @@
 @section('title', __('Products'))
 <div class="container-fluid ">
-    <div class="row">
-        <div class="col-md-2">
+    <div class="btn-group">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            Right-aligned menu
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" wire:self>
             <div class="shadow p-3">
                 <p>Filtros de busqueda</p>
                 <input wire:model='nombre' type="text" class="form-control mb-2" name="search" id="search"
@@ -27,7 +31,7 @@
                 @foreach ($colores as $color)
                     <option value="{{ $color->id }}">{{ $color->color }}</option>
                 @endforeach
-            </select> --}}
+                </select> --}}
                 <select wire:model='type' name="types" id="type" class="form-control mb-2">
                     <option value="">Importacion o Catalogo...</option>
                     @foreach ($types as $type)
@@ -42,15 +46,15 @@
                     <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
                         placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
                 </div>
-                <p class="mb-0">Stock</p>
-                <div class="d-flex align-items-center mb-2">
-                    <input wire:model='stockMin' type="number" class="form-control" placeholder="Stock Minimo"
-                        min="0" value="0">
-                    -
-                    <input wire:model='stockMax' type="number" class="form-control" placeholder="Stock Maximo"
-                        value="{{ $stock }}" max="{{ $stock }}">
-                </div>
                 @permission('ver-stock')
+                    <p class="mb-0">Stock</p>
+                    <div class="d-flex align-items-center mb-2">
+                        <input wire:model='stockMin' type="number" class="form-control" placeholder="Stock Minimo"
+                            min="0" value="0">
+                        -
+                        <input wire:model='stockMax' type="number" class="form-control" placeholder="Stock Maximo"
+                            value="{{ $stock }}" max="{{ $stock }}">
+                    </div>
                     <p class="mb-0">Ordenar por Stock</p>
                     <select wire:model='orderStock' name="orderStock" id="provee" class="form-control mb-2">
                         <option value="">Ninguno</option>
@@ -64,9 +68,78 @@
                     <option value="ASC">De menor a mayor</option>
                     <option value="DESC">De mayor a menor</option>
                 </select>
+                <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
             </div>
         </div>
-        <div class="products col-md-10">
+    </div>
+    <div class="row">
+        <div class="col-lg-2 col-md-4 col-sm-5 d-none d-sm-block">
+            <div class="shadow p-3">
+                <p>Filtros de busqueda</p>
+                <input wire:model='nombre' type="text" class="form-control mb-2" name="search" id="search"
+                    placeholder="Nombre">
+                @permission('ver-sku-s-de-proveedores')
+                    <input wire:model='sku' type="text" class="form-control mb-2" name="search" id="search"
+                        placeholder="SKU">
+                @endpermission
+                <input wire:model='color' type="text" class="form-control mb-2" name="color" id="color"
+                    placeholder="Ingrese el color">
+                <input wire:model='category' type="text" class="form-control mb-2" name="category"
+                    id="category" placeholder="Ingrese la familia">
+                @permission('ver-proveedores')
+                    <select wire:model='proveedor' name="proveedores" id="provee" class="form-control mb-2">
+                        <option value="">Seleccione Proveedor...</option>
+                        @foreach ($proveedores as $provider)
+                            <option value="{{ $provider->id }}">{{ $provider->company }}</option>
+                        @endforeach
+                    </select>
+                @endpermission
+                {{-- <select wire:model='color' name="colores" id="provee" class="form-control mb-2">
+                <option value="">Seleccione color...</option>
+                @foreach ($colores as $color)
+                    <option value="{{ $color->id }}">{{ $color->color }}</option>
+                @endforeach
+                </select> --}}
+                <select wire:model='type' name="types" id="type" class="form-control mb-2">
+                    <option value="">Importacion o Catalogo...</option>
+                    @foreach ($types as $type)
+                        <option value="{{ $type->id }}">{{ $type->type }}</option>
+                    @endforeach
+                </select>
+                <p class="mb-0">Precio</p>
+                <div class="d-flex align-items-center mb-2">
+                    <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
+                        placeholder="Precio Minimo" min="0" value="0">
+                    -
+                    <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
+                        placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
+                </div>
+                @permission('ver-stock')
+                    <p class="mb-0">Stock</p>
+                    <div class="d-flex align-items-center mb-2">
+                        <input wire:model='stockMin' type="number" class="form-control" placeholder="Stock Minimo"
+                            min="0" value="0">
+                        -
+                        <input wire:model='stockMax' type="number" class="form-control" placeholder="Stock Maximo"
+                            value="{{ $stock }}" max="{{ $stock }}">
+                    </div>
+                    <p class="mb-0">Ordenar por Stock</p>
+                    <select wire:model='orderStock' name="orderStock" id="provee" class="form-control mb-2">
+                        <option value="">Ninguno</option>
+                        <option value="ASC">De menor a mayor</option>
+                        <option value="DESC">De mayor a menor</option>
+                    </select>
+                @endpermission
+                <p class="mb-0">Ordenar por Precio</p>
+                <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
+                    <option value="">Ninguno</option>
+                    <option value="ASC">De menor a mayor</option>
+                    <option value="DESC">De mayor a menor</option>
+                </select>
+                <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
+            </div>
+        </div>
+        <div class="products col-lg-10 col-md-8 col-sm-7">
             @php
                 $counter = $products->perPage() * $products->currentPage() - $products->perPage() + 1;
             @endphp
@@ -90,7 +163,7 @@
                 @endif
                 @foreach ($products as $row)
                     {{-- {{ $row->firstImage->image_url }} --}}
-                    <div class="col-md-3 d-flex justify-content-center">
+                    <div class="col-md-4 col-lg-3 col-sm-6 d-none d-sm-flex justify-content-center">
                         <div class="card mb-4" style="width: 14rem;">
                             <div class="card-body text-center shadow-sm">
                                 @php
@@ -121,6 +194,45 @@
                                     data-target="#modalProduct" wire:click="showProduct({{ $row->id }})">
                                     Vista Rapida
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-block d-sm-none" style="width: 100%;">
+                        <div class="card mb-4" style="width: 100%;">
+                            <div class="card-body text-center shadow-sm d-flex">
+                                @php
+                                    $priceProduct = $row->price;
+                                    if ($row->producto_promocion) {
+                                        $priceProduct = round($priceProduct - $priceProduct * ($row->descuento / 100), 2);
+                                    } else {
+                                        $priceProduct = round($priceProduct - $priceProduct * ($row->provider->discount / 100), 2);
+                                    }
+                                @endphp
+                                <div>
+                                    <img src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
+                                        class="card-img-top " alt="{{ $row->name }}"
+                                        style="max-width: 100%; max-height: 150px; width: auto">
+                                </div>
+
+                                <div>
+                                    <h5 class="card-title" style="text-transform: capitalize">{{ $row->name }}
+                                    </h5>
+                                    @permission('ver-sku-s-de-proveedores')
+                                        <p class=" m-0 pt-1"><strong>SKU:</strong> {{ $row->sku }}</p>
+                                    @endpermission
+                                    <div class="d-flex justify-content-between">
+                                        @permission('ver-stock')
+                                            <p class=" m-0 pt-1">Stock: {{ $row->stock }}</p>
+                                        @endpermission
+                                        <p class=" m-0 pt-1">$
+                                            {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                    </div>
+                                    <br>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#modalProduct" wire:click="showProduct({{ $row->id }})">
+                                        Vista Rapida
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

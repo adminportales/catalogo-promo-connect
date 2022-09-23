@@ -1,22 +1,21 @@
-<nav class="navbar navbar-expand topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand topbar mb-4 static-top shadow h-auto">
     <ul class="navbar-nav mr-auto">
         <!-- Nav Item - User Information -->
-        <li class="nav-item no-arrow Drop-shadow">
-            <div class="nav-link text-light">
-                <img class="imagen img-fluid h-100" src="{{ asset('/img/logo.png') }}" alt="bhtrade"></a>
-            </div>
-        </li>
-        <div class="topbar-divider d-none d-sm-block"></div>
-        <li class="nav-item">
-            <div class="nav-link">
-                <h5 style="color: #000 !important; font-weight: bold;">Promo Connect</h5>
+        <li class="nav-item no-arrow">
+            <div class="nav-link text-light d-flex align-items-center">
+                <img class="imagen img-fluid h-100" src="{{ asset('/img/logoOnly.png') }}" alt="bhtrade"></a>
+                <div class="text-center">
+                    <h6 class="m-0 text-white font-weight-bold" style="font-family:'Myriad Pro Bold';font-weight:bold;">PROMO CONNECT</h6>
+                    <p class="m-0 text-white" style="font-family:'Myriad Pro Regular';font-weight:normal;">Encuentra tus articulos</p>
+                </div>
             </div>
         </li>
     </ul>
-
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
-
+        <li class="nav-item d-flex align-items-center">
+            <input type="text" class="form-control">
+        </li>
         <div class="topbar-divider d-none d-sm-block"></div>
 
         <!-- Nav Item - User Information -->
@@ -24,8 +23,8 @@
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
-                    <span class="mr-2 d-none d-lg-inline text-gray-600 small"> {{ Auth::user()->name }}</span>
-                    {{-- <img class="img-profile rounded-circle" src="img/undraw_profile.svg"> --}}
+                    <span class="mr-2 d-none d-lg-inline text-white"> {{ Auth::user()->name }}</span>
+                    <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
                 </a>
 
                 <!-- Dropdown - User Information -->

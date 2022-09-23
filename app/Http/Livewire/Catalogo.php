@@ -17,10 +17,14 @@ class Catalogo extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public $proveedores;
+
     public $nombre, $sku, $proveedor, $color, $category, $type, $precioMax, $precioMin, $stockMax, $stockMin, $orderStock = '', $orderPrice = '';
 
     public function __construct()
     {
+        $this->proveedores = auth()->user()->roles()->first()->providers;
+
         $utilidad = GlobalAttribute::find(1);
         $utilidad = (float) $utilidad->value;
 
@@ -44,7 +48,6 @@ class Catalogo extends Component
         if (auth()->user()->settingsUser) {
             $utilidad = (float)(auth()->user()->settingsUser->utility > 0 ?  auth()->user()->settingsUser->utility :  $utilidad);
         }
-        $proveedores = auth()->user()->roles()->first()->providers;
         // Agrupar Colores similares
         $types = Type::all();
         $price = DB::table('products')->max('price');
@@ -84,8 +87,16 @@ class Catalogo extends Component
             ->where('products.sku', 'LIKE', $sku)
             ->whereBetween('products.price', [$precioMin, $precioMax])
             ->whereBetween('products.stock', [$stockMin, $stockMax])
-            //TODO: Limitar Proveedores
-            ->where('products.provider_id', 'LIKE', $proveedor)
+            ->when($proveedor === null, function ($query, $proveedor) {
+                $providers_id = array();
+                foreach ($this->proveedores as $uniqueProvider) {
+                    array_push($providers_id, $uniqueProvider->id);
+                }
+                $query->whereIn('products.provider_id', $providers_id);
+            })
+            ->when($proveedor !== null, function ($query, $proveedor) {
+                $query->where('products.provider_id', 'LIKE', $this->proveedor);
+            })
             ->where('products.type_id', 'LIKE', $type)
             ->when($orderStock !== '', function ($query, $orderStock) {
                 $query->orderBy('products.stock', $this->orderStock);
@@ -94,21 +105,19 @@ class Catalogo extends Component
                 $query->orderBy('products.price', $this->orderPrice);
             })
             ->when($color !== '' && $color !== null, function ($query, $color) {
-                $newColor  = $this->color . '%';
+                $newColor  = '%' . $this->color . '%';
                 $query->where('colors.color', 'LIKE', $newColor);
             })
             ->when($category !== '' && $category !== null, function ($query, $category) {
                 $newCat  = '%' . $this->category . '%';
                 $query->where('categories.family', 'LIKE', $newCat);
             })
-            ->orderBy('products.id', 'ASC')
             ->select('products.*')
             ->paginate(32);
 
         return view('cotizador.catalogo.view', [
             'products' => $products,
             'utilidad' => $utilidad,
-            'proveedores' => $proveedores,
             'types' => $types,
             'price' => $price,
             'priceMax' => $precioMax,
@@ -123,5 +132,17 @@ class Catalogo extends Component
     public function showProduct(Product $product)
     {
         $this->emit('showProductListener', $product->id);
+    }
+
+    public function limpiar()
+    {
+        $this->nombre = '';
+        $this->sku = '';
+        $this->color = '';
+        $this->category = '';
+        $this->proveedor = null;
+        $this->type = null;
+        $this->orderPrice = '';
+        $this->orderStock = '';
     }
 }

@@ -6,6 +6,11 @@
             border-radius: 15px !important;
             padding: 2px
         }
+        .modal-header {
+            background-color: #09343F;
+            color: white;
+        }
+
     </style>
     <div wire:ignore.self class="modal fade" id="modalProduct" tabindex="-1" aria-labelledby="modalProductLabel"
         aria-hidden="true">
@@ -20,8 +25,8 @@
                 </div> --}}
                 @if ($product)
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalProductLabel">{{ $product->name }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        <h5 class="modal-title text-white" id="modalProductLabel">{{ $product->name }}</h5>
+                        <button type="button" class="text-white close" data-dismiss="modal" aria-label="Close"
                             wire:click="clear()">
                             <span aria-hidden="true">&times;</span>
                         </button>

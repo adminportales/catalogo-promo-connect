@@ -57,6 +57,8 @@
                                                     <a data-toggle="modal" data-target="#updateModal"
                                                         class="dropdown-item" wire:click="edit({{ $row->id }})"><i
                                                             class="fa fa-edit"></i> Editar </a>
+                                                    <a href="/laratrust/roles-assignment/{{ $row->id }}/edit?model=users"
+                                                        class="dropdown-item"><i class="fa fa-edit"></i> Permisos </a>
                                                     <a class="dropdown-item"
                                                         onclick="confirm('Confirm Delete User id {{ $row->id }}? \nDeleted Users cannot be recovered!')||event.stopImmediatePropagation()"
                                                         wire:click="destroy({{ $row->id }})"><i
