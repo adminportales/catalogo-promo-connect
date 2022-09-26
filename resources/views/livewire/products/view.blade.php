@@ -63,7 +63,7 @@
                                         <td class="text-center"><img
                                                 src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
                                                 class="img-fluid" alt="Sin imagen"
-                                                style="max-width: 100%; max-height: 150px; width: auto" srcset="">
+                                                style="max-width: 100%; max-height: 60px; width: auto" srcset="">
                                         </td>
                                         <td>{{ $row->color ? $row->color->color : '' }}</td>
                                         <td>{{ $row->provider->company }}</td>

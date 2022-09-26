@@ -1,12 +1,45 @@
 <div>
+    <style>
+        .lds-dual-ring {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+        }
+
+        .lds-dual-ring:after {
+            content: " ";
+            display: block;
+            width: 24px;
+            height: 24px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid #1FADD3;
+            border-color: #1FADD3 transparent #1FADD3 transparent;
+            animation: lds-dual-ring 1.2s linear infinite;
+        }
+
+        @keyframes lds-dual-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .form-control {
+            margin-bottom: 9px !important;
+        }
+    </style>
     <div class="d-flex h-100 w-100 justify-content-center align-items-center">
         <div class="row justify-content-center">
             <div class="col-md-12 text-center">
-                <h3>Nueva Importacion de Productos</h3>
+                <h3 class="m-0">Nueva Importacion de Productos</h3>
                 @if (!$archivo)
                     <p>Seleccione un archivo compatible (.csv, .xlsx) y siga los pasos para la importacion</p>
                 @elseif (count($columns) > 0)
-                    <p>Coloque el numero de columna en cada campo de los productos</p>
+                    <p class="">Coloque el numero de columna en cada campo de los productos</p>
                 @endif
             </div>
             <div class="w-100"></div>
@@ -15,16 +48,18 @@
                     <form wire:submit.prevent="save">
                         <div class="">
                             <div class="form-group">
-                                <label for="">Selecionar Archivo</label>
-                                <input type="file" class="form-control" wire:model="fileLayout">
-                            </div>
-                            <div class="form-group">
-                                <label for="">Crear o actualizar</label>
-                                <select wire:model="tipo" class="form-control">
-                                    <option value="">Seleccione...</option>
-                                    <option value="create">Crear Productos</option>
-                                    <option value="update">Actualizar Productos</option>
-                                </select>
+                                <div class="d-flex justify-content-between">
+                                    <label for="">Selecionar Archivo</label>
+                                    <div wire:loading>
+                                        <div class="lds-dual-ring"></div>
+                                    </div>
+                                </div>
+                                <input type="file"
+                                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                    class="form-control" wire:model="fileLayout">
+                                @error('fileLayout')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             <br>
                             <div class="form-group text-center mt-3">
@@ -34,341 +69,323 @@
 
                     </form>
                     @error('fileLayout.*')
-                        <span class="error">{{ $message }}</span>
+                        <span>{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="w-100 text-center">
-                </div>
             @elseif (count($columns) > 0 && count($productsImporteds) == 0)
-                @if ($tipo == 'create')
-                    <form wire:submit.prevent="createProductos()" class="w-100">
-                    @elseif($tipo == 'update')
-                        <form wire:submit.prevent="updateProductos()" class="w-100">
-                @endif
-                <div class="row justify-content-center">
-                    <div class="col-md-5">
-                        <h4>Informacion del producto</h4>
-                        <ul class="list-group">
-                            @if ($updateProducts)
-                                <li class="list-group-item py-1">
-                                    <div class="d-flex align-items-center">
-                                        <div class="w-50">
-                                            <label for="">SKU Interno</label>
-                                        </div>
-                                        <div class="w-50">
-                                            <input type="text" wire:model="SKU_interno" class="form-control p-0 m-0">
-                                        </div>
-                                    </div>
-                                    @error('SKU_interno')
-                                        <span class="error">
-                                            <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                            </p>
-                                        </span>
-                                    @enderror
-                                </li>
-                            @endif
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">SKU</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="SKU" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('SKU')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">SKU Padre</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="SKU_Padre" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('SKU_Padre')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Nombre</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Nombre" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Nombre')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Descripcion</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Descripcion" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Descripcion')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Precio</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Precio" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Precio')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Stock</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Stock" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Stock')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Promocion</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Promocion" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Promocion')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Descuento</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Descuento" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Descuento')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Producto Nuevo</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Nuevo_Producto"
-                                            class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Nuevo_Producto')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Precio Unico</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Precio_Unico" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Precio_Unico')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Tipo</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Tipo" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Tipo')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Color</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Color" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Color')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Proveedor</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Proveedor" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Proveedor')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Familia</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Familia" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Familia')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Sub Familia</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="SubFamilia" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('SubFamilia')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Imagenes</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Imagenes" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Imagenes')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Escalas de Precios</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Escalas" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Escalas')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                            <li class="list-group-item py-1">
-                                <div class="d-flex align-items-center">
-                                    <div class="w-50">
-                                        <label for="">Atributos</label>
-                                    </div>
-                                    <div class="w-50">
-                                        <input type="text" wire:model="Atributos" class="form-control p-0 m-0">
-                                    </div>
-                                </div>
-                                @error('Atributos')
-                                    <span class="error">
-                                        <p class="text-center text-danger" style="font-size: 15px">{{ $message }}
-                                        </p>
-                                    </span>
-                                @enderror
-                            </li>
-                        </ul>
+                <div class="row w-100">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between">
+                            <label for="">Crear o actualizar</label>
+                            <div class="form-group text-center m-0">
+                                <button class="btn btn-sm btn-success" wire:click="firstStep()">Regresar al paso
+                                    1</button>
+                            </div>
+                        </div>
+                        <select wire:model="tipo" class="form-control   @error('tipo') border border-danger @enderror"
+                            wire:change='typeChange'>
+                            <option value="">Seleccione...</option>
+                            <option value="create">Crear Productos</option>
+                            <option value="update">Actualizar Productos</option>
+                        </select>
                     </div>
+                </div>
+                <div class="row w-100">
+                    <div class="col-md-7">
+                        <form wire:submit.prevent="saveProductos()">
 
+                            <h6>Informacion del producto</h6>
+                            <div class="row">
+                                @if ($updateProducts)
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="w-25">
+                                                <label for="" style="display: block" class="m-0  d-block">
+                                                    SKU Interno <span class="text-danger ">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="w-75">
+                                                <input type="text" wire:model="SKU_interno"
+                                                    placeholder="SKU generado por el sistema"
+                                                    class="form-control p-0 m-0 text-center @error('SKU_interno') border border-danger @enderror">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-25">
+                                                <label for="" style="display: block" class="m-0  d-block">
+                                                    SKU Padre Proveedor
+                                                </label>
+                                            </div>
+                                            <div class="w-75">
+                                                <input type="text" wire:model="SKU_Padre"
+                                                    placeholder="SKU Padre del Proveedor (Opcional)"
+                                                    class="form-control p-0 m-0 text-center @error('SKU_Padre') border border-danger @enderror">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-25">
+                                                <label for="" style="display: block" class="m-0  d-block">
+                                                    SKU Proveedor
+                                                </label>
+                                            </div>
+                                            <div class="w-75">
+                                                <input type="text" wire:model="SKU"
+                                                    placeholder=" SKU del Proveedor (Opcional)"
+                                                    class="form-control p-0 m-0 text-center @error('SKU') border border-danger @enderror">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Nombre <span class="text-danger ">*</span>
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="text" wire:model="Nombre" placeholder="Nombre del Producto"
+                                                class="form-control p-0 m-0 text-center @error('Nombre') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Descripcion
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="text" wire:model="Descripcion"
+                                                placeholder="Por defecto: Sin Descripcion"
+                                                class="form-control p-0 m-0 text-center @error('Descripcion') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Precio Unico <span class="text-danger ">*</span>
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Precio"
+                                                placeholder="Colocar en el archivo 0 o 1"
+                                                class="form-control p-0 m-0 text-center @error('Precio') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Precio
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Precio"
+                                                placeholder="Precio por defecto: 0"
+                                                class="form-control p-0 m-0 text-center @error('Precio') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Escala de Precios
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Precio"
+                                                placeholder="Colocar en el archivo las diferentes escalas"
+                                                class="form-control p-0 m-0 text-center @error('Precio') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Cantidad
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Stock"
+                                                placeholder="Cantidad por defecto: 0"
+                                                class="form-control p-0 m-0 text-center @error('Stock') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Promocion
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Promocion"
+                                                placeholder="Colocar en el archivo 0 o 1"
+                                                class="form-control p-0 m-0 text-center @error('Promocion') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Descueto
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Descuento"
+                                                placeholder="Porcentaje de descuento del Producto"
+                                                class="form-control p-0 m-0 text-center @error('Descuento') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Producto Nuevo
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Nuevo_Producto"
+                                                placeholder="Colocar 0 o 1, segun sea el caso"
+                                                class="form-control p-0 m-0 text-center @error('Nuevo_Producto') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Tipo de Producto
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Tipo"
+                                                placeholder="Instrucciones de llenado en la guia"
+                                                class="form-control p-0 m-0 text-center @error('Tipo') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Color
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Color"
+                                                placeholder="Color del Producto. Por defecto: Sin Color"
+                                                class="form-control p-0 m-0 text-center @error('Color') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Proveedor <span class="text-danger ">*</span>
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Color"
+                                                placeholder="Identificador del Proveedor."
+                                                class="form-control p-0 m-0 text-center @error('Color') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Familia
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Familia"
+                                                placeholder="Por defecto: Vacio."
+                                                class="form-control p-0 m-0 text-center @error('Familia') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                SubFamilia
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="SubFamilia"
+                                                placeholder="Por defecto: Vacio."
+                                                class="form-control p-0 m-0 text-center @error('SubFamilia') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Imagenes
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Imagenes"
+                                                placeholder="Por defecto: Sin Imagen."
+                                                class="form-control p-0 m-0 text-center @error('Imagenes') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Atributos
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Atributos"
+                                                placeholder="Intrucciones de llenado en la guia."
+                                                class="form-control p-0 m-0 text-center @error('Atributos') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group text-center mt-3">
+                                <button type="submit" class="btn btn-success">Comenzar Importacion</button>
+                            </div>
+                        </form>
+                    </div>
                     <div class="col-md-5">
-                        <h4>Columnas del Archivo</h4>
-                        <ul class="list-group">
-                            @foreach ($columns as $column)
-                                <li class="list-group-item py-1">
-                                    {{ $column[0] . '. ' . $column[1] }}
-                                </li>
-                            @endforeach
+                        <h6>Columnas del Archivo</h6>
+                        <ul class="list-group ">
+                            <div class="row">
+
+                                @foreach ($columns as $column)
+                                    <div class="col-md-6">
+                                        <li class="list-group-item py-1">
+                                            {{ $column[0] . '. ' . $column[1] }}
+                                        </li>
+                                    </div>
+                                @endforeach
+                            </div>
                         </ul>
                     </div>
                 </div>
-                <div class="form-group text-center mt-3">
-                    <button class="btn btn-success" wire:click="firstStep()">Regresar al paso 1</button>
-                </div>
-                <div class="form-group text-center mt-3">
-                    <button type="submit" class="btn btn-success">Comenzar Importacion</button>
-                </div>
-                </form>
             @elseif (count($productsImporteds) > 0)
                 <div class="col-md-10">
                     <table class="table">
@@ -391,11 +408,6 @@
                     </table>
                 </div>
             @endif
-            <div wire:loading.flex>
-                <div class="p-5 text-success d-flex justify-content-center w-100">
-                    <span>Espere...</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>

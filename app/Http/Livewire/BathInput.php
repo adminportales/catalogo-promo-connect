@@ -40,7 +40,6 @@ class BathInput extends Component
     {
         $this->validate([
             'fileLayout' => 'required', // 1MB Max
-            'tipo' => 'required', // 1MB Max
         ]);
         // Mostrar columnas
         $path = time() . $this->fileLayout->getClientOriginalName();
@@ -57,13 +56,33 @@ class BathInput extends Component
             array_push($columns, [$indiceCol, $hojaActual->getCellByColumnAndRow($indiceCol, 1)->getValue()]);
         }
         $this->columns = $columns;
-        if ($this->tipo == 'update') {
+    }
+    public function typeChange()
+    {
+        if ($this->tipo == 'create') {
+            $this->updateProducts = false;
+        } else if ($this->tipo == 'update') {
             $this->updateProducts = true;
         }
     }
-
-    public function createProductos()
+    public function saveProductos()
     {
+        $this->validate([
+            'tipo' => 'required'
+        ]);
+        if ($this->tipo == 'create') {
+            $this->validate([
+                'SKU' => 'required',
+                'SKU_Padre' => 'required',
+                'Nombre' => 'required',
+            ]);
+        }
+        if ($this->tipo == 'update') {
+            $this->validate([
+                'SKU_interno' => 'required'
+            ]);
+        }
+        return;
         $this->validate([
             'SKU' => 'required',
             'Nombre' => 'required',
@@ -199,163 +218,163 @@ class BathInput extends Component
         $this->productsImporteds = $productosImportados;
     }
 
-    public function updateProductos()
-    {
-        if ($this->SKU == trim('') && $this->SKU_interno == trim('')) {
-            return;
-        }
+    // public function updateProductos()
+    // {
+    //     if ($this->SKU == trim('') && $this->SKU_interno == trim('')) {
+    //         return;
+    //     }
 
-        $documento = IOFactory::load($this->rutaArchivo);
-        $hojaActual = $documento->getSheet(0);
-        $numeroMayorDeFila = $hojaActual->getHighestRow(); // Numérico
+    //     $documento = IOFactory::load($this->rutaArchivo);
+    //     $hojaActual = $documento->getSheet(0);
+    //     $numeroMayorDeFila = $hojaActual->getHighestRow(); // Numérico
 
-        $productosImportados = [];
+    //     $productosImportados = [];
 
-        for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
-            // Verificar si el color existe y si no registrarla
-            $color = null;
-            if (trim($this->Color)) {
-                $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()));
-                $color = Color::where("slug", $slug)->first();
-                if (!$color) {
-                    $color = Color::create([
-                        'color' => ucfirst($hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()), 'slug' => $slug,
-                    ]);
-                }
-            }
+    //     for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
+    //         // Verificar si el color existe y si no registrarla
+    //         $color = null;
+    //         if (trim($this->Color)) {
+    //             $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()));
+    //             $color = Color::where("slug", $slug)->first();
+    //             if (!$color) {
+    //                 $color = Color::create([
+    //                     'color' => ucfirst($hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue()), 'slug' => $slug,
+    //                 ]);
+    //             }
+    //         }
 
-            // Verificar si la categoria existe y si no registrarla
-            $categoria = null;
-            if (trim($this->Familia)) {
-                $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()));
-                $categoria = Category::where("slug", $slug)->first();
-                if (!$categoria) {
-                    $categoria = Category::create([
-                        'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
-                    ]);
-                }
-            }
+    //         // Verificar si la categoria existe y si no registrarla
+    //         $categoria = null;
+    //         if (trim($this->Familia)) {
+    //             $slug = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()));
+    //             $categoria = Category::where("slug", $slug)->first();
+    //             if (!$categoria) {
+    //                 $categoria = Category::create([
+    //                     'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
+    //                 ]);
+    //             }
+    //         }
 
-            $subcategoria = null;
-            if (trim($this->SubFamilia)) {
-                // Verificar si la subcategoria existe y si no registrarla
-                $slugSub = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()));
-                $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
+    //         $subcategoria = null;
+    //         if (trim($this->SubFamilia)) {
+    //             // Verificar si la subcategoria existe y si no registrarla
+    //             $slugSub = mb_strtolower(str_replace(' ', '-', $hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()));
+    //             $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
 
-                if (!$subcategoria) {
-                    $subcategoria = $categoria->subcategories()->create([
-                        'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
-                        'slug' => $slugSub,
-                    ]);
-                }
-            }
-            $productExist = '';
-            if ($this->SKU_interno != trim('')) {
-                $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
-            } else if ($this->SKU == trim('')) {
-                $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
-            } else {
-                $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue()))->first();
-            }
-            if ($productExist) {
-                $dataProduct = [];
+    //             if (!$subcategoria) {
+    //                 $subcategoria = $categoria->subcategories()->create([
+    //                     'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
+    //                     'slug' => $slugSub,
+    //                 ]);
+    //             }
+    //         }
+    //         $productExist = '';
+    //         if ($this->SKU_interno != trim('')) {
+    //             $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
+    //         } else if ($this->SKU == trim('')) {
+    //             $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU_interno, $indiceFila)->getValue()))->first();
+    //         } else {
+    //             $productExist = ModelProduct::where('sku', trim($hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue()))->first();
+    //         }
+    //         if ($productExist) {
+    //             $dataProduct = [];
 
-                if ($this->SKU) {
-                    $dataProduct['sku'] =  $hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue();
-                }
-                if ($this->SKU_Padre) {
-                    $dataProduct['sku_parent'] = $hojaActual->getCellByColumnAndRow($this->SKU_Padre, $indiceFila)->getValue();
-                }
-                if ($this->Nombre) {
-                    $dataProduct['name'] = $hojaActual->getCellByColumnAndRow($this->Nombre, $indiceFila)->getValue();
-                }
-                if ($this->Descripcion) {
-                    $dataProduct['description'] = $hojaActual->getCellByColumnAndRow($this->Descripcion, $indiceFila)->getValue();
-                }
-                if ($this->Precio) {
-                    $dataProduct['price'] = $hojaActual->getCellByColumnAndRow($this->Precio, $indiceFila)->getValue();
-                }
-                if ($this->Stock) {
-                    $dataProduct['stock'] = $hojaActual->getCellByColumnAndRow($this->Stock, $indiceFila)->getValue();
-                }
-                if ($this->Promocion) {
-                    $dataProduct['producto_promocion'] = $hojaActual->getCellByColumnAndRow($this->Promocion, $indiceFila)->getValue();
-                }
-                if ($this->Descuento) {
-                    $dataProduct['descuento'] = $hojaActual->getCellByColumnAndRow($this->Descuento, $indiceFila)->getValue();
-                }
-                if ($this->Nuevo_Producto) {
-                    $dataProduct['producto_nuevo'] = $hojaActual->getCellByColumnAndRow($this->Nuevo_Producto, $indiceFila)->getValue();
-                }
-                if ($this->Precio_Unico) {
-                    $dataProduct['precio_unico'] = $hojaActual->getCellByColumnAndRow($this->Precio_Unico, $indiceFila)->getValue();
-                }
-                if ($this->Proveedor) {
-                    $dataProduct['provider_id'] = $hojaActual->getCellByColumnAndRow($this->Proveedor, $indiceFila)->getValue();
-                }
-                if ($this->Tipo) {
-                    $dataProduct['type_id'] = $hojaActual->getCellByColumnAndRow($this->Tipo, $indiceFila)->getValue();
-                }
-                if ($this->Color) {
-                    $dataProduct['color_id'] = $color ? $color->id : null;
-                }
+    //             if ($this->SKU) {
+    //                 $dataProduct['sku'] =  $hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue();
+    //             }
+    //             if ($this->SKU_Padre) {
+    //                 $dataProduct['sku_parent'] = $hojaActual->getCellByColumnAndRow($this->SKU_Padre, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Nombre) {
+    //                 $dataProduct['name'] = $hojaActual->getCellByColumnAndRow($this->Nombre, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Descripcion) {
+    //                 $dataProduct['description'] = $hojaActual->getCellByColumnAndRow($this->Descripcion, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Precio) {
+    //                 $dataProduct['price'] = $hojaActual->getCellByColumnAndRow($this->Precio, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Stock) {
+    //                 $dataProduct['stock'] = $hojaActual->getCellByColumnAndRow($this->Stock, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Promocion) {
+    //                 $dataProduct['producto_promocion'] = $hojaActual->getCellByColumnAndRow($this->Promocion, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Descuento) {
+    //                 $dataProduct['descuento'] = $hojaActual->getCellByColumnAndRow($this->Descuento, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Nuevo_Producto) {
+    //                 $dataProduct['producto_nuevo'] = $hojaActual->getCellByColumnAndRow($this->Nuevo_Producto, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Precio_Unico) {
+    //                 $dataProduct['precio_unico'] = $hojaActual->getCellByColumnAndRow($this->Precio_Unico, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Proveedor) {
+    //                 $dataProduct['provider_id'] = $hojaActual->getCellByColumnAndRow($this->Proveedor, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Tipo) {
+    //                 $dataProduct['type_id'] = $hojaActual->getCellByColumnAndRow($this->Tipo, $indiceFila)->getValue();
+    //             }
+    //             if ($this->Color) {
+    //                 $dataProduct['color_id'] = $color ? $color->id : null;
+    //             }
 
-                $productExist->update($dataProduct);
-                if ($this->Imagenes) {
-                    foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Imagenes, $indiceFila)->getValue()) as $img) {
-                        $productExist->images()->delete();
-                        $productExist->images()->create([
-                            'image_url' => $img
-                        ]);
-                    }
-                }
+    //             $productExist->update($dataProduct);
+    //             if ($this->Imagenes) {
+    //                 foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Imagenes, $indiceFila)->getValue()) as $img) {
+    //                     $productExist->images()->delete();
+    //                     $productExist->images()->create([
+    //                         'image_url' => $img
+    //                     ]);
+    //                 }
+    //             }
 
-                if (!$productExist->precio_unico) {
-                    if ($this->Escalas) {
-                        foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Escalas, $indiceFila)->getValue()) as $esc) {
-                            $dataEscala = explode(':', $esc);
-                            $productExist->precios()->delete();
-                            $productExist->precios()->create([
-                                'escala' => $dataEscala[0],
-                                'precio' => $dataEscala[1],
-                            ]);
-                        }
-                    }
-                }
+    //             if (!$productExist->precio_unico) {
+    //                 if ($this->Escalas) {
+    //                     foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Escalas, $indiceFila)->getValue()) as $esc) {
+    //                         $dataEscala = explode(':', $esc);
+    //                         $productExist->precios()->delete();
+    //                         $productExist->precios()->create([
+    //                             'escala' => $dataEscala[0],
+    //                             'precio' => $dataEscala[1],
+    //                         ]);
+    //                     }
+    //                 }
+    //             }
 
-                if ($this->Atributos) {
-                    if ($hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue() != "") {
-                        foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue()) as $att) {
-                            $dataAttr = explode(':', $att);
-                            $productExist->productAttributes()->delete();
-                            $productExist->productAttributes()->create([
-                                'attribute' => trim($dataAttr[0]),
-                                'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),
-                                'value' => $dataAttr[1],
-                            ]);
-                        }
-                    }
-                }
+    //             if ($this->Atributos) {
+    //                 if ($hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue() != "") {
+    //                     foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue()) as $att) {
+    //                         $dataAttr = explode(':', $att);
+    //                         $productExist->productAttributes()->delete();
+    //                         $productExist->productAttributes()->create([
+    //                             'attribute' => trim($dataAttr[0]),
+    //                             'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),
+    //                             'value' => $dataAttr[1],
+    //                         ]);
+    //                     }
+    //                 }
+    //             }
 
 
-                /*
-                Registrar en la tabla product_category el producto, categoria y sub categoria
-                */
-                if ($this->Familia) {
-                    $productExist->productCategories()->create([
-                        'category_id' => $categoria->id,
-                    ]);
-                }
-                if ($this->SubFamilia) {
-                    $productExist->productCategories()->create([
-                        'subcategory_id' => $subcategoria->id,
-                    ]);
-                }
-                array_push($productosImportados, $productExist);
-            }
-        }
-        $this->productsImporteds = $productosImportados;
-    }
+    //             /*
+    //             Registrar en la tabla product_category el producto, categoria y sub categoria
+    //             */
+    //             if ($this->Familia) {
+    //                 $productExist->productCategories()->create([
+    //                     'category_id' => $categoria->id,
+    //                 ]);
+    //             }
+    //             if ($this->SubFamilia) {
+    //                 $productExist->productCategories()->create([
+    //                     'subcategory_id' => $subcategoria->id,
+    //                 ]);
+    //             }
+    //             array_push($productosImportados, $productExist);
+    //         }
+    //     }
+    //     $this->productsImporteds = $productosImportados;
+    // }
 
     public function firstStep()
     {
