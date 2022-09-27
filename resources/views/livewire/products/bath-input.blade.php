@@ -91,7 +91,7 @@
                     </div>
                 </div>
                 <div class="row w-100">
-                    <div class="col-md-7">
+                    <div class="col-md-8">
                         <form wire:submit.prevent="saveProductos()">
 
                             <h6>Informacion del producto</h6>
@@ -105,38 +105,9 @@
                                                 </label>
                                             </div>
                                             <div class="w-75">
-                                                <input type="text" wire:model="SKU_interno"
+                                                <input type="number" wire:model="SKU_interno"
                                                     placeholder="SKU generado por el sistema"
                                                     class="form-control p-0 m-0 text-center @error('SKU_interno') border border-danger @enderror">
-                                            </div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-center">
-                                            <div class="w-25">
-                                                <label for="" style="display: block" class="m-0  d-block">
-                                                    SKU Padre Proveedor
-                                                </label>
-                                            </div>
-                                            <div class="w-75">
-                                                <input type="text" wire:model="SKU_Padre"
-                                                    placeholder="SKU Padre del Proveedor (Opcional)"
-                                                    class="form-control p-0 m-0 text-center @error('SKU_Padre') border border-danger @enderror">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-center">
-                                            <div class="w-25">
-                                                <label for="" style="display: block" class="m-0  d-block">
-                                                    SKU Proveedor
-                                                </label>
-                                            </div>
-                                            <div class="w-75">
-                                                <input type="text" wire:model="SKU"
-                                                    placeholder=" SKU del Proveedor (Opcional)"
-                                                    class="form-control p-0 m-0 text-center @error('SKU') border border-danger @enderror">
                                             </div>
                                         </div>
                                     </div>
@@ -145,11 +116,42 @@
                                     <div class="d-flex align-items-center">
                                         <div class="w-25">
                                             <label for="" style="display: block" class="m-0  d-block">
-                                                Nombre <span class="text-danger ">*</span>
+                                                SKU Padre Proveedor
                                             </label>
                                         </div>
                                         <div class="w-75">
-                                            <input type="text" wire:model="Nombre" placeholder="Nombre del Producto"
+                                            <input type="number" wire:model="SKU_Padre"
+                                                placeholder="SKU Padre del Proveedor (Opcional)"
+                                                class="form-control p-0 m-0 text-center @error('SKU_Padre') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                SKU Proveedor
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="SKU"
+                                                placeholder=" SKU del Proveedor (Opcional)"
+                                                class="form-control p-0 m-0 text-center @error('SKU') border border-danger @enderror">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="w-25">
+                                            <label for="" style="display: block" class="m-0  d-block">
+                                                Nombre
+                                                @if (!$updateProducts)
+                                                    <span class="text-danger ">*</span>
+                                                @endif
+                                            </label>
+                                        </div>
+                                        <div class="w-75">
+                                            <input type="number" wire:model="Nombre" placeholder="Nombre del Producto"
                                                 class="form-control p-0 m-0 text-center @error('Nombre') border border-danger @enderror">
                                         </div>
                                     </div>
@@ -162,7 +164,7 @@
                                             </label>
                                         </div>
                                         <div class="w-75">
-                                            <input type="text" wire:model="Descripcion"
+                                            <input type="number" wire:model="Descripcion"
                                                 placeholder="Por defecto: Sin Descripcion"
                                                 class="form-control p-0 m-0 text-center @error('Descripcion') border border-danger @enderror">
                                         </div>
@@ -172,13 +174,16 @@
                                     <div class="d-flex align-items-center">
                                         <div class="w-25">
                                             <label for="" style="display: block" class="m-0  d-block">
-                                                Precio Unico <span class="text-danger ">*</span>
+                                                Precio Unico
+                                                @if (!$updateProducts)
+                                                    <span class="text-danger ">*</span>
+                                                @endif
                                             </label>
                                         </div>
                                         <div class="w-75">
-                                            <input type="number" wire:model="Precio"
+                                            <input type="number" wire:model="Precio_Unico"
                                                 placeholder="Colocar en el archivo 0 o 1"
-                                                class="form-control p-0 m-0 text-center @error('Precio') border border-danger @enderror">
+                                                class="form-control p-0 m-0 text-center @error('Precio_Unico') border border-danger @enderror">
                                         </div>
                                     </div>
                                 </div>
@@ -242,7 +247,7 @@
                                     <div class="d-flex align-items-center">
                                         <div class="w-25">
                                             <label for="" style="display: block" class="m-0  d-block">
-                                                Descueto
+                                                Descuento
                                             </label>
                                         </div>
                                         <div class="w-75">
@@ -271,6 +276,9 @@
                                         <div class="w-25">
                                             <label for="" style="display: block" class="m-0  d-block">
                                                 Tipo de Producto
+                                                @if (!$updateProducts)
+                                                    <span class="text-danger ">*</span>
+                                                @endif
                                             </label>
                                         </div>
                                         <div class="w-75">
@@ -289,7 +297,7 @@
                                         </div>
                                         <div class="w-75">
                                             <input type="number" wire:model="Color"
-                                                placeholder="Color del Producto. Por defecto: Sin Color"
+                                                placeholder="Por defecto: Sin Color"
                                                 class="form-control p-0 m-0 text-center @error('Color') border border-danger @enderror">
                                         </div>
                                     </div>
@@ -298,13 +306,16 @@
                                     <div class="d-flex align-items-center">
                                         <div class="w-25">
                                             <label for="" style="display: block" class="m-0  d-block">
-                                                Proveedor <span class="text-danger ">*</span>
+                                                Proveedor
+                                                @if (!$updateProducts)
+                                                    <span class="text-danger ">*</span>
+                                                @endif
                                             </label>
                                         </div>
                                         <div class="w-75">
-                                            <input type="number" wire:model="Color"
+                                            <input type="number" wire:model="Proveedor"
                                                 placeholder="Identificador del Proveedor."
-                                                class="form-control p-0 m-0 text-center @error('Color') border border-danger @enderror">
+                                                class="form-control p-0 m-0 text-center @error('Proveedor') border border-danger @enderror">
                                         </div>
                                     </div>
                                 </div>
@@ -370,7 +381,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <h6>Columnas del Archivo</h6>
                         <ul class="list-group ">
                             <div class="row">
@@ -411,21 +422,3 @@
         </div>
     </div>
 </div>
-{{-- <table class="table">
-    <thead>
-        <tr>
-            <th>SKU</th>
-            <th>Nombre</th>
-            <th>Precio</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($productsImporteds as $productImported)
-            <tr>
-                <td class="m-0">{{ $productImported->internal_sku }}</td>
-                <td class="m-0">{{ $productImported->name }}</td>
-                <td class="m-0">{{ $productImported->price }}</td>
-            </tr>
-        @endforeach
-    </tbody>
-</table> --}}
