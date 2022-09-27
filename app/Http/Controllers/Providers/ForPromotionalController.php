@@ -127,11 +127,23 @@ class ForPromotionalController extends Controller
                     ]);
                     foreach (array_reverse($product['imagenes']) as $key => $imagen) {
                         // Descargar Imagenes solo Si no existen
-                        $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
-                        $newPath = '/forpromotional/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
-                        Storage::append('public' . $newPath, $fileImage);
+                        $errorGetImage = false;
+                        $fileImage = "";
+                        try {
+                            $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
+                        } catch (Exception $th) {
+                            $errorGetImage = true;
+                        }
+                        $newPath = 'img/default_product_image.jpg';
+                        if (!$errorGetImage) {
+                            $newPath = '/forpromotional/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
+                            Storage::append('public' . $newPath, $fileImage);
+                            $newProduct->images()->create([
+                                'image_url' => '/storage' . $newPath
+                            ]);
+                        }
                         $newProduct->images()->create([
-                            'image_url' => '/storage' . $newPath
+                            'image_url' => $newPath
                         ]);
                     }
                     /*
@@ -203,12 +215,23 @@ class ForPromotionalController extends Controller
                     ]);
                     // $productExist->images()->delete();
                     // foreach (array_reverse($product['imagenes']) as $key => $imagen) {
-                    //     // Descargar Imagenes solo Si no existen
-                    //     $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
-                    //     $newPath = '/forpromotional/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
-                    //     Storage::append('public' . $newPath, $fileImage);
+                    //     $errorGetImage = false;
+                    //     $fileImage = "";
+                    //     try {
+                    //         $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
+                    //     } catch (Exception $th) {
+                    //         $errorGetImage = true;
+                    //     }
+                    //     $newPath = 'img/default_product_image.jpg';
+                    //     if (!$errorGetImage) {
+                    //         $newPath = '/forpromotional/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
+                    //         Storage::append('public' . $newPath, $fileImage);
+                    //         $productExist->images()->create([
+                    //             'image_url' => '/storage' . $newPath
+                    //         ]);
+                    //     }
                     //     $productExist->images()->create([
-                    //         'image_url' => '/storage' . $newPath
+                    //         'image_url' => $newPath
                     //     ]);
                     // }
                 }
