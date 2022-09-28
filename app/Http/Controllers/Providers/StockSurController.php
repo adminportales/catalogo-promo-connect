@@ -96,9 +96,10 @@ class StockSurController extends Controller
                             'image_url' => $variant->picture->medium
                         ]);
                         $idSku++;
-                    }else{
+                    } else {
                         $productExist->stock =  $variant->stock_available;
                         $productExist->price = $variant->list_price;
+                        $productExist->save();
                     }
                 }
             }
