@@ -214,7 +214,7 @@ class ForPromotionalController extends Controller
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
                         'descuento' => $discount,
                     ]);
-                    if ($productExist->images <= 0) {
+                    if (count($productExist->images) <= 0) {
                         foreach (array_reverse($product['imagenes']) as $key => $imagen) {
                             $errorGetImage = false;
                             $fileImage = "";
