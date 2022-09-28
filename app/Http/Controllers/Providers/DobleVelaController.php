@@ -12,8 +12,6 @@ class DobleVelaController extends Controller
 {
     public function getAllProductosDoblevela()
     {
-        //agregamos la libreria de nusoap del directorio donde se encuentre
-
         $cliente = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?wsdl', 'wsdl');
         $error = $cliente->getError();
         if ($error) {
@@ -115,6 +113,8 @@ class DobleVelaController extends Controller
                 }
             }
         }
+
+        return $products;
     }
 
     public function getImagesDoblevela()
@@ -126,30 +126,40 @@ class DobleVelaController extends Controller
         if ($error) {
             echo 'Error' . $error;
         }
-        //agregamos los parametros, en este caso solo es la llave de acceso
-        $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'Codigo' => '{"CLAVES": ["TXM2263"]}');
-        //hacemos el llamado del metodo
-        $resultado = $cliente->call('GetrProdImagenes', $parametros);
 
-        $images = null;
-        if ($error) {
-            echo 'Fallo';
-            return 0;
-        } else {
-            $error = $cliente->getError();
+
+        $products = Product::select(['sku_parent'])->where('provider_id', 5)->groupBy('sku_parent')->get();
+        foreach ($products  as $productInServer) {
+            $sku_parent = $productInServer->sku_parent;
+            $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'Codigo' => '{"CLAVES": ["' . $sku_parent . '"]}');
+            $resultado = $cliente->call('GetrProdImagenes', $parametros);
+            $images = null;
             if ($error) {
-                echo 'Error' . $error;
+                echo 'Fallo';
                 return 0;
             } else {
-                // imprimimos el resultado
-                $images =  json_decode(utf8_encode($resultado['GetrProdImagenesResult']))->Resultado;
+                $error = $cliente->getError();
+                if ($error) {
+                    echo 'Error' . $error;
+                    return 0;
+                } else {
+                    // imprimimos el resultado
+                    $images =  json_decode(utf8_encode($resultado['GetrProdImagenesResult']))->Resultado;
+                    if ($images != null) {
+                        // return ($images);
+                        // Comenzar a registrar los productos
+
+                        $productsSkuP = Product::where('sku_parent', $sku_parent)->get();
+                        dd($productsSkuP, $images);
+                    }
+                }
             }
         }
 
-        if ($images != null) {
-            // Comenzar a registrar los productos
-            $products = Product::where('provider_id', 5)->groupBy('sku_parent')->get();
-            dd($products);
-        }
+        //agregamos los parametros, en este caso solo es la llave de acceso
+        //hacemos el llamado del metodo
+
+
+
     }
 }

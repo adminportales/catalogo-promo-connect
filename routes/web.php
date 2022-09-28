@@ -43,6 +43,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
     Route::view('batchInputProducts',  'livewire.products.importProducts');
+    Route::view('batchInputDoblevela',  'livewire.products.importDobleVela');
     Route::post('batchInputProducts/iusb',  [BatchInputProducts::class, 'updateProductsIUSB'])->name('import.iusb');
     Route::view('sites', 'livewire.sites.index')->middleware('auth');
     Route::view('users', 'livewire.users.index');
@@ -78,6 +79,7 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 
 // Doble Vela
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
+Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);

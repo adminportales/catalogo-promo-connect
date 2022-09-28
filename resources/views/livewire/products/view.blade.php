@@ -22,6 +22,9 @@
                                 <a class="btn btn-info ml-3" href="{{ url('admin/batchInputProducts') }}">
                                     <span>Importar Productos</span>
                                 </a>
+                                <a class="btn btn-info ml-3" href="{{ url('admin/batchInputDoblevela') }}">
+                                    <span>Importar Imagenes DV</span>
+                                </a>
                             </div>
                         </div>
                     </div>

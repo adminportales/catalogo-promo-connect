@@ -104,11 +104,11 @@ class BathInput extends Component
             $idSku++;
         }
         // Revision de Datos, para ver si estan completos y correctos
-        for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
-            if ($this->SKU) {
-            }
-            $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue();
-        }
+        // for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
+        //     if ($this->SKU) {
+        //         $hojaActual->getCellByColumnAndRow($this->Color, $indiceFila)->getValue();
+        //     }
+        // }
         for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
             // Verificar si el color existe y si no registrarla
             $color = null;
