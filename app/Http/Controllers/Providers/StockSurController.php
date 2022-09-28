@@ -46,7 +46,7 @@ class StockSurController extends Controller
                 ]);
                 return 'Error';
             }
-
+            // return $result;
             $maxSKU = Product::max('internal_sku');
             $idSku = null;
             if (!$maxSKU) {
@@ -55,6 +55,8 @@ class StockSurController extends Controller
                 $idSku = (int) explode('-', $maxSKU)[1];
                 $idSku++;
             }
+            $dataArregloProductos = array();
+            // return $result;
             foreach ($result as $product) {
 
                 $data = [
@@ -85,8 +87,7 @@ class StockSurController extends Controller
                     $data['type_id'] = 1;
                     $data['provider_id'] = 6;
 
-                    $productExist = Product::where('sku', $product->code . '_' . $slug)->first();
-
+                    $productExist = Product::where('sku', $data['sku'])->first();
                     if (!$productExist) {
                         $newProduct = Product::create($data);
                         $newProduct->images()->create([
@@ -101,9 +102,35 @@ class StockSurController extends Controller
                         $productExist->price = $variant->list_price;
                         $productExist->save();
                     }
+                    array_push($dataArregloProductos, $productExist);
                 }
             }
+
+            $count = 0;
+
+            $allProducts = Product::where('provider_id', 6)->get();
+            foreach ($result as $product) {
+                foreach ($product->variants as $variant) {
+                    $count++;
+                    $slugNew = mb_strtolower(str_replace(' ', '-', $variant->color));
+                    $inWS = false;
+                    foreach ($allProducts as $key => $value) {
+                        if (($value->sku == $product->code . '_' . $slugNew)) {
+                            $inWS = true;
+                            unset($allProducts[$key]);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
+            return ($result);
         } catch (Exception $ex) {
+            dd($ex);
         }
     }
 }
