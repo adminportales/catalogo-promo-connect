@@ -78,8 +78,8 @@ class StockSurController extends Controller
                     $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
                     $data['color_id'] = $color->id;
                     $data['producto_nuevo'] = $variant->novedad;
-                    $data['price'] =  $variant->stock_available;
-                    $data['stock'] = $variant->list_price;
+                    $data['stock'] =  $variant->stock_available;
+                    $data['price'] = $variant->list_price;
                     $data['producto_promocion'] = false;
                     $data['precio_unico'] = true;
                     $data['type_id'] = 1;
@@ -96,6 +96,9 @@ class StockSurController extends Controller
                             'image_url' => $variant->picture->medium
                         ]);
                         $idSku++;
+                    }else{
+                        $productExist->stock =  $variant->stock_available;
+                        $productExist->price = $variant->list_price;
                     }
                 }
             }

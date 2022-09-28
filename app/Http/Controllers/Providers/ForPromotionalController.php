@@ -244,10 +244,10 @@ class ForPromotionalController extends Controller
             foreach ($products as $product) {
                 foreach ($allProducts as $key => $value) {
                     if (($value->sku == $product['id_articulo'] && $value->color->color == ucfirst($product['color']))) {
-                        unset($allProducts[$key]);
-                        return;
+                        break;
                     }
                 }
+                unset($allProducts[$key]);
             }
 
             foreach ($allProducts as  $value) {
