@@ -29,6 +29,7 @@ class CreateProductsTable extends Migration
             $table->foreignId('type_id')->nullable()->constrained();
             $table->foreignId('color_id')->nullable()->constrained();
             $table->foreignId('provider_id')->nullable()->constrained();
+            $table->boolean('visible')->default(true);
             $table->timestamps();
         });
     }

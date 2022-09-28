@@ -240,7 +240,20 @@ class ForPromotionalController extends Controller
                 }
             }
 
-            return $products;
+            $allProducts = Product::where('provider_id', 1)->get();
+            foreach ($products as $product) {
+                foreach ($allProducts as $key => $value) {
+                    if (($value->sku == $product['id_articulo'] && $value->color->color == ucfirst($product['color']))) {
+                        unset($allProducts[$key]);
+                        return;
+                    }
+                }
+            }
+
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
         } catch (Exception $e) {
             FailedJobsCron::create([
                 'name' => 'For Promotional',

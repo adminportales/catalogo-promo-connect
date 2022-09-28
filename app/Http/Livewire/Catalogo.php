@@ -84,6 +84,7 @@ class Catalogo extends Component
             ->leftjoin('categories', 'product_category.category_id', 'categories.id')
             ->leftjoin('colors', 'products.color_id', 'colors.id')
             ->where('products.name', 'LIKE', $nombre)
+            ->where('products.visible', '=', true)
             ->where('products.sku', 'LIKE', $sku)
             ->whereBetween('products.price', [$precioMin, $precioMax])
             ->whereBetween('products.stock', [$stockMin, $stockMax])
