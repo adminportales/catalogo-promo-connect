@@ -30,6 +30,21 @@ class IUSBController extends Controller
                     $product->save();
                 }
             }
+
+            $allProducts = Product::where('provider_id', 4)->get();
+            foreach ($sheetData as $product) {
+                foreach ($allProducts as $key => $value) {
+                    if (($value->sku == $product[4])) {
+                        break;
+                    }
+                }
+                unset($allProducts[$key]);
+            }
+
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
         }
     }
 }

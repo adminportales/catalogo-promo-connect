@@ -106,17 +106,12 @@ class StockSurController extends Controller
                 }
             }
 
-            $count = 0;
-
             $allProducts = Product::where('provider_id', 6)->get();
             foreach ($result as $product) {
                 foreach ($product->variants as $variant) {
-                    $count++;
                     $slugNew = mb_strtolower(str_replace(' ', '-', $variant->color));
-                    $inWS = false;
                     foreach ($allProducts as $key => $value) {
                         if (($value->sku == $product->code . '_' . $slugNew)) {
-                            $inWS = true;
                             unset($allProducts[$key]);
                             break;
                         }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class DobleVelaController extends Controller
 {
@@ -148,18 +147,13 @@ class DobleVelaController extends Controller
                     if ($images != null) {
                         // return ($images);
                         // Comenzar a registrar los productos
-
                         $productsSkuP = Product::where('sku_parent', $sku_parent)->get();
-                        dd($productsSkuP, $images);
                     }
                 }
             }
         }
-
         //agregamos los parametros, en este caso solo es la llave de acceso
         //hacemos el llamado del metodo
-
-
 
     }
 }
