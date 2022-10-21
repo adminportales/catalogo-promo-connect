@@ -13,7 +13,9 @@ class SettingsController extends Controller
         $users = User::all();
         $userRole = Role::where('display_name', 'usuario')->first();
         foreach ($users as $user) {
-            $user->attachRole($userRole);
+            if (count($user->roles) <= 0) {
+                $user->attachRole($userRole);
+            }
         }
     }
 }

@@ -200,9 +200,14 @@ class InnovationController extends Controller
                                 ]
                             );
                         }
+                        $productExist->images()->delete();
+                        foreach ($imagenes as $imagen) {
+                            $productExist->images()->create($imagen);
+                        }
                     }
                 }
             }
+            return $responseData;
         } catch (Exception $e) {
             FailedJobsCron::create([
                 'name' => 'Innovation',
