@@ -9,6 +9,7 @@ use App\Models\FailedJobsCron;
 use App\Models\Product;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PromoOpcionController extends Controller
 {
@@ -135,6 +136,7 @@ class PromoOpcionController extends Controller
                 // dd($newProduct);
             }
         }
+        DB::table('images')->where('image_url', '=', null)->delete();
 
         return $result;
     }

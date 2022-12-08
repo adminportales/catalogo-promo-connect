@@ -112,7 +112,7 @@ class DobleVelaController extends Controller
                 }
             }
         }
-
+        DB::table('images')->where('image_url', '=', null)->delete();
         return $products;
     }
 

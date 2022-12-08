@@ -254,6 +254,7 @@ class ForPromotionalController extends Controller
                 $value->visible = 0;
                 $value->save();
             }
+            DB::table('images')->where('image_url', '=', null)->delete();
         } catch (Exception $e) {
             FailedJobsCron::create([
                 'name' => 'For Promotional',

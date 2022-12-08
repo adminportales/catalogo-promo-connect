@@ -123,6 +123,7 @@ class StockSurController extends Controller
                 $value->visible = 0;
                 $value->save();
             }
+            DB::table('images')->where('image_url', '=', null)->delete();
             return ($result);
         } catch (Exception $ex) {
             dd($ex);

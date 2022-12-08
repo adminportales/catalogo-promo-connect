@@ -207,6 +207,7 @@ class InnovationController extends Controller
                     }
                 }
             }
+            DB::table('images')->where('image_url', '=', null)->delete();
             return $responseData;
         } catch (Exception $e) {
             FailedJobsCron::create([
