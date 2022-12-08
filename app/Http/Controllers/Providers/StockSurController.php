@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Subcategory;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StockSurController extends Controller
 {

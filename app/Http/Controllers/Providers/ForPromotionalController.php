@@ -9,6 +9,7 @@ use App\Models\FailedJobsCron;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ForPromotionalController extends Controller

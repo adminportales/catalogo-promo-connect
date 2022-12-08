@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 
 class DobleVelaController extends Controller
 {
