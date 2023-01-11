@@ -68,7 +68,6 @@ class StockSurController extends Controller
                 ];
 
                 foreach ($product->variants as $variant) {
-
                     $color = null;
                     $slug = mb_strtolower(str_replace(' ', '-', $variant->color));
                     $color = Color::where("slug", $slug)->first();

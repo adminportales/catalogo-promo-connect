@@ -21,7 +21,6 @@ class DobleVelaController extends Controller
         $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==');
         //hacemos el llamado del metodo
         $resultado = $cliente->call('GetExistenciaAll', $parametros);
-
         $products = [];
         if ($error) {
             echo 'Fallo';
@@ -47,7 +46,6 @@ class DobleVelaController extends Controller
                 $idSku++;
             }
             foreach ($products as $product) {
-
                 // Verificar si el color existe y si no registrarla
                 $color = null;
                 $slug = substr(mb_strtolower(str_replace(' ', '-', $product->COLOR)), 5);

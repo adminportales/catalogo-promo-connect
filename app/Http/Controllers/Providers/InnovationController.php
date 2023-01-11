@@ -193,6 +193,8 @@ class InnovationController extends Controller
                         // dd($/newProduct);
                     } else {
                         $productExist->precios()->delete();
+                        $productExist->price = $product->lista_precios[0]->mi_precio;
+                        $productExist->save();
                         foreach ($product->lista_precios as $precio) {
                             $productExist->precios()->create(
                                 [

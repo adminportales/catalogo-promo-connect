@@ -140,7 +140,7 @@ class ForPromotionalController extends Controller
                             $newPath = '/forpromotional/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
                             Storage::append('public' . $newPath, $fileImage);
                             $newProduct->images()->create([
-                                'image_url' => '/storage' . $newPath
+                                'image_url' => url('/storage' . $newPath)
                             ]);
                         } else {
                             $newProduct->images()->create([
@@ -229,7 +229,7 @@ class ForPromotionalController extends Controller
                                 $newPath = '/forpromotional/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
                                 Storage::append('public' . $newPath, $fileImage);
                                 $productExist->images()->create([
-                                    'image_url' => '/storage' . $newPath
+                                    'image_url' => url('/storage' . $newPath)
                                 ]);
                             } else {
                                 $productExist->images()->create([
@@ -244,7 +244,7 @@ class ForPromotionalController extends Controller
             $allProducts = Product::where('provider_id', 1)->get();
             foreach ($products as $product) {
                 foreach ($allProducts as $key => $value) {
-                    if (($value->sku == $product['id_articulo'] && $value->color->color == ucfirst($product['color']))) {
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
                         break;
                     }
                 }
@@ -255,6 +255,21 @@ class ForPromotionalController extends Controller
                 $value->visible = 0;
                 $value->save();
             }
+
+            $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
+            foreach ($allProducts as $key => $value) {
+                foreach ($products as $product) {
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+                        unset($allProducts[$key]);
+                        break;
+                    }
+                }
+            }
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
+
             DB::table('images')->where('image_url', '=', null)->delete();
         } catch (Exception $e) {
             FailedJobsCron::create([

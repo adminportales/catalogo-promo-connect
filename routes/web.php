@@ -7,6 +7,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Providers\DobleVelaController;
 use App\Http\Controllers\Providers\ForPromotionalController;
+use App\Http\Controllers\Providers\G4Controller;
+use App\Http\Controllers\Providers\ImpressLineController;
 use App\Http\Controllers\Providers\InnovationController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
@@ -85,3 +87,7 @@ Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDobleve
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
 
 Route::get('/setRoles', [SettingsController::class, 'setRoles']);
+
+Route::get('/getProductsG4', [G4Controller::class, 'getProducts']);
+
+Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
