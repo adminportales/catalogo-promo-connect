@@ -25,7 +25,7 @@ class StockSurController extends Controller
                     'name' => 'For Promotional',
                     'message' => "'failed to initialize'",
                     'status' => 0,
-                    'type' =>   1
+                    'type' => 1
                 ]);
                 throw new Exception('failed to initialize');
             }

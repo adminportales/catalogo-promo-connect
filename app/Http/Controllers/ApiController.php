@@ -46,6 +46,7 @@ class ApiController extends Controller
             'globalAttribute' => $globalAttribute,
         ], 200);
     }
+
     public function getPricePromoOpcion()
     {
         $products = Product::where('provider_id', 2)->get();
