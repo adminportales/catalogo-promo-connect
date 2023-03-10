@@ -163,14 +163,12 @@ class BathInput extends Component
                 $dataProduct['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
                 if ($this->SKU) {
                     $dataProduct['sku'] =  $hojaActual->getCellByColumnAndRow($this->SKU, $indiceFila)->getValue();
-                    // dd($this->SKU_Padre, $this->SKU_interno, $this->SKU, $dataProduct);
                 } else {
                     $dataProduct['sku'] = $dataProduct['internal_sku'];
                 }
                 if ($this->SKU_Padre) {
                     $dataProduct['sku_parent'] = $hojaActual->getCellByColumnAndRow($this->SKU_Padre, $indiceFila)->getValue();
                 }
-                dd($this->SKU_Padre, $this->SKU_interno, $this->SKU, $dataProduct);
                 $dataProduct['name'] = $hojaActual->getCellByColumnAndRow($this->Nombre, $indiceFila)->getValue();
                 if ($this->SKU_Padre) {
                     $dataProduct['description'] = $hojaActual->getCellByColumnAndRow($this->Descripcion, $indiceFila)->getValue();
@@ -224,7 +222,6 @@ class BathInput extends Component
                 $dataProduct['type_id'] = $hojaActual->getCellByColumnAndRow($this->Tipo, $indiceFila)->getValue();
 
                 $dataProduct['color_id'] = $color ? $color->id : null;
-                dd($dataProduct);
                 $newProduct = ModelProduct::create($dataProduct);
 
                 // Imagenes
