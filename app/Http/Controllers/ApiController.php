@@ -15,12 +15,16 @@ use App\Models\Subcategory;
 use App\Models\Type;
 
 use App\Models\FailedJobsCron;
+use App\Models\User;
 use DOMDocument;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use SimpleXMLElement;
 
 class ApiController extends Controller
 {
+    use AuthenticatesUsers;
     public function getAllProducts()
     {
         $providers = Provider::all();
@@ -58,72 +62,79 @@ class ApiController extends Controller
     // Herdez Auth
     public function loginCustomer(Request $request)
     {
-        // $xml = file_get_contents('php://input');
-        // $cxml = new SimpleXMLElement($xml);
-        $xmlString = '
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd">
-        <cXML xml:lang="en-US" payloadID="1591126611.9325364@stg1302app4.int.coupahost.com" timestamp="2020-06-02T14:36:51-05:00">
-            <Header>
-                <From>
-                    <Credential domain="DUNS">
-                        <Identity>COUPA1</Identity>
-                    </Credential>
-                </From>
-                <To>
-                    <Credential domain="DUNS">
-                        <Identity>079928354</Identity>
-                    </Credential>
-                </To>
-                <Sender>
-                    <Credential domain="DUNS">
-                        <Identity>COUPA1</Identity>
-                        <SharedSecret>ALD</SharedSecret>
-                    </Credential>
-                    <UserAgent>Coupa Procurement 1.0</UserAgent>
-                </Sender>
-            </Header>
-            <Request>
-                <PunchOutSetupRequest operation="create">
-                    <BuyerCookie>99ea3c4c8cf9f6dc905a6b6772daa0d1</BuyerCookie>
-                    <Extrinsic name="FirstName">Mary Anne</Extrinsic>
-                    <Extrinsic name="LastName">Krzeminski</Extrinsic>
-                    <Extrinsic name="UniqueName">maryanne.krzeminski@coupa.com</Extrinsic>
-                    <Extrinsic name="UserEmail">maryanne.krzeminski@coupa.com</Extrinsic>
-                    <Extrinsic name="User">maryanne.krzeminski@coupa.com</Extrinsic>
-                    <Extrinsic name="BusinessUnit">COUPA</Extrinsic>
-                    <BrowserFormPost>
-                        <URL>https://mwilczek-demo.coupacloud.com/punchout/checkout?id=2</URL>
-                    </BrowserFormPost>
-                    <Contact role="endUser">
-                        <Name xml:lang="en-US">maryanne.krzeminski@coupa.com</Name>
-                        <Email>maryanne.krzeminski@coupa.com</Email>
-                    </Contact>
-                    <SupplierSetup>
-                        <URL>https://uttest.free.beeceptor.com</URL>
-                    </SupplierSetup>
-                </PunchOutSetupRequest>
-            </Request>
-        </cXML>';
+        $user = User::where('email', "adminportales@promolife.com.mx")->first();
+        // Auth::login(['email' => "adminportales@promolife.com.mx", 'password' => "password"]);
 
-        /* // Verificar que la solicitud de Coupa sea válida
+        if (Auth::attempt(['email' => "adminportales@promolife.com.mx", 'password' => "password"])) {
+            Auth::login($user);
+            // return auth()->user();
+            return redirect('/catalogo');
+            dd(1);
+        }
+        return redirect('/');
+        $xml = file_get_contents('php://input');
+        $cxml = new SimpleXMLElement($xml);
+
+        // Verificar que la solicitud de Coupa sea válida
         if ($cxml->getName() !== 'cXML') {
             // La solicitud no es válida, enviar una respuesta de error
             return '<cXML><Response><Status code="500" text="Invalid request"></Status></Response></cXML>';
-        } */
+        }
         $xmlDoc = new DOMDocument();
-        $xmlDoc->loadXML($xmlString, );
+        $xmlDoc->loadXML($xml);
         $punhOutRequest = $xmlDoc->getElementsByTagName('PunchOutSetupRequest');
-        foreach ($punhOutRequest as $node) {
-            if ($node->hasAttribute("name")) {
-                echo "NOXNUIS";
-                if ($node->getAttribute("name")) {
+        $parent = $punhOutRequest->item(0);
+        foreach ($parent->childNodes as $child) {
+            if ($child->nodeType == XML_ELEMENT_NODE) {
+                if ($child->hasAttribute('name')) {
+                    if ($child->getAttribute('name') == "UserEmail") {
+                        $user = User::where('email', $child->nodeValue)->first();
+                        if ($user) {
+                            Auth::attempt(['email' => "adminportales@promolife.com.mx", 'password' => "password"]);
+                            // return $user;
+                            // Crea un nuevo DOMDocument
+                            $doc = new DOMDocument('1.0', 'UTF-8');
+
+                            // Crear nodo raíz
+                            $cxml = $doc->createElement('cXML');
+                            $cxml->setAttribute('version', '1.1.007');
+                            $cxml->setAttribute('xml:lang', 'en-US');
+                            $cxml->setAttribute('payloadID', '200303450803006749@b2b.euro.com');
+                            $cxml->setAttribute('timestamp', '2020-06-02T14:36:53-05:00');
+                            $doc->appendChild($cxml);
+
+                            // Crear nodo Response
+                            $response = $doc->createElement('Response');
+                            $cxml->appendChild($response);
+
+                            // Crear nodo Status dentro de Response
+                            $status = $doc->createElement('Status');
+                            $status->setAttribute('code', '200');
+                            $status->setAttribute('text', 'OK');
+                            $response->appendChild($status);
+
+                            // Crear nodo PunchOutSetupResponse dentro de Response
+                            $punchOutSetupResponse = $doc->createElement('PunchOutSetupResponse');
+                            $response->appendChild($punchOutSetupResponse);
+
+                            // Crear nodo StartPage dentro de PunchOutSetupResponse
+                            $startPage = $doc->createElement('StartPage');
+                            $punchOutSetupResponse->appendChild($startPage);
+
+                            // Crear nodo URL dentro de StartPage
+                            $url = $doc->createElement('URL', url("") . '/loginEmail?email=adminportales@promolife.com.mx');
+                            $startPage->appendChild($url);
+
+                            // Imprimir el XML
+                            $xml = $doc->saveXML(); // $dom es el objeto DOMDocument que has creado antes
+                            return response($xml, 200)->header('Content-Type', 'text/xml');
+                        }
+                    }
                 }
             }
-            // echo  $name = $node->nodeValue;
         }
-
+        // https://intranet.promolife.lat/loginEmail?email=adminportales@promolife.com.mx&password=rHZAWYmb
         // Enviar la respuesta a Coupa
-        header('Content-Type: application/xml');
+        return  response('<cXML><Response><Status code="500" text="Invalid request"></Status></Response></cXML>', 500)->header('Content-Type', 'application/xml');
     }
 }
