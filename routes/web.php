@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
@@ -29,6 +30,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/loginEmail', [LoginController::class, 'loginWithLink'])->name('loginWithLink');
+Route::get('/login-customer',  [ApiController::class, 'loginCustomer']);
+
 Auth::routes();
 
 
