@@ -18,10 +18,12 @@ use App\Models\FailedJobsCron;
 use App\Models\Role;
 use App\Models\User;
 use DOMDocument;
+use Exception;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use SimpleXMLElement;
 
 class ApiController extends Controller
@@ -65,6 +67,13 @@ class ApiController extends Controller
     public function loginCustomer(Request $request)
     {
         $xml = file_get_contents('php://input');
+
+        try {
+            Storage::put('public/' . time() . 'archivo.xml', $xml);
+        } catch (Exception $th) {
+            //throw $th;
+        }
+
         $cxml = new SimpleXMLElement($xml);
         // Verificar que la solicitud de Coupa sea válida
         if ($cxml->getName() !== 'cXML') {
@@ -157,15 +166,14 @@ class ApiController extends Controller
             $xml = $doc->saveXML(); // $dom es el objeto DOMDocument que has creado antes
             return response($xml, 200)->header('Content-Type', 'text/xml');
         }
-        // https://intranet.promolife.lat/loginEmail?email=adminportales@promolife.com.mx&password=rHZAWYmb
-        // Enviar la respuesta a Coupa
 
+        return response('<cXML><Response><Status code="500" text="Invalid request"></Status></Response></cXML>', 500)->header('Content-Type', 'application/xml');
     }
 
     public function loginPunchOut(Request $req)
     {
         $user = User::where('email', $req->data)->first();
-        if($user->external_company!== null){
+        if ($user->external_company !== null) {
             Auth::login($user);
             return  redirect('/catalogo');
         }
