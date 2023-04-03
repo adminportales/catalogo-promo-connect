@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/loginEmail', [LoginController::class, 'loginWithLink'])->name('loginWithLink');
-Route::get('/login-customer',  [ApiController::class, 'loginCustomer']);
+Route::get('/loginPunchOut',  [ApiController::class, 'loginPunchOut']);
 
 Auth::routes();
 
