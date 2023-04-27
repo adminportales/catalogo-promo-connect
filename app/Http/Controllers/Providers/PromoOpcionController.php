@@ -136,6 +136,22 @@ class PromoOpcionController extends Controller
                 // dd($newProduct);
             }
         }
+
+        $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
+        foreach ($allProducts as $key => $value) {
+            foreach ($result as $product) {
+                if ($value->sku == $product['item_code']) {
+                    unset($allProducts[$key]);
+                    break;
+                }
+            }
+        }
+
+        foreach ($allProducts as  $value) {
+            $value->visible = 0;
+            $value->save();
+        }
+
         DB::table('images')->where('image_url', '=', null)->delete();
 
         return $result;

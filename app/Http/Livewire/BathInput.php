@@ -233,65 +233,62 @@ class BathInput extends Component
                     $dataProduct['type_id'] = $hojaActual->getCellByColumnAndRow($this->Tipo, $indiceFila)->getValue();
 
                     $dataProduct['color_id'] = $color ? $color->id : null;
-                    $newProduct = ModelProduct::create($dataProduct);
-
+                    $imagenes = [];
                     // Imagenes
                     if ($this->Imagenes) {
                         foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Imagenes, $indiceFila)->getValue()) as $img) {
-
-                            /* $errorGetImage = false;
-                            $fileImage = "";
-                            try {
-                                $fileImage = file_get_contents(str_replace(' ', '%20', $img), false, stream_context_create($arrContextOptions));
-                            } catch (Exception $th) {
-                                $errorGetImage = true;
-                            }
-                            dd(str_replace(' ', '%20', $img));
-                            $newPath = '';
-                            if (!$errorGetImage) {
-                                $newPath = '/photos/' . time() . $dataProduct['name'] . '.jpg';
-                                Storage::append('public' . $newPath, $fileImage);
+                            /*
                                 $newProduct->images()->create([
-                                    'image_url' => url('/storage' . $newPath)
+                                    'image_url' => $img
                                 ]);
-                            } else {
-                                $newProduct->images()->create([
-                                    'image_url' => 'img/default_product_image.jpg'
-                                ]);
-                            } */
-
-                            $newProduct->images()->create([
+                            */
+                            array_push($imagenes, [
                                 'image_url' => $img
                             ]);
                         }
                     }
+                    $escalas = [];
                     // Escalas
-                    if (!$newProduct->precio_unico) {
+                    if (!$dataProduct['precio_unico']) {
                         if ($this->Escalas) {
                             foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Escalas, $indiceFila)->getValue()) as $esc) {
                                 $dataEscala = explode(':', $esc);
-                                $newProduct->precios()->create([
+                                array_push($escalas, [
                                     'escala' => $dataEscala[0],
-                                    'precio' => $dataEscala[1],
+                                    'price' => (int)(trim($dataEscala[1])),
                                 ]);
+                                /* $newProduct->precios()->create([
+                                    'escala' => $dataEscala[0],
+                                    'price' => (int)(trim($dataEscala[1])),
+                                ]); */
                             }
                         }
                     }
-
+                    $attributos = [];
                     if ($this->Atributos) {
                         if ($hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue() != "") {
                             foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Atributos, $indiceFila)->getValue()) as $att) {
                                 $dataAttr = explode(':', $att);
                                 if (count($dataAttr) > 0) {
-                                    $newProduct->productAttributes()->create([
+                                    array_push($attributos, [
                                         'attribute' => trim($dataAttr[0]),
                                         'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),
                                         'value' => $dataAttr[1],
                                     ]);
+                                    /*  $newProduct->productAttributes()->create([
+                                        'attribute' => trim($dataAttr[0]),
+                                        'slug' => $slug = mb_strtolower(str_replace(' ', '-', trim($dataAttr[0]))),
+                                        'value' => $dataAttr[1],
+                                    ]); */
                                 }
                             }
                         }
                     }
+                    dd($dataProduct, [
+                        $categoria, $subcategoria
+                    ], $categoria, $subcategoria, $imagenes, $escalas, $attributos);
+                    dd(1);
+                    $newProduct = ModelProduct::create($dataProduct);
                     /*
                     Registrar en la tabla product_category el producto, categoria y sub categoria
                     */

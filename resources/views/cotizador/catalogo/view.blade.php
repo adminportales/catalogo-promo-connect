@@ -66,12 +66,14 @@
                             <option value="DESC">De mayor a menor</option>
                         </select>
                     @endpermission
-                    <p class="mb-0">Ordenar por Precio</p>
-                    <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
-                        <option value="">Ninguno</option>
-                        <option value="ASC">De menor a mayor</option>
-                        <option value="DESC">De mayor a menor</option>
-                    </select>
+                    @permission('ver-precio')
+                        <p class="mb-0">Ordenar por Precio</p>
+                        <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
+                            <option value="">Ninguno</option>
+                            <option value="ASC">De menor a mayor</option>
+                            <option value="DESC">De mayor a menor</option>
+                        </select>
+                    @endpermission
                     <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
                 </div>
             </div>
@@ -135,12 +137,14 @@
                         <option value="DESC">De mayor a menor</option>
                     </select>
                 @endpermission
-                <p class="mb-0">Ordenar por Precio</p>
-                <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
-                    <option value="">Ninguno</option>
-                    <option value="ASC">De menor a mayor</option>
-                    <option value="DESC">De mayor a menor</option>
-                </select>
+                @permission('ver-precio')
+                    <p class="mb-0">Ordenar por Precio</p>
+                    <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
+                        <option value="">Ninguno</option>
+                        <option value="ASC">De menor a mayor</option>
+                        <option value="DESC">De mayor a menor</option>
+                    </select>
+                @endpermission
                 <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
             </div>
         </div>
@@ -191,8 +195,10 @@
                                     @permission('ver-stock')
                                         <p class=" m-0 pt-1">Stock: {{ $row->stock }}</p>
                                     @endpermission
-                                    <p class=" m-0 pt-1">$
-                                        {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                    @permission('ver-precio')
+                                        <p class=" m-0 pt-1">$
+                                            {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                    @endpermission
                                 </div>
                                 <br>
                                 <button type="button" class="btn btn-primary" data-toggle="modal"

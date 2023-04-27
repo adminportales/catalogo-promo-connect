@@ -20,14 +20,17 @@ class G4Controller extends Controller
         }
 
         //arreglo parámetros para la consulta de un solo producto
-        $params = array('user' => 'CXXXX', 'key' => 'Password', 'sku' => 'anf-cav-gob');
-        $params = array('user' => 'CXXXX', 'key' => 'Password');
+        $params = array('user' => 'C2677', 'key' => 'pL%43');
         //arreglo parámetros para la consulta de todos los productos
         //$params=array('user'=>'CXXXX','key'=>'Password');
         //llamada al método getProduct
         $response = $client->call('getProduct', $params);
-        $movies = (new SimpleXMLElement(base64_decode($response)));
+        $products = (new SimpleXMLElement(base64_decode($response)));
 
-        dd($movies);
+        foreach ($products as $product) {
+            $att = "@attributes";
+            dd($product->attributes);
+            return;
+        }
     }
 }

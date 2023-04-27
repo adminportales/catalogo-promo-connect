@@ -55,7 +55,6 @@ class InnovationController extends Controller
                 $idSku = (int) explode('-', $maxSKU)[1];
                 $idSku++;
             }
-
             foreach ($responseData as $product) {
                 $categoria = null;
                 if (count($product->categorias->categorias) > 0) {
@@ -193,8 +192,9 @@ class InnovationController extends Controller
                         // dd($/newProduct);
                     } else {
                         $productExist->precios()->delete();
-                        $productExist->price = $product->lista_precios[0]->mi_precio;
-                        $productExist->save();
+                        $productExist->update([
+                            "price" => $product->lista_precios[0]->mi_precio
+                        ]);
                         foreach ($product->lista_precios as $precio) {
                             $productExist->precios()->create(
                                 [
@@ -260,9 +260,28 @@ class InnovationController extends Controller
             $productCatalogo = Product::where('sku', $product->clave)->first();
             if ($productCatalogo) {
                 $productCatalogo->update(['stock' => $product->general_stock]);
+                $productCatalogo->touch();
             } else {
                 array_push($productsNotFound, $product->clave);
+                $productCatalogo->visible = 0;
+                $productCatalogo->save();
             }
+        }
+
+
+        $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
+        foreach ($allProducts as $key => $value) {
+            foreach ($responseData as $product) {
+                if ($value->sku == $product->clave) {
+                    unset($allProducts[$key]);
+                    break;
+                }
+            }
+        }
+
+        foreach ($allProducts as  $value) {
+            $value->visible = 0;
+            $value->save();
         }
         FailedJobsCron::create([
             'name' => 'Innovation',
