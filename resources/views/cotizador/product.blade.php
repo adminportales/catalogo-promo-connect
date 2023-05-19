@@ -6,11 +6,11 @@
             border-radius: 15px !important;
             padding: 2px
         }
+
         .modal-header {
             background-color: #09343F;
             color: white;
         }
-
     </style>
     <div wire:ignore.self class="modal fade" id="modalProduct" tabindex="-1" aria-labelledby="modalProductLabel"
         aria-hidden="true">
@@ -108,38 +108,42 @@
                                     @permission('ver-proveedores')
                                         <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
                                     @endpermission
-                                    @if ($product->precio_unico)
-                                        <p><strong>Precio: </strong>
-                                            $ {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
-                                    @endif
+                                    @permission('ver-precio')
+                                        @if ($product->precio_unico)
+                                            <p><strong>Precio: </strong>
+                                                $ {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                        @endif
+                                    @endpermission
                                     <p><strong>Producto Nuevo: </strong> {{ $product->producto_nuevo ? 'SI' : 'NO' }}
                                     </p>
                                     <p><strong>Producto de Promocion: </strong>
                                         {{ $product->producto_promocion ? 'SI' : 'NO' }}</p>
-                                    @if (!$product->precio_unico)
-                                        <h5><strong>Precios</strong></h5>
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Escala</th>
-                                                    <th>Precio</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($product->precios as $precio)
-                                                    @php
-                                                        $priceProduct = $product->price;
-                                                        $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
-                                                        $precioFinal = round($price / ((100 - $utilidad) / 100), 2);
-                                                    @endphp
+                                    @permission('ver-precio')
+                                        @if (!$product->precio_unico)
+                                            <h5><strong>Precios</strong></h5>
+                                            <table class="table">
+                                                <thead>
                                                     <tr>
-                                                        <td class="p-0">{{ $precio->escala }}</td>
-                                                        <td class="p-0">$ {{ $precioFinal }}</td>
+                                                        <th>Escala</th>
+                                                        <th>Precio</th>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    @endif
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($product->precios as $precio)
+                                                        @php
+                                                            $priceProduct = $product->price;
+                                                            $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
+                                                            $precioFinal = round($price / ((100 - $utilidad) / 100), 2);
+                                                        @endphp
+                                                        <tr>
+                                                            <td class="p-0">{{ $precio->escala }}</td>
+                                                            <td class="p-0">$ {{ $precioFinal }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        @endif
+                                    @endpermission
                                 </div>
                                 <div class="col-md-6">
                                     @if (count($product->productCategories) > 0)

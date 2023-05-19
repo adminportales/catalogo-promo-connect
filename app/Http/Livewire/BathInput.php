@@ -272,7 +272,7 @@ class BathInput extends Component
                                 $dataEscala = explode(':', $esc);
                                 $newProduct->precios()->create([
                                     'escala' => $dataEscala[0],
-                                    'precio' => $dataEscala[1],
+                                    'price' => (int) $dataEscala[1],
                                 ]);
                             }
                         }

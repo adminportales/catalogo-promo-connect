@@ -110,6 +110,20 @@ class DobleVelaController extends Controller
                     ]);
                 }
             }
+            $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
+            foreach ($allProducts as $key => $value) {
+                foreach ($products as $product) {
+                    if ($value->sku == trim($product->CLAVE)) {
+                        unset($allProducts[$key]);
+                        break;
+                    }
+                }
+            }
+
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
         }
         DB::table('images')->where('image_url', '=', null)->delete();
         return $products;
@@ -154,5 +168,26 @@ class DobleVelaController extends Controller
         //agregamos los parametros, en este caso solo es la llave de acceso
         //hacemos el llamado del metodo
 
+    }
+
+    public function getProductProductosDoblevela($sku)
+    {
+        $cliente = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?wsdl', 'wsdl');
+        $error = $cliente->getError();
+        if ($error) {
+            echo 'Error' . $error;
+        }
+        //agregamos los parametros, en este caso solo es la llave de acceso
+        $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'codigo' => $sku);
+        //hacemos el llamado del metodo
+        $resultado = $cliente->call('GetExistencia', $parametros);
+        $msg = '';
+        if (array_key_exists('GetExistenciaResult', $resultado)) {
+            $informacionExistencias = json_decode(utf8_encode($resultado['GetExistenciaResult']))->Resultado;
+            return $informacionExistencias;
+        } else {
+            $msg = "No se obtuvo informacion acerca del Stock de este producto. Es posible que los datos sean incorrectos";
+        }
+        return $msg;
     }
 }
