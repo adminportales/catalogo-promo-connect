@@ -42,14 +42,16 @@
                             <option value="{{ $type->id }}">{{ $type->type }}</option>
                         @endforeach
                     </select>
-                    <p class="mb-0">Precio</p>
-                    <div class="d-flex align-items-center mb-2">
-                        <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
-                            placeholder="Precio Minimo" min="0" value="0">
-                        -
-                        <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
-                            placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
-                    </div>
+                    @permission('ver-precio')
+                        <p class="mb-0">Precio</p>
+                        <div class="d-flex align-items-center mb-2">
+                            <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
+                                placeholder="Precio Minimo" min="0" value="0">
+                            -
+                            <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
+                                placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
+                        </div>
+                    @endpermission
                     @permission('ver-stock')
                         <p class="mb-0">Stock</p>
                         <div class="d-flex align-items-center mb-2">
@@ -113,14 +115,17 @@
                         <option value="{{ $type->id }}">{{ $type->type }}</option>
                     @endforeach
                 </select>
-                <p class="mb-0">Precio</p>
-                <div class="d-flex align-items-center mb-2">
-                    <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
-                        placeholder="Precio Minimo" min="0" value="0">
-                    -
-                    <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
-                        placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
-                </div>
+
+                @permission('ver-precio')
+                    <p class="mb-0">Precio</p>
+                    <div class="d-flex align-items-center mb-2">
+                        <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
+                            placeholder="Precio Minimo" min="0" value="0">
+                        -
+                        <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
+                            placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
+                    </div>
+                @endpermission
                 @permission('ver-stock')
                     <p class="mb-0">Stock</p>
                     <div class="d-flex align-items-center mb-2">
@@ -238,8 +243,10 @@
                                         @permission('ver-stock')
                                             <p class=" m-0 pt-0">Stock: {{ $row->stock }}</p>
                                         @endpermission
-                                        <p class=" m-0 pt-0">Precio: $
-                                            {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                        @permission('ver-precio')
+                                            <p class=" m-0 pt-0">Precio: $
+                                                {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                        @endpermission
                                     </div>
                                 </div>
                                 {{-- <div class="al">

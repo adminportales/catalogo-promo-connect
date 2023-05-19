@@ -84,6 +84,7 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 
 // Doble Vela
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
+Route::get('/getProductProductosDoblevela/{sku}', [DobleVelaController::class, 'getProductProductosDoblevela']);
 Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
 
 // StockSur
@@ -92,5 +93,6 @@ Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsSt
 Route::get('/setRoles', [SettingsController::class, 'setRoles']);
 
 Route::get('/getProductsG4', [G4Controller::class, 'getProducts']);
+Route::get('/getAllStockG4', [G4Controller::class, 'getAllStock']);
 
 Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
