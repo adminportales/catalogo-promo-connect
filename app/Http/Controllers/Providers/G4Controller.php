@@ -15,7 +15,7 @@ use SimpleXMLElement;
 
 class G4Controller extends Controller
 {
-    public function getProducts()
+    public function getProductsPL()
     {
         $wsdl = "https://distr.ws.g4mexico.com/index.php?wsdl";
         $client = new \nusoap_client($wsdl, 'wsdl');
@@ -209,7 +209,7 @@ class G4Controller extends Controller
         DB::table('images')->where('image_url', '=', null)->delete();
     }
 
-    public function getAllStock()
+    public function getAllStockPL()
     {
         $wsdl = "https://distr.ws.g4mexico.com/index.php?wsdl";
         $client = new \nusoap_client($wsdl, 'wsdl');
