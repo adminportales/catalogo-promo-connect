@@ -110,7 +110,7 @@ class DobleVelaController extends Controller
                     ]);
                 }
             }
-            $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
+            $allProducts = Product::where('provider_id', 5)->where('visible', 1)->get();
             foreach ($allProducts as $key => $value) {
                 foreach ($products as $product) {
                     if ($value->sku == trim($product->CLAVE)) {
@@ -169,7 +169,6 @@ class DobleVelaController extends Controller
         //hacemos el llamado del metodo
 
     }
-
     public function getProductProductosDoblevela($sku)
     {
         $cliente = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?wsdl', 'wsdl');

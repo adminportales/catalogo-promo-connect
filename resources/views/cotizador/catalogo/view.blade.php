@@ -160,7 +160,7 @@
             <div wire:loading.block>
                 <div class="loading w-100 d-flex justify-content-center align-items-center" style="height: 85vh;">
                     <div class="w-25">
-                        <img src="{{ asset('img/load.gif') }}" alt="" srcset="" class="w-100">
+                        <img src="{{ asset('img/load1.gif') }}" alt="" srcset="" class="w-100">
                     </div>
                 </div>
             </div>
