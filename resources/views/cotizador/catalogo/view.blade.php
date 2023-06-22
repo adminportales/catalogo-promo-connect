@@ -42,14 +42,16 @@
                             <option value="{{ $type->id }}">{{ $type->type }}</option>
                         @endforeach
                     </select>
-                    <p class="mb-0">Precio</p>
-                    <div class="d-flex align-items-center mb-2">
-                        <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
-                            placeholder="Precio Minimo" min="0" value="0">
-                        -
-                        <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
-                            placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
-                    </div>
+                    @permission('ver-precio')
+                        <p class="mb-0">Precio</p>
+                        <div class="d-flex align-items-center mb-2">
+                            <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
+                                placeholder="Precio Minimo" min="0" value="0">
+                            -
+                            <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
+                                placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
+                        </div>
+                    @endpermission
                     @permission('ver-stock')
                         <p class="mb-0">Stock</p>
                         <div class="d-flex align-items-center mb-2">
@@ -66,12 +68,14 @@
                             <option value="DESC">De mayor a menor</option>
                         </select>
                     @endpermission
-                    <p class="mb-0">Ordenar por Precio</p>
-                    <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
-                        <option value="">Ninguno</option>
-                        <option value="ASC">De menor a mayor</option>
-                        <option value="DESC">De mayor a menor</option>
-                    </select>
+                    @permission('ver-precio')
+                        <p class="mb-0">Ordenar por Precio</p>
+                        <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
+                            <option value="">Ninguno</option>
+                            <option value="ASC">De menor a mayor</option>
+                            <option value="DESC">De mayor a menor</option>
+                        </select>
+                    @endpermission
                     <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
                 </div>
             </div>
@@ -111,14 +115,17 @@
                         <option value="{{ $type->id }}">{{ $type->type }}</option>
                     @endforeach
                 </select>
-                <p class="mb-0">Precio</p>
-                <div class="d-flex align-items-center mb-2">
-                    <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
-                        placeholder="Precio Minimo" min="0" value="0">
-                    -
-                    <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
-                        placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
-                </div>
+
+                @permission('ver-precio')
+                    <p class="mb-0">Precio</p>
+                    <div class="d-flex align-items-center mb-2">
+                        <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
+                            placeholder="Precio Minimo" min="0" value="0">
+                        -
+                        <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
+                            placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
+                    </div>
+                @endpermission
                 @permission('ver-stock')
                     <p class="mb-0">Stock</p>
                     <div class="d-flex align-items-center mb-2">
@@ -135,12 +142,14 @@
                         <option value="DESC">De mayor a menor</option>
                     </select>
                 @endpermission
-                <p class="mb-0">Ordenar por Precio</p>
-                <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
-                    <option value="">Ninguno</option>
-                    <option value="ASC">De menor a mayor</option>
-                    <option value="DESC">De mayor a menor</option>
-                </select>
+                @permission('ver-precio')
+                    <p class="mb-0">Ordenar por Precio</p>
+                    <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
+                        <option value="">Ninguno</option>
+                        <option value="ASC">De menor a mayor</option>
+                        <option value="DESC">De mayor a menor</option>
+                    </select>
+                @endpermission
                 <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
             </div>
         </div>
@@ -151,7 +160,7 @@
             <div wire:loading.block>
                 <div class="loading w-100 d-flex justify-content-center align-items-center" style="height: 85vh;">
                     <div class="w-25">
-                        <img src="{{ asset('img/load.gif') }}" alt="" srcset="" class="w-100">
+                        <img src="{{ asset('img/load1.gif') }}" alt="" srcset="" class="w-100">
                     </div>
                 </div>
             </div>
@@ -191,8 +200,10 @@
                                     @permission('ver-stock')
                                         <p class=" m-0 pt-1">Stock: {{ $row->stock }}</p>
                                     @endpermission
-                                    <p class=" m-0 pt-1">$
-                                        {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                    @permission('ver-precio')
+                                        <p class=" m-0 pt-1">$
+                                            {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                    @endpermission
                                 </div>
                                 <br>
                                 <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -232,8 +243,10 @@
                                         @permission('ver-stock')
                                             <p class=" m-0 pt-0">Stock: {{ $row->stock }}</p>
                                         @endpermission
-                                        <p class=" m-0 pt-0">Precio: $
-                                            {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                        @permission('ver-precio')
+                                            <p class=" m-0 pt-0">Precio: $
+                                                {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                        @endpermission
                                     </div>
                                 </div>
                                 {{-- <div class="al">

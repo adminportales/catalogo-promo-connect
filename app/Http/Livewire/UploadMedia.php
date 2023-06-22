@@ -20,7 +20,7 @@ class UploadMedia extends Component
     public function save()
     {
         $this->validate([
-            'photos.*' => 'image|max:2048', // 1MB Max
+            'photos.*' => 'image|max:8000', // 1MB Max
         ]);
 
         foreach ($this->photos as $photo) {

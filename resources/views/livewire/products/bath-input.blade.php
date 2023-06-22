@@ -209,7 +209,7 @@
                                             </label>
                                         </div>
                                         <div class="w-75">
-                                            <input type="number" wire:model="Precio"
+                                            <input type="number" wire:model="Escalas"
                                                 placeholder="Colocar en el archivo las diferentes escalas"
                                                 class="form-control p-0 m-0 text-center @error('Precio') border border-danger @enderror">
                                         </div>
@@ -399,6 +399,25 @@
                 </div>
             @elseif (count($productsImporteds) > 0)
                 <div class="col-md-10">
+                    Filas que no se importaron
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td></td>
+                                <td>Fila</td>
+                                <td>Error</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($filasError as $i)
+                                <tr>
+                                    <td></td>
+                                    <td>{{ $i[0] }}</td>
+                                    <td>{{ $i[1] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                     <table class="table">
                         <thead>
                             <tr>

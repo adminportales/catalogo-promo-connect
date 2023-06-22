@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
@@ -29,6 +30,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/loginEmail', [LoginController::class, 'loginWithLink'])->name('loginWithLink');
+Route::get('/loginPunchOut',  [ApiController::class, 'loginPunchOut']);
+
 Auth::routes();
 
 
@@ -81,6 +84,7 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 
 // Doble Vela
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
+Route::get('/getProductProductosDoblevela/{sku}', [DobleVelaController::class, 'getProductProductosDoblevela']);
 Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
 
 // StockSur
@@ -88,6 +92,10 @@ Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsSt
 
 Route::get('/setRoles', [SettingsController::class, 'setRoles']);
 
-Route::get('/getProductsG4', [G4Controller::class, 'getProducts']);
+Route::get('/getProductsG4PL', [G4Controller::class, 'getProductsPL']);
+Route::get('/getAllStockG4PL', [G4Controller::class, 'getAllStockPL']);
+
+Route::get('/getProductsG4BH', [G4Controller::class, 'getProductsBH']);
+Route::get('/getAllStockG4BH', [G4Controller::class, 'getAllStockBH']);
 
 Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);

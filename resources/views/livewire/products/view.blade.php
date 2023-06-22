@@ -69,7 +69,7 @@
                                                 style="max-width: 100%; max-height: 60px; width: auto" srcset="">
                                         </td>
                                         <td>{{ $row->color ? $row->color->color : '' }}</td>
-                                        <td>{{ $row->provider->company }}</td>
+                                        <td>{{ $row->provider ? $row->provider->company : 'Proveedor No Encontrado' }}</td>
                                         <td width="90">
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-info btn-sm dropdown-toggle"

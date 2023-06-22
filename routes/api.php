@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Rutas de la actualizacion de Web WooCommerce
 // Route::get('/setProductsToGoodIN', [SendProductsToEcommerce::class, 'setProductsToGoodIN']);
+Route::post('/login-customer',  [ApiController::class, 'loginCustomer']);
 
 Route::post('/login-customer',  [ApiController::class, 'loginCustomer']);
 

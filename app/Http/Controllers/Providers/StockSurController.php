@@ -99,8 +99,15 @@ class StockSurController extends Controller
                         $idSku++;
                     } else {
                         $productExist->stock =  $variant->stock_available;
-                        $productExist->price = $variant->list_price;
+                        $productExist->price = $variant->net_price;
                         $productExist->save();
+                        $productExist->images()->delete();
+                        $productExist->images()->create([
+                            'image_url' => $variant->detail_picture->medium
+                        ]);
+                        $productExist->images()->create([
+                            'image_url' => $variant->picture->medium
+                        ]);
                     }
                     array_push($dataArregloProductos, $productExist);
                 }
