@@ -25,6 +25,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Route::get('/setProductsToGoodIN', [SendProductsToEcommerce::class, 'setProductsToGoodIN']);
 Route::post('/login-customer',  [ApiController::class, 'loginCustomer']);
 
+Route::post('/login-customer',  [ApiController::class, 'loginCustomer']);
+
 Route::get('/getAllProductos',  [ApiController::class, 'getAllProducts']);
 Route::get('/getPricePromoOpcion',  [ApiController::class, 'getPricePromoOpcion']);
 

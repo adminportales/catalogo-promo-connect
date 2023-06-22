@@ -20,10 +20,10 @@ use App\Models\User;
 use DOMDocument;
 use Exception;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use SimpleXMLElement;
 
 class ApiController extends Controller
@@ -184,5 +184,20 @@ class ApiController extends Controller
     {
         $diff = array_diff_key(array_flip($keys), $array);
         return count($diff) === 0;
+        foreach ($punhOutRequest as $node) {
+            $name = $node->nodeValue;
+            echo $name;
+        }
+        /* foreach ($punhOutRequest as $book) {
+          $bookId = $book->getAttribute('id');
+          if ($bookId == 'bk101') {
+            $title = $book->getElementsByTagName('title')->item(0)->nodeValue;
+            echo 'El título del libro con id="bk101" es: ' . $title;
+          }
+        } */
+
+        // Enviar la respuesta a Coupa
+        header('Content-Type: application/xml');
+        return $response;
     }
 }
