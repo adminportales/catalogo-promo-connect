@@ -17,7 +17,8 @@ class CreatePricesTable extends Migration
             $table->id();
             $table->foreignId('product_id')->nullable()->constrained();
             $table->decimal('price', 8, 2)->nullable();
-            $table->string('escala')->nullable();
+            $table->string('escala_inicial')->nullable();
+            $table->string('escala_final')->nullable();
             $table->timestamps();
         });
     }

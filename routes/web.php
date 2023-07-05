@@ -36,6 +36,7 @@ Auth::routes();
 
 
 Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');
+Route::get('/setRoles', [SettingsController::class, 'setRoles']);
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
@@ -90,12 +91,14 @@ Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDobleve
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
 
-Route::get('/setRoles', [SettingsController::class, 'setRoles']);
-
+// G4
 Route::get('/getProductsG4PL', [G4Controller::class, 'getProductsPL']);
 Route::get('/getAllStockG4PL', [G4Controller::class, 'getAllStockPL']);
 
 Route::get('/getProductsG4BH', [G4Controller::class, 'getProductsBH']);
 Route::get('/getAllStockG4BH', [G4Controller::class, 'getAllStockBH']);
 
+// ImpressLine
 Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
+
+// EuroCotton

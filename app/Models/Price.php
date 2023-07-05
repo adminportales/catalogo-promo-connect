@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Price extends Model
 {
 	use HasFactory;
-	
+
     public $timestamps = true;
 
     protected $table = 'prices';
 
-    protected $fillable = ['product_id','price','escala'];
-	
+    protected $fillable = ['product_id','price','escala_inicial', 'escala_final'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
@@ -22,5 +22,5 @@ class Price extends Model
     {
         return $this->hasOne('App\Models\Product', 'id', 'product_id');
     }
-    
+
 }
