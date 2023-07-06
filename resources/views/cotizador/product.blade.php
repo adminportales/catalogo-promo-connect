@@ -131,13 +131,16 @@
                                                 <tbody>
                                                     @foreach ($product->precios as $precio)
                                                         @php
-                                                            $priceProduct = $product->price;
-                                                            $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
-                                                            $precioFinal = round($price / ((100 - $utilidad) / 100), 2);
+                                                            $priceProduct = $precio->price;
+                                                            if ($product->producto_promocion) {
+                                                                $priceProduct = round($priceProduct - $priceProduct * ($product->descuento / 100), 2);
+                                                            } else {
+                                                                $priceProduct = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
+                                                            }
                                                         @endphp
                                                         <tr>
-                                                            <td class="p-0">{{ $precio->escala }}</td>
-                                                            <td class="p-0">$ {{ $precioFinal }}</td>
+                                                            <td class="p-0">{{ $precio->escala_inicial }} - {{ $precio->escala_final }}</td>
+                                                            <td class="p-0">$ {{ $priceProduct }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

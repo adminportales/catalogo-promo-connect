@@ -298,10 +298,6 @@ class G4Controller extends Controller
         $productos = [];
         foreach ($products as $producto) {
             $atributos = $producto->attributes();
-            if ('age-dia-aob' == (string) $atributos['codigo_producto']) {
-                print_r($producto);
-                return;
-            }
             $data = [];
             $data['codigo_producto'] = (string) $atributos['codigo_producto'];
             $data['nombre_producto'] = (string) $atributos['nombre_producto'];
@@ -338,9 +334,11 @@ class G4Controller extends Controller
                 array_push($precios,  $precio);
             }
             $data['precios'] = $precios;
-            array_push($productos, [$data]);
+            if (count($data['precios']) > 0) {
+                array_push($productos, $data);
+            }
         }
-        dd($productos);
+
         $maxSKU = Product::max('internal_sku');
         $idSku = null;
         if (!$maxSKU) {
@@ -455,11 +453,18 @@ class G4Controller extends Controller
                     $newProduct->productAttributes()->create($attr);
                 }
                 $idSku++;
-                dd($newProduct);
             } else {
+                $productExist->precios()->delete();
                 $productExist->update([
-                    'price' => $product['precio'],
+                    "price" => floatval($product['precios'][0]['precio'])
                 ]);
+                foreach ($product['precios'] as $precio) {
+                    $productExist->precios()->create([
+                        'escala_inicial' => $precio['escala_inicial'],
+                        'escala_final' => $precio['escala_final'],
+                        'price' => $precio['precio'],
+                    ]);
+                }
             }
         }
 
