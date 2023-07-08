@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Providers\DobleVelaController;
 use App\Http\Controllers\Providers\ForPromotionalController;
+use App\Http\Controllers\Providers\EuroCottonController;
 use App\Http\Controllers\Providers\G4Controller;
 use App\Http\Controllers\Providers\ImpressLineController;
 use App\Http\Controllers\Providers\InnovationController;
@@ -102,3 +103,4 @@ Route::get('/getAllStockG4BH', [G4Controller::class, 'getAllStockBH']);
 Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
 
 // EuroCotton
+Route::get('/getAllProductsEuroCotton', [EuroCottonController::class, 'getAllProductsEuroCotton']);
