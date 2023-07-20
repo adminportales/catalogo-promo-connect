@@ -32,12 +32,6 @@
                         </button>
                     </div>
                     <div class="modal-body px-2 py-0">
-                        @if ($product->precio_unico)
-                            @php
-                                $priceProduct = $product->price;
-                                $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
-                            @endphp
-                        @endif
                         <div class="d-flex align-items-center flex-column">
                             <div class="d-flex justify-content-center">
                                 <div id="carouselExampleControls" class="carousel slide w-50" data-ride="carousel">
@@ -79,67 +73,20 @@
 
                             </div>
                             <div class="d-flex justify-content-around w-100 align-items-center">
-                                @permission('ver-sku-s-de-proveedores')
-                                    <div class="">
-                                        <p><strong>SKU: </strong> {{ $product->sku }}</p>
-                                        <p><strong>SKU Padre: </strong> {{ $product->sku_parent }}</p>
-                                    </div>
-                                @endpermission
                                 <p><strong>SKU Interno: </strong> {{ $product->internal_sku }}</p>
                             </div>
                             <div class="row w-100">
                                 <div class="col-md-6">
-                                    @php
-                                        $priceProduct = $product->price;
-                                        if ($product->producto_promocion) {
-                                            $priceProduct = round($priceProduct - $priceProduct * ($product->descuento / 100), 2);
-                                        } else {
-                                            $priceProduct = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
-                                        }
-                                    @endphp
                                     <h5><strong>Informacion</strong></h5>
                                     <p><strong>Descripcion: </strong> {{ $product->description }}</p>
                                     <p><strong>Color: </strong>
                                         {{ $product->color ? $product->color->color : 'Sin Color' }}</p>
 
-                                    @permission('ver-stock')
                                         <p><strong>Stock: </strong> {{ $product->stock }}</p>
-                                    @endpermission
-                                    @permission('ver-proveedores')
-                                        <p><strong>Proveedor: </strong> {{ $product->provider->company }}</p>
-                                    @endpermission
-                                    @if ($product->precio_unico)
-                                        <p><strong>Precio: </strong>
-                                            $ {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
-                                    @endif
                                     <p><strong>Producto Nuevo: </strong> {{ $product->producto_nuevo ? 'SI' : 'NO' }}
                                     </p>
                                     <p><strong>Producto de Promocion: </strong>
                                         {{ $product->producto_promocion ? 'SI' : 'NO' }}</p>
-                                    @if (!$product->precio_unico)
-                                        <h5><strong>Precios</strong></h5>
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Escala</th>
-                                                    <th>Precio</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($product->precios as $precio)
-                                                    @php
-                                                        $priceProduct = $product->price;
-                                                        $price = round($priceProduct - $priceProduct * ($product->provider->discount / 100), 2);
-                                                        $precioFinal = round($price / ((100 - $utilidad) / 100), 2);
-                                                    @endphp
-                                                    <tr>
-                                                        <td class="p-0">{{ $precio->escala }}</td>
-                                                        <td class="p-0">$ {{ $precioFinal }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    @endif
                                 </div>
                                 <div class="col-md-6">
                                     @if (count($product->productCategories) > 0)

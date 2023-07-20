@@ -14,22 +14,10 @@
                     <p>Filtros de busqueda</p>
                     <input wire:model='nombre' type="text" class="form-control mb-2" name="search" id="search"
                         placeholder="Nombre">
-                    @permission('ver-sku-s-de-proveedores')
-                        <input wire:model='sku' type="text" class="form-control mb-2" name="search" id="search"
-                            placeholder="SKU">
-                    @endpermission
                     <input wire:model='color' type="text" class="form-control mb-2" name="color" id="color"
                         placeholder="Ingrese el color">
                     <input wire:model='category' type="text" class="form-control mb-2" name="category" id="category"
                         placeholder="Ingrese la familia">
-                    @permission('ver-proveedores')
-                        <select wire:model='proveedor' name="proveedores" id="provee" class="form-control mb-2">
-                            <option value="">Seleccione Proveedor...</option>
-                            @foreach ($proveedores as $provider)
-                                <option value="{{ $provider->id }}">{{ $provider->company }}</option>
-                            @endforeach
-                        </select>
-                    @endpermission
                     {{-- <select wire:model='color' name="colores" id="provee" class="form-control mb-2">
                 <option value="">Seleccione color...</option>
                 @foreach ($colores as $color)
@@ -42,15 +30,7 @@
                             <option value="{{ $type->id }}">{{ $type->type }}</option>
                         @endforeach
                     </select>
-                    <p class="mb-0">Precio</p>
-                    <div class="d-flex align-items-center mb-2">
-                        <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
-                            placeholder="Precio Minimo" min="0" value="0">
-                        -
-                        <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
-                            placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
-                    </div>
-                    @permission('ver-stock')
+                    {{-- @permission('ver-stock') --}}
                         <p class="mb-0">Stock</p>
                         <div class="d-flex align-items-center mb-2">
                             <input wire:model='stockMin' type="number" class="form-control" placeholder="Stock Minimo"
@@ -65,13 +45,7 @@
                             <option value="ASC">De menor a mayor</option>
                             <option value="DESC">De mayor a menor</option>
                         </select>
-                    @endpermission
-                    <p class="mb-0">Ordenar por Precio</p>
-                    <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
-                        <option value="">Ninguno</option>
-                        <option value="ASC">De menor a mayor</option>
-                        <option value="DESC">De mayor a menor</option>
-                    </select>
+                    {{-- @endpermission --}}
                     <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
                 </div>
             </div>
@@ -83,22 +57,10 @@
                 <p>Filtros de busqueda</p>
                 <input wire:model='nombre' type="text" class="form-control mb-2" name="search" id="search"
                     placeholder="Nombre">
-                @permission('ver-sku-s-de-proveedores')
-                    <input wire:model='sku' type="text" class="form-control mb-2" name="search" id="search"
-                        placeholder="SKU">
-                @endpermission
                 <input wire:model='color' type="text" class="form-control mb-2" name="color" id="color"
                     placeholder="Ingrese el color">
                 <input wire:model='category' type="text" class="form-control mb-2" name="category"
                     id="category" placeholder="Ingrese la familia">
-                @permission('ver-proveedores')
-                    <select wire:model='proveedor' name="proveedores" id="provee" class="form-control mb-2">
-                        <option value="">Seleccione Proveedor...</option>
-                        @foreach ($proveedores as $provider)
-                            <option value="{{ $provider->id }}">{{ $provider->company }}</option>
-                        @endforeach
-                    </select>
-                @endpermission
                 {{-- <select wire:model='color' name="colores" id="provee" class="form-control mb-2">
                 <option value="">Seleccione color...</option>
                 @foreach ($colores as $color)
@@ -111,15 +73,7 @@
                         <option value="{{ $type->id }}">{{ $type->type }}</option>
                     @endforeach
                 </select>
-                <p class="mb-0">Precio</p>
-                <div class="d-flex align-items-center mb-2">
-                    <input wire:model='precioMin' type="number" class="form-control" name="search" id="search"
-                        placeholder="Precio Minimo" min="0" value="0">
-                    -
-                    <input wire:model='precioMax' type="number" class="form-control" name="search" id="search"
-                        placeholder="Precio Maximo" value="{{ $price }}" max="{{ $price }}">
-                </div>
-                @permission('ver-stock')
+                {{-- @permission('ver-stock') --}}
                     <p class="mb-0">Stock</p>
                     <div class="d-flex align-items-center mb-2">
                         <input wire:model='stockMin' type="number" class="form-control" placeholder="Stock Minimo"
@@ -134,13 +88,7 @@
                         <option value="ASC">De menor a mayor</option>
                         <option value="DESC">De mayor a menor</option>
                     </select>
-                @endpermission
-                <p class="mb-0">Ordenar por Precio</p>
-                <select wire:model='orderPrice' name="orderPrice" id="provee" class="form-control mb-2">
-                    <option value="">Ninguno</option>
-                    <option value="ASC">De menor a mayor</option>
-                    <option value="DESC">De mayor a menor</option>
-                </select>
+                {{-- @endpermission --}}
                 <button class="btn btn-primary btn-block" wire:click="limpiar">Limpiar Filtros</button>
             </div>
         </div>
@@ -171,28 +119,15 @@
                     <div class="col-md-4 col-lg-3 col-sm-6  d-none d-sm-flex justify-content-center">
                         <div class="card mb-4" style="width: 14rem;">
                             <div class="card-body text-center shadow-sm">
-                                @php
-                                    $priceProduct = $row->price;
-                                    if ($row->producto_promocion) {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->descuento / 100), 2);
-                                    } else {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->provider->discount / 100), 2);
-                                    }
-                                @endphp
                                 <img src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
                                     class="card-img-top " alt="{{ $row->name }}"
                                     style="max-width: 100%; max-height: 150px; width: auto">
                                 <hr>
                                 <h5 class="card-title" style="text-transform: capitalize">{{ $row->name }}</h5>
-                                @permission('ver-sku-s-de-proveedores')
-                                    <p class=" m-0 pt-1"><strong>SKU:</strong> {{ $row->sku }}</p>
-                                @endpermission
                                 <div class="d-flex justify-content-between">
-                                    @permission('ver-stock')
+                                    {{-- @permission('ver-stock') --}}
                                         <p class=" m-0 pt-1">Stock: {{ $row->stock }}</p>
-                                    @endpermission
-                                    <p class=" m-0 pt-1">$
-                                        {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                    {{-- @endpermission --}}
                                 </div>
                                 <br>
                                 <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -206,14 +141,6 @@
                         <div class="card mb-2" style="width: 100%;" data-toggle="modal" data-target="#modalProduct"
                             wire:click="showProduct({{ $row->id }})">
                             <div class="card-body text-center shadow-sm d-flex">
-                                @php
-                                    $priceProduct = $row->price;
-                                    if ($row->producto_promocion) {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->descuento / 100), 2);
-                                    } else {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->provider->discount / 100), 2);
-                                    }
-                                @endphp
                                 <div style="width: 35%">
                                     <img src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
                                         alt="{{ $row->name }}"
@@ -224,16 +151,11 @@
                                         {{ $row->name }}
                                     </h5>
                                     <p class=" m-0 pt-0">{{ Str::limit($row->description, 25, '...') }}</p>
-                                    @permission('ver-sku-s-de-proveedores')
-                                        <p class="m-0 pt-0"><strong>SKU:</strong> {{ $row->sku }}</p>
-                                    @endpermission
 
                                     <div class="d-flex justify-content-between">
-                                        @permission('ver-stock')
+                                        {{-- @permission('ver-stock') --}}
                                             <p class=" m-0 pt-0">Stock: {{ $row->stock }}</p>
-                                        @endpermission
-                                        <p class=" m-0 pt-0">Precio: $
-                                            {{ round($priceProduct / ((100 - $utilidad) / 100), 2) }}</p>
+                                        {{-- @endpermission --}}
                                     </div>
                                 </div>
                                 {{-- <div class="al">
