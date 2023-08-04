@@ -127,32 +127,6 @@ class EuroCottonController extends Controller
                         'type_id' => 1,
                         'color_id' => $color->id,
                     ]);
-                    // dd($newProduct); //ver productos
-                    // foreach (array_reverse($product['imagenes']) as $key => $imagen) {
-                    //     // Descargar Imagenes solo Si no existen
-                    //     $errorGetImage = false;
-                    //     $fileImage = "";
-                    //     try {
-                    //         $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
-                    //     } catch (Exception $th) {
-                    //         $errorGetImage = true;
-                    //     }
-                    //     $newPath = '';
-                    //     if (!$errorGetImage) {
-                    //         $newPath = '/forpromotional/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
-                    //         Storage::append('public' . $newPath, $fileImage);
-                    //         $newProduct->images()->create([
-                    //             'image_url' => url('/storage' . $newPath)
-                    //         ]);
-                    //     } else {
-                    //         $newProduct->images()->create([
-                    //             'image_url' => 'img/default_product_image.jpg'
-                    //         ]);
-                    //     }
-                    // }
-                    /*
-                    Registrar en la tabla product_category el producto, categoria y sub categoria
-                    */
                     $newProduct->productCategories()->create([
                         'category_id' => $categoria->id,
                         'subcategory_id' => $subcategoria->id,
@@ -217,60 +191,37 @@ class EuroCottonController extends Controller
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
                         'descuento' => $discount,
                     ]);
-                    // if (count($productExist->images) <= 0) {
-                    //     foreach (array_reverse($product['imagenes']) as $key => $imagen) {
-                    //         $errorGetImage = false;
-                    //         $fileImage = "";
-                    //         try {
-                    //             $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
-                    //         } catch (Exception $th) {
-                    //             $errorGetImage = true;
-                    //         }
-                    //         $newPath = '';
-                    //         if (!$errorGetImage) {
-                    //             $newPath = '/forpromotional/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
-                    //             Storage::append('public' . $newPath, $fileImage);
-                    //             $productExist->images()->create([
-                    //                 'image_url' => url('/storage' . $newPath)
-                    //             ]);
-                    //         } else {
-                    //             $productExist->images()->create([
-                    //                 'image_url' => 'img/default_product_image.jpg'
-                    //             ]);
-                    //         }
-                    //     }
-                    // }
                 }
             }
 
-            $allProducts = Product::where('provider_id', 1)->get();
-            foreach ($products as $product) {
-                foreach ($allProducts as $key => $value) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-                        break;
-                    }
-                }
-                unset($allProducts[$key]);
-            }
+            // $allProducts = Product::where('provider_id', 9)->get();
+            // foreach ($products as $product) {
+            //     foreach ($allProducts as $key => $value) {
+            //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+            //             break;
+            //         }
+            //     }
+            //     unset($allProducts[$key]);
+            // }
 
-            foreach ($allProducts as  $value) {
-                $value->visible = 0;
-                $value->save();
-            }
+            // foreach ($allProducts as  $value) {
+            //     $value->visible = 0;
+            //     $value->save();
+            // }
 
-            $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
-            foreach ($allProducts as $key => $value) {
-                foreach ($products as $product) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-                        unset($allProducts[$key]);
-                        break;
-                    }
-                }
-            }
-            foreach ($allProducts as  $value) {
-                $value->visible = 0;
-                $value->save();
-            }
+            // $allProducts = Product::where('provider_id', 9)->where('visible', 1)->get();
+            // foreach ($allProducts as $key => $value) {
+            //     foreach ($products as $product) {
+            //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+            //             unset($allProducts[$key]);
+            //             break;
+            //         }
+            //     }
+            // }
+            // foreach ($allProducts as  $value) {
+            //     $value->visible = 0;
+            //     $value->save();
+            // }
 
             DB::table('images')->where('image_url', '=', null)->delete();
         // } catch (Exception $e) {
