@@ -193,13 +193,13 @@ class InnovationController extends Controller
                     } else {
                         $productExist->precios()->delete();
                         $productExist->update([
-                            "price" => $product->lista_precios[0]->mi_precio
+                            "price" => floatval($product->lista_precios[0]->mi_precio)
                         ]);
                         foreach ($product->lista_precios as $precio) {
                             $productExist->precios()->create(
                                 [
                                     'price' => $precio->mi_precio,
-                                    'escala' => $precio->escala,
+                                    'escala_inicial' => $precio->mi_precio,
                                 ]
                             );
                         }

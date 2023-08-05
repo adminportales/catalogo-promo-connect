@@ -4,10 +4,12 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
+use App\Http\Controllers\HelperController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Providers\DobleVelaController;
 use App\Http\Controllers\Providers\ForPromotionalController;
+use App\Http\Controllers\Providers\EuroCottonController;
 use App\Http\Controllers\Providers\G4Controller;
 use App\Http\Controllers\Providers\ImpressLineController;
 use App\Http\Controllers\Providers\InnovationController;
@@ -36,6 +38,7 @@ Auth::routes();
 
 
 Route::get('/',  [HomeController::class, 'index'])->middleware(['auth'])->name('home');
+Route::get('/setRoles', [SettingsController::class, 'setRoles']);
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard']);
@@ -90,12 +93,19 @@ Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDobleve
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
 
-Route::get('/setRoles', [SettingsController::class, 'setRoles']);
-
+// G4
 Route::get('/getProductsG4PL', [G4Controller::class, 'getProductsPL']);
 Route::get('/getAllStockG4PL', [G4Controller::class, 'getAllStockPL']);
 
-Route::get('/getProductsG4BH', [G4Controller::class, 'getProductsBH']);
-Route::get('/getAllStockG4BH', [G4Controller::class, 'getAllStockBH']);
+// Route::get('/getProductsG4BH', [G4Controller::class, 'getProductsBH']);
+// Route::get('/getAllStockG4BH', [G4Controller::class, 'getAllStockBH']);
 
+// ImpressLine
 Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
+
+// EuroCotton
+Route::get('/getAllProductsEuroCotton', [EuroCottonController::class, 'getAllProductsEuroCotton']);
+
+
+// Helpers
+Route::get('/changeProviderToInternalProducts', [HelperController::class, 'changeProviderToInternalProducts'])->name('companies');

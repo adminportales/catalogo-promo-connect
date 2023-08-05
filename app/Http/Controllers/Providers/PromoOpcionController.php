@@ -163,13 +163,13 @@ class PromoOpcionController extends Controller
             }
         }
 
-        $allProducts = Product::where('provider_id', 2)->where('visible', 1)->get();
+        $allProducts = Product::where('provider_id', 2)->get();
         foreach ($allProducts as $key => $value) {
             foreach ($productsWs as $product) {
                 foreach ($product['hijos'] as $productHijo) {
                     if ($value->sku == $productHijo['skuHijo'] && $productHijo['estatus'] == '1') {
                         unset($allProducts[$key]);
-                        break;
+                        break 2;
                     }
                 }
             }
