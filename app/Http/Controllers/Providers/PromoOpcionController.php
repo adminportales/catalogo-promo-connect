@@ -108,11 +108,11 @@ class PromoOpcionController extends Controller
                         'slug' => 'material',
                         'value' => $product['material'],
                     ],
-                    [
-                        'attribute' => 'Capacidad',
-                        'slug' => 'capacity',
-                        'value' => $product['capacidad'],
-                    ],
+                    // [
+                    //     'attribute' => 'Capacidad',
+                    //     'slug' => 'capacity',
+                    //     'value' => $product['capacidad'],
+                    // ],
                     // Medidas
                     [
                         'attribute' => 'Medidas',
@@ -158,24 +158,32 @@ class PromoOpcionController extends Controller
                 } else {
                     // Actualizar el precio
                     $productExist->price = $productHijo['precio'];
+                    $productExist->visible = 1;
                     $productExist->save();
                 }
             }
         }
 
-        $allProducts = Product::where('provider_id', 2)->get();
-        foreach ($allProducts as $key => $value) {
-            foreach ($productsWs as $product) {
-                foreach ($product['hijos'] as $productHijo) {
-                    if ($value->sku == $productHijo['skuHijo'] && $productHijo['estatus'] == '1') {
-                        unset($allProducts[$key]);
-                        break 2;
-                    }
-                }
+        // Obtener los productos que estan en la base de datos y no en el proveedor
+        $allProducts = Product::where('provider_id', 2)->get(['id', 'sku']);
+
+        $dataSkus = [];
+        foreach ($result['response'] as $value) {
+            foreach ($value['hijos'] as $hijo) {
+                array_push($dataSkus, ["sku" => $hijo['skuHijo']]);
             }
         }
 
-        foreach ($allProducts as  $value) {
+        // Buscar los productos que no estan en el proveedor
+        foreach ($allProducts as $key => $value) {
+            foreach ($dataSkus as $skuProvider) {
+                if ($value->sku == $skuProvider['sku']) {
+                    unset($allProducts[$key]);
+                    break;
+                }
+            }
+        }
+        foreach ($allProducts as $value) {
             $value->visible = 0;
             $value->save();
         }
@@ -226,7 +234,8 @@ class PromoOpcionController extends Controller
         foreach ($stocks as $stock) {
             $productCatalogo = Product::where('sku', $stock['Material'])->first();
             if ($productCatalogo) {
-                $productCatalogo->update(['stock' => $stock['Stock']]);
+                $productCatalogo->stock = $stock['Stock'];
+                $productCatalogo->save();
             } else {
                 array_push($errors, $stock['Material']);
             }
