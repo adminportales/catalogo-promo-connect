@@ -10,29 +10,21 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
+use App\Models\Status;
 use App\Http\Controllers\Controller;
 
 class EuroCottonController extends Controller
 {
     public function getAllProductsEurocotton()
     {
-        $result = null;
-
+        try {
+            $result = null;
             $ch = curl_init();
-            // Check if initialization had gone wrong*
-            if ($ch === false) {
-                FailedJobsCron::create([
-                    'name' => 'Eurocotton',
-                    'message' => "'failed to initialize'",
-                    'status' => 0,
-                    'type' =>   1
-                ]);
-                throw new Exception('failed to initialize');
-            }
+
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
-                "https://ac.appeuro.mx/webservices/"
+                "https://ac.appeuro.mx/whugebservices/"
             );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -41,11 +33,10 @@ class EuroCottonController extends Controller
             $result = curl_exec($ch);
 
             if (strpos($result, "HTTP Status 404 – Not Found") == true) {
-                FailedJobsCron::create([
-                    'name' => 'For Promotional',
-                    'message' => "HTTP Status 404 – Not Found Metodo No encontrado",
-                    'status' => 0,
-                    'type' =>   1
+                Status::create([
+                    'name_provider' => 'Eurocotton',
+                    'status' => 'Problemas al acceder al servidor',
+                    'update_sumary' => 'No se pudo acceder al servidor de Eurocotton',
                 ]);
                 return 'Error';
             }
@@ -54,14 +45,22 @@ class EuroCottonController extends Controller
             if ($result === false) {
                 throw new Exception(curl_error($ch), curl_errno($ch));
             }
+        } catch (Exception $e) {
+            Status::create([
+                'name_provider' => 'Eurocotton',
+                'status' => 'Problemas al acceder al servidor',
+                'update_sumary' => 'No se pudo acceder al servidor de Eurocotton',
+            ]);
+            return ('Error al acceder al servidor de Eurocotton');
+        }
 
+        try {
             $arrContextOptions = array(
                 "ssl" => array(
                     "verify_peer" => false,
                     "verify_peer_name" => false,
                 ),
             );
-
             // Convertir en array
             $products = json_decode($result, true);
 
@@ -194,36 +193,56 @@ class EuroCottonController extends Controller
                 }
             }
 
-            // $allProducts = Product::where('provider_id', 9)->get();
-            // foreach ($products as $product) {
-            //     foreach ($allProducts as $key => $value) {
-            //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-            //             break;
-            //         }
-            //     }
-            //     unset($allProducts[$key]);
-            // }
-
-            // foreach ($allProducts as  $value) {
-            //     $value->visible = 0;
-            //     $value->save();
-            // }
-
-            // $allProducts = Product::where('provider_id', 9)->where('visible', 1)->get();
-            // foreach ($allProducts as $key => $value) {
-            //     foreach ($products as $product) {
-            //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-            //             unset($allProducts[$key]);
-            //             break;
-            //         }
-            //     }
-            // }
-            // foreach ($allProducts as  $value) {
-            //     $value->visible = 0;
-            //     $value->save();
-            // }
+            // Status::create([
+            //     'name_provider' => 'Eurocotton',
+            //     'status' => 'Actualizacion Completa al servidor',
+            //     'update_sumary' => 'Actualizacion Completa de los productos de Eurocotton',
+            // ]);
 
             DB::table('images')->where('image_url', '=', null)->delete();
+
+            return $products;
+        } catch (Exception) {
+            Status::create([
+                'name_provider' => 'Eurocotton',
+                'status' => 'Actualización incompleta al servidor',
+                'update_sumary' => 'Actualización incompleta del productos del servidor de Eurocotton',
+            ]);
+
+            return ('Actualización incompleta de productos del servidor de Eurocotton');
+        }
+
+        // $allProducts = Product::where('provider_id', 9)->get();
+        // foreach ($products as $product) {
+        //     foreach ($allProducts as $key => $value) {
+        //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+        //             break;
+        //         }
+        //     }
+        //     unset($allProducts[$key]);
+        // }
+
+        // foreach ($allProducts as  $value) {
+        //     $value->visible = 0;
+        //     $value->save();
+        // }
+
+        // $allProducts = Product::where('provider_id', 9)->where('visible', 1)->get();
+        // foreach ($allProducts as $key => $value) {
+        //     foreach ($products as $product) {
+        //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+        //             unset($allProducts[$key]);
+        //             break;
+        //         }
+        //     }
+        // }
+        // foreach ($allProducts as  $value) {
+        //     $value->visible = 0;
+        //     $value->save();
+        // }
+
+
+
         // } catch (Exception $e) {
         //     FailedJobsCron::create([
         //         'name' => 'For Promotional',
@@ -234,6 +253,4 @@ class EuroCottonController extends Controller
         //     return $e->getMessage();
         // }
     }
-
 }
-

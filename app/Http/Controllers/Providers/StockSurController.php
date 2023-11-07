@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
+use App\Models\Status;
 use App\Models\Subcategory;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,19 +17,12 @@ class StockSurController extends Controller
 {
     public function getAllProductsStockSur()
     {
-        $result = null;
         try {
+
+            $result = null;
+
             $ch = curl_init();
             // Check if initialization had gone wrong*
-            if ($ch === false) {
-                FailedJobsCron::create([
-                    'name' => 'For Promotional',
-                    'message' => "'failed to initialize'",
-                    'status' => 0,
-                    'type' => 1
-                ]);
-                throw new Exception('failed to initialize');
-            }
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
@@ -39,14 +33,23 @@ class StockSurController extends Controller
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $result = json_decode(curl_exec($ch));
             if ($result == null) {
-                FailedJobsCron::create([
-                    'name' => 'For Promotional',
-                    'message' => "HTTP Status 404 – Not Found Metodo No encontrado",
-                    'status' => 0,
-                    'type' =>   1
+                Status::create([
+                    'name_provider' => 'stockSur',
+                    'status' => 'Problemas al acceder al servidor',
+                    'update_sumary' => 'No se pudo acceder al servidor de stockSur',
                 ]);
                 return 'Error';
             }
+        } catch (Exception $ex) {
+            Status::create([
+                'name_provider' => 'stockSur',
+                'status' => 'Problemas al acceder al servidor',
+                'update_sumary' => 'No se pudo acceder al servidor de stockSur',
+            ]);
+            return ('Error al acceder al servidor de stockSur');
+        }
+
+        try {
             // return $result;
             $maxSKU = Product::max('internal_sku');
             $idSku = null;
@@ -130,10 +133,23 @@ class StockSurController extends Controller
                 $value->visible = 0;
                 $value->save();
             }
+
+            /* Status::create([
+                'name_provider' => 'stockSur',
+                'status' => 'Actualizacion Completa al servidor',
+                'update_sumary' => 'Actualizacion Completa de los productos de stockSur',
+            ]); */
+
             DB::table('images')->where('image_url', '=', null)->delete();
             return ($result);
         } catch (Exception $ex) {
-            dd($ex);
+            Status::create([
+                'name_provider' => 'stockSur',
+                'status' => 'Actualización incompleta al servidor',
+                'update_sumary' => 'Actualización incompleta de productos del servidor de stockSur',
+            ]);
+
+            return ('Actualización incompleta de productos del servidor stockSur');
         }
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
+use App\Models\Status;
 use App\Models\Subcategory;
 use Exception;
 use Illuminate\Http\Request;
@@ -22,31 +23,32 @@ class InnovationController extends Controller
             $api_key = "OM5rkL-820602674c12ce3b6GNoUjiOvnZF8x";
             $wsdl = "https://ws.innovation.com.mx/index.php?wsdl";
             $client = new \nusoap_client($wsdl, 'wsdl');
-            $err = $client->getError();
-            if ($err) { //MOSTRAR ERRORES
-                echo '<h2>Constructor error</h2>' . $err;
-                FailedJobsCron::create([
-                    'name' => 'Innovation',
-                    'message' => $err,
-                    'status' => 0,
-                    'type' =>   1
-                ]);
-                exit();
-            }
+
+
+
             $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
             $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
+
             $response = json_decode($response, true);
-            if ($response['response'] === true) {
-                for ($i = 1; $i <= $response['pages']; $i++) {
-                    $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
-                    $responseProducts = json_decode($client->call('Products', $params));
-                    foreach ($responseProducts->data as $product) {
-                        array_push($responseData, $product);
-                    }
+            for ($i = 1; $i <= $response['pages']; $i++) {
+                $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
+                $responseProducts = json_decode($client->call('Products', $params));
+                foreach ($responseProducts->data as $product) {
+                    array_push($responseData, $product);
                 }
-            } else {
-                return $response;
             }
+        } catch (Exception $e) {
+
+            Status::create([
+                'name_provider' => 'Innovation',
+                'status' => 'Problemas al acceder al servidor',
+                'update_sumary' => 'No se pudo acceder al servidor de Innovation',
+            ]);
+
+            return ('Error al acceder al servidor de Innovation');
+        }
+
+        try {
             $maxSKU = Product::max('internal_sku');
             $idSku = null;
             if (!$maxSKU) {
@@ -210,36 +212,40 @@ class InnovationController extends Controller
                     }
                 }
             }
+
+            // Status::create([
+            //     'name_provider' => 'Innovation',
+            //     'status' => 'Actualización completa al servidor',
+            //     'update_sumary' => 'Actualización completa del servidor de Innovation',
+            // ]);
+
             DB::table('images')->where('image_url', '=', null)->delete();
             return $responseData;
         } catch (Exception $e) {
-            FailedJobsCron::create([
-                'name' => 'Innovation',
-                'message' => $e->getMessage(),
-                'status' => 0,
-                'type' =>   1
+            Status::create([
+                'name_provider' => 'Innovation',
+                'status' => 'Actualización incompleta al servidor',
+                'update_sumary' => 'Actualización incompleta de productos del servidor de Innovation',
             ]);
-            return $e->getMessage();
+
+            return ('Actualización incompleta de productos del servidor de Innovation');
         }
     }
 
     public function getStockInnova()
     {
-        $user_api = "frjrEhY602674c12ce2dm586";
-        $api_key = "OM5rkL-820602674c12ce3b6GNoUjiOvnZF8x";
-        $wsdl = "https://ws.innovation.com.mx/index.php?wsdl";
-        $client = new \nusoap_client($wsdl, 'wsdl');
-        $err = $client->getError();
-        if ($err) { //MOSTRAR ERRORES
-            echo '<h2>Constructor error</h2>' . $err;
-            exit();
-        }
-        $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
-        $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
-        $response = json_decode($response, true);
-        // return $response;
-        $responseData = [];
-        if ($response['response'] === true) {
+        // TODO: Stock
+        try {
+            $user_api = "frjrEhY602674c12ce2dm586";
+            $api_key = "OM5rkL-820602674c12ce3b6GNoUjiOvnZF8x";
+            $wsdl = "https://ws.innovation.com.mx/index.php?wsdl";
+            $client = new \nusoap_client($wsdl, 'wsdl');
+
+            $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
+            $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
+            $response = json_decode($response, true);
+            // return $response;
+            $responseData = [];
             for ($i = 1; $i <= $response['pages']; $i++) {
                 $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
                 $responseProducts = json_decode($client->call('Stock', $params));
@@ -251,43 +257,53 @@ class InnovationController extends Controller
                     }
                 }
             }
-        } else {
-            return $response;
+        } catch (Exception $e) {
+            Status::create([
+                'name_provider' => 'Innovation',
+                'status' => 'Problemas al acceder al servidor',
+                'update_sumary' => 'No se pudo acceder al servidor de Innovation',
+            ]);
+
+            return ('Error al acceder al servidor de Innovation');
         }
 
-        $productsNotFound = [];
-        foreach ($responseData as $product) {
-            $productCatalogo = Product::where('sku', $product->clave)->first();
-            if ($productCatalogo) {
-                $productCatalogo->update(['stock' => $product->general_stock]);
-                $productCatalogo->touch();
-            } else {
-                array_push($productsNotFound, $product->clave);
-                $productCatalogo->visible = 0;
-                $productCatalogo->save();
-            }
-        }
-
-
-        $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
-        foreach ($allProducts as $key => $value) {
+        try {
+            $productsNotFound = [];
             foreach ($responseData as $product) {
-                if ($value->sku == $product->clave) {
-                    unset($allProducts[$key]);
-                    break;
+                $productCatalogo = Product::where('sku', $product->clave)->first();
+                if ($productCatalogo) {
+                    $productCatalogo->update(['stock' => $product->general_stock]);
+                    $productCatalogo->touch();
+                } else {
+                    array_push($productsNotFound, $product->clave);
+                    $productCatalogo->visible = 0;
+                    $productCatalogo->save();
                 }
             }
-        }
 
-        foreach ($allProducts as  $value) {
-            $value->visible = 0;
-            $value->save();
+
+            $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
+            foreach ($allProducts as $key => $value) {
+                foreach ($responseData as $product) {
+                    if ($value->sku == $product->clave) {
+                        unset($allProducts[$key]);
+                        break;
+                    }
+                }
+            }
+
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
+        } catch (Exception $e) {
+            Status::create([
+                'name_provider' => 'Innovation',
+                'status' => 'Actualización incompleta al servidor',
+                'update_sumary' => 'Actualización incompleta de stock del servidor de Innovation',
+            ]);
+
+            return ('Actualización incompleta de stock del servidor de Innovation');
         }
-        FailedJobsCron::create([
-            'name' => 'Innovation',
-            'message' => "Productos No encontrados al actualizar el stock: " . implode(",", $productsNotFound),
-            'status' => 0,
-            'type' =>   1
-        ]);
     }
 }

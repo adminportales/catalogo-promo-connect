@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
+use App\Models\Status;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,19 +17,10 @@ class ForPromotionalController extends Controller
 {
     public function getAllProductsForPromotional()
     {
-        $result = null;
         try {
+            $result = null;
             $ch = curl_init();
-            // Check if initialization had gone wrong*
-            if ($ch === false) {
-                FailedJobsCron::create([
-                    'name' => 'For Promotional',
-                    'message' => "'failed to initialize'",
-                    'status' => 0,
-                    'type' =>   1
-                ]);
-                throw new Exception('failed to initialize');
-            }
+
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
@@ -38,14 +30,16 @@ class ForPromotionalController extends Controller
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
+
             $result = curl_exec($ch);
 
+
             if (strpos($result, "HTTP Status 404 – Not Found") == true) {
-                FailedJobsCron::create([
-                    'name' => 'For Promotional',
-                    'message' => "HTTP Status 404 – Not Found Metodo No encontrado",
-                    'status' => 0,
-                    'type' =>   1
+
+                Status::create([
+                    'name_provider' => 'For Promotional',
+                    'status' => 'Problemas al acceder al servidor',
+                    'update_sumary' => 'No se pudo acceder al servidor de For Promotional',
                 ]);
                 return 'Error';
             }
@@ -54,7 +48,17 @@ class ForPromotionalController extends Controller
             if ($result === false) {
                 throw new Exception(curl_error($ch), curl_errno($ch));
             }
+        } catch (Exception $e) {
+            Status::create([
+                'name_provider' => 'For Promotional',
+                'status' => 'Problemas al acceder al servidor',
+                'update_sumary' => 'No se pudo acceder al servidor de For Promotional',
+            ]);
+            return ('Error al acceder al servidor de For Promotional');
+        }
 
+
+        try {
             $arrContextOptions = array(
                 "ssl" => array(
                     "verify_peer" => false,
@@ -270,15 +274,23 @@ class ForPromotionalController extends Controller
                 $value->save();
             }
 
+            /* Status::create([
+                'name_provider' => 'For Promotional',
+                'status' => 'Actualizaciónn completa al servidor',
+                'update_sumary' => 'Actualizacion completa de los productos de For Promotional',
+            ]); */
+
             DB::table('images')->where('image_url', '=', null)->delete();
+
+            return $products;
         } catch (Exception $e) {
-            FailedJobsCron::create([
-                'name' => 'For Promotional',
-                'message' => $e->getMessage(),
-                'status' => 0,
-                'type' =>   1
+            Status::create([
+                'name_provider' => 'For Promotional',
+                'status' => 'Actualización incompleta al servidor',
+                'update_sumary' => 'Actualización incompleta de productos del servidor For Promotional',
             ]);
-            return $e->getMessage();
+
+            return ('Actualización incompleta de productos del servidor de For Promotional ');
         }
     }
 
