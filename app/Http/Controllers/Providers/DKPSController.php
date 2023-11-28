@@ -7,6 +7,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Color;
+use App\Models\Image;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,22 +18,23 @@ class DKPSController extends Controller
     public function getAllProductsDKSP()
     {
         $url = 'http://intuicion.com.mx/Existencias/DescargarPlantilla?user=C00007&password=P90mo1if3';
-        $archivoLocal = 'Existencias_C00007.xlsx';
 
-        // Obtener el contenido del archivo desde la URL
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            "$url no es una URL válida";
+        }
         $contenido = file_get_contents($url);
-        //dd($contenido);
-        // Guardar el contenido en un archivo local
-        file_put_contents($archivoLocal, $contenido);
 
+        // Guardar el contenido en un archivo local
+        Storage::put("public/tmp/Existencia.xlsx", $contenido);
         // Verificar si la descarga fue exitosa
         if ($contenido !== false) {
-            echo 'Descarga exitosa. El archivo se guardó como ' . $archivoLocal;
+            echo 'Descarga exitosa. El archivo se guardó como tmp/Existencia.xlsx';
         } else {
             echo 'Error al descargar el archivo';
         }
+
         // Cargar el archivo Excel
-        $spreadsheet = IOFactory::load($archivoLocal);
+        $spreadsheet = IOFactory::load("storage/tmp/Existencia.xlsx");
 
         // Seleccionar la hoja de trabajo (puedes cambiar 'Sheet1' al nombre de tu hoja)
         $hoja = $spreadsheet->getSheetByName('Hoja1');
@@ -85,85 +87,56 @@ class DKPSController extends Controller
                 ]);
             }
             $productExist = Product::where('sku', $file['A'])->where('color_id', $color->id)->first();
+            $exp = $file['H'];
+            $price = (float)$exp;
+
             if (!$productExist) {
                 $newProduct = Product::create([
                     'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
-                    'sku' => $file['A'],
+                    'sku' => 0,
                     'name' => $file['B'],
-                    'price' =>  $file['H'],
+                    'price' =>  $price,
                     'description' => $file['B'],
                     'stock' => $file['C'],
-                    'producto_promocion' => null,
+                    'producto_promocion' => 0,
                     'descuento' => 0,
                     'producto_nuevo' => 0,
                     'precio_unico' => true,
-                    'provider_id' => 1,
+                    'provider_id' => 15,
                     'type_id' => 1,
                     'color_id' => $color->id,
                 ]);
-                dd($newProduct);
-                foreach (array_reverse($file['K']) as $key => $imagen) {
-                    // Descargar Imagenes solo Si no existen
-                    $errorGetImage = false;
-                    $fileImage = "";
-                    try {
-                        $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
-                    } catch (Exception $th) {
-                        $errorGetImage = true;
-                    }
-                    $newPath = '';
-                    if (!$errorGetImage) {
-                        $newPath = '/newimage/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
-                        Storage::append('public' . $newPath, $fileImage);
-                        $newProduct->images()->create([
-                            'image_url' => url('/storage' . $newPath)
-                        ]);
-                    } else {
-                        $newProduct->images()->create([
-                            'image_url' => 'img/default_product_image.jpg'
-                        ]);
-                    }
-                }
-                /*
-                Registrar en la tabla product_category el producto, categoria y sub categoria
-                */
-                $newProduct->productCategories()->create([
-                    'category_id' => $categoria->id,
-                    'subcategory_id' => $subcategoria->id,
+
+
+                $url_prod =   url("storage/DKSP/" . $nombreImagen = $file['K']);
+
+
+                $newProduct->images()->create([
+                    'image_url' => url($url_prod)
                 ]);
 
+                $attributes = [
+                    [
+                        'attribute' => 'Marca',
+                        'slug' => 'marca',
+                        'value' => $file['D'],
+                    ],
 
-                // dd($newProduct);
+
+
+
+                ];
+                foreach ($attributes as $attr) {
+                    $newProduct->productAttributes()->create($attr);
+                }
+
+                $idSku++;
             } else {
+
                 $productExist->update([
                     'price' => $file['H'],
                     'stock' => $file['C'],
-                    'producto_promocion' =>0,
-                    'descuento' => 0,
                 ]);
-                if (count($productExist->images) <= 0) {
-                    foreach (array_reverse($file['imagenes']) as $key => $imagen) {
-                        $errorGetImage = false;
-                        $fileImage = "";
-                        try {
-                            $fileImage = file_get_contents(str_replace(' ', '%20', $imagen['url_imagen']), false, stream_context_create($arrContextOptions));
-                        } catch (Exception $th) {
-                            $errorGetImage = true;
-                        }
-                        $newPath = '';
-                        if (!$errorGetImage) {
-                            $newPath = '/nuevaimagen/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
-                            Storage::append('public' . $newPath, $fileImage);
-                            $productExist->images()->create([
-                                'image_url' => url('/storage' . $newPath)
-                            ]);
-                        } else {
-                            $productExist->images()->create([
-                                'image_url' => 'img/default_product_image.jpg'
-                            ]);
-                        }
-                    }
-                }
             }
         }
     }
