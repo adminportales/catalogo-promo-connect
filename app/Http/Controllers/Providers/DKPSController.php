@@ -121,9 +121,21 @@ class DKPSController extends Controller
                         'slug' => 'marca',
                         'value' => $file['D'],
                     ],
-
-
-
+                    [
+                        'attribute' => 'Unidad de venta',
+                        'slug' => 'unidad de venta',
+                        'value' => $file['L'],
+                    ],
+                    [
+                        'attribute' => 'Cantidad por paquete',
+                        'slug' => 'cantidad por paquete',
+                        'value' => $file['M'],
+                    ],
+                    [
+                        'attribute' => 'Peso',
+                        'slug' => 'peso',
+                        'value' => $file['N'],
+                    ],
 
                 ];
                 foreach ($attributes as $attr) {
