@@ -8,7 +8,6 @@ use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
 use App\Models\Subcategory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PromoOpcionController extends Controller
@@ -157,10 +156,39 @@ class PromoOpcionController extends Controller
                     $idSku++;
                 } else {
                     // Actualizar el precio
+                    // Actualizar los atributos
+
+                    //Create or update
+                    $atrr = [
+                        [
+                            'attribute' => 'Piezas Inner',
+                            'slug' => 'piezas_inner',
+                            'value' => $product['paquete']["PiezasInner"],
+                        ],
+                        [
+                            'attribute' => 'Piezas de la caja',
+                            'slug' => 'piezas_caja',
+                            'value' => $product['paquete']["PiezasCaja"],
+                        ],
+                    ];
+
+                    foreach ($atrr as $attribute) {
+                        // create or update
+                        $productExist->productAttributes()->updateOrCreate(
+                            [
+                                'slug' => $attribute['slug'],
+                            ],
+                            [
+                                'attribute' => $attribute['attribute'],
+                                'value' => $attribute['value'],
+                            ]
+                        );
+                    }
+
+
                     $productExist->price = $productHijo['precio'];
                     $productExist->visible = 1;
                     $productExist->save();
-
                     $imagenes =  count($productHijo['imagenesHijo']) <= 0 ? $product['imagenesPadre'] : $productHijo['imagenesHijo'];
                     $productExist->images()->delete();
                     foreach ($imagenes as $image) {
