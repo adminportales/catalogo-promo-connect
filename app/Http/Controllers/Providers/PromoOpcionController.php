@@ -160,6 +160,14 @@ class PromoOpcionController extends Controller
                     $productExist->price = $productHijo['precio'];
                     $productExist->visible = 1;
                     $productExist->save();
+
+                    $imagenes =  count($productHijo['imagenesHijo']) <= 0 ? $product['imagenesPadre'] : $productHijo['imagenesHijo'];
+                    $productExist->images()->delete();
+                    foreach ($imagenes as $image) {
+                        $productExist->images()->create([
+                            'image_url' => $image
+                        ]);
+                    }
                 }
             }
         }
@@ -170,6 +178,10 @@ class PromoOpcionController extends Controller
         $dataSkus = [];
         foreach ($result['response'] as $value) {
             foreach ($value['hijos'] as $hijo) {
+                if ($hijo['estatus'] == 0 || $hijo['estatus'] == '') {
+                    // Romper aqui y continuar con el siguiente ciclo del foreach
+                    continue;
+                }
                 array_push($dataSkus, ["sku" => $hijo['skuHijo']]);
             }
         }
@@ -240,7 +252,7 @@ class PromoOpcionController extends Controller
                 array_push($errors, $stock['Material']);
             }
         }
-        return $errors;
+        return [$errors, $stocks];
 
         FailedJobsCron::create([
             'name' => 'Promo Opcion',

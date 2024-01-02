@@ -192,9 +192,9 @@ class InnovationController extends Controller
                         // dd($/newProduct);
                     } else {
                         $productExist->precios()->delete();
-                        $productExist->update([
-                            "price" => floatval($product->lista_precios[0]->mi_precio)
-                        ]);
+                        $productExist->price = floatval($product->lista_precios[0]->mi_precio);
+                        $productExist->visible = 1;
+                        $productExist->save();
                         foreach ($product->lista_precios as $precio) {
                             $productExist->precios()->create(
                                 [
@@ -210,6 +210,29 @@ class InnovationController extends Controller
                     }
                 }
             }
+
+            $dataSkus = [];
+            foreach ($responseData as $value) {
+                foreach ($value->colores as $colorWS) {
+                    array_push($dataSkus, ["sku" => $colorWS->clave]);
+                }
+            }
+
+            $allProducts = Product::where('provider_id', 3)->get(['id', 'sku']);
+            foreach ($allProducts as $key => $value) {
+                foreach ($dataSkus as $product) {
+                    if ($value->sku == $product->sku) {
+                        unset($allProducts[$key]);
+                        break;
+                    }
+                }
+            }
+
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
+
             DB::table('images')->where('image_url', '=', null)->delete();
             return $responseData;
         } catch (Exception $e) {
@@ -219,7 +242,7 @@ class InnovationController extends Controller
                 'status' => 0,
                 'type' =>   1
             ]);
-            return $e->getMessage();
+            return [$e->getMessage(), $e];
         }
     }
 
@@ -259,30 +282,14 @@ class InnovationController extends Controller
         foreach ($responseData as $product) {
             $productCatalogo = Product::where('sku', $product->clave)->first();
             if ($productCatalogo) {
-                $productCatalogo->update(['stock' => $product->general_stock]);
-                $productCatalogo->touch();
+                $productCatalogo->stock = $product->general_stock;
+                $productCatalogo->visible = 1;
+                $productCatalogo->save();
             } else {
                 array_push($productsNotFound, $product->clave);
-                $productCatalogo->visible = 0;
-                $productCatalogo->save();
             }
         }
 
-
-        $allProducts = Product::where('provider_id', 3)->where('visible', 1)->get();
-        foreach ($allProducts as $key => $value) {
-            foreach ($responseData as $product) {
-                if ($value->sku == $product->clave) {
-                    unset($allProducts[$key]);
-                    break;
-                }
-            }
-        }
-
-        foreach ($allProducts as  $value) {
-            $value->visible = 0;
-            $value->save();
-        }
         FailedJobsCron::create([
             'name' => 'Innovation',
             'message' => "Productos No encontrados al actualizar el stock: " . implode(",", $productsNotFound),

@@ -17,7 +17,7 @@ class EuroCottonController extends Controller
     public function getAllProductsEurocotton()
     {
         $result = null;
-
+        try {
             $ch = curl_init();
             // Check if initialization had gone wrong*
             if ($ch === false) {
@@ -194,46 +194,44 @@ class EuroCottonController extends Controller
                 }
             }
 
-            // $allProducts = Product::where('provider_id', 9)->get();
-            // foreach ($products as $product) {
-            //     foreach ($allProducts as $key => $value) {
-            //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-            //             break;
-            //         }
-            //     }
-            //     unset($allProducts[$key]);
-            // }
+            $allProducts = Product::where('provider_id', 9)->get();
+            foreach ($products as $product) {
+                foreach ($allProducts as $key => $value) {
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+                        break;
+                    }
+                }
+                unset($allProducts[$key]);
+            }
 
-            // foreach ($allProducts as  $value) {
-            //     $value->visible = 0;
-            //     $value->save();
-            // }
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
 
-            // $allProducts = Product::where('provider_id', 9)->where('visible', 1)->get();
-            // foreach ($allProducts as $key => $value) {
-            //     foreach ($products as $product) {
-            //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-            //             unset($allProducts[$key]);
-            //             break;
-            //         }
-            //     }
-            // }
-            // foreach ($allProducts as  $value) {
-            //     $value->visible = 0;
-            //     $value->save();
-            // }
+            $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
+            foreach ($allProducts as $key => $value) {
+                foreach ($products as $product) {
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
+                        unset($allProducts[$key]);
+                        break;
+                    }
+                }
+            }
+            foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            }
 
             DB::table('images')->where('image_url', '=', null)->delete();
-        // } catch (Exception $e) {
-        //     FailedJobsCron::create([
-        //         'name' => 'For Promotional',
-        //         'message' => $e->getMessage(),
-        //         'status' => 0,
-        //         'type' =>   1
-        //     ]);
-        //     return $e->getMessage();
-        // }
+        } catch (Exception $e) {
+            FailedJobsCron::create([
+                'name' => 'For Promotional',
+                'message' => $e->getMessage(),
+                'status' => 0,
+                'type' =>   1
+            ]);
+            return $e->getMessage();
+        }
     }
-
 }
-
