@@ -207,6 +207,8 @@ class PromoOpcionController extends Controller
         $result = curl_exec($ch);
         curl_close($ch);
         $result = json_decode($result, true);
+
+
         if (!isset($result['success'])) {
             return $result;
         }
@@ -219,11 +221,22 @@ class PromoOpcionController extends Controller
         }
         // Convertir en array
         $stocks = $result['Stocks'];
+    
+        $coleccionDatos = collect($stocks);
+
+        $newStocks = $coleccionDatos->groupBy('Material')->map(function ($items) {
+            /* return $items->all(); */
+            return [
+                "Material" => $items[0]["Material"],
+                "Stock" => $items->sum('Stock'),
+                "Planta" => $items[0]["Planta"],
+            ];
+        })->values()->all();
 
         // return $response;
         $errors = [];
 
-        foreach ($stocks as $stock) {
+        foreach ($newStocks as $stock) {
             $productCatalogo = Product::where('sku', $stock['Material'])->first();
             if ($productCatalogo) {
                 $productCatalogo->update(['stock' => $stock['Stock']]);
