@@ -66,7 +66,7 @@ class PromoOpcionController extends Controller
             }
             // Verificar si la subcategoria existe y si no registrarla
             $subcategoria = Subcategory::find(1);
-
+            
             $data = [
                 'sku_parent' => $product['skuPadre'],
                 'description' => $product['descripcion'],
@@ -76,7 +76,9 @@ class PromoOpcionController extends Controller
                 'precio_unico' => true,
                 'type_id' => 1,
                 'provider_id' => 2,
+                'type' => 1
             ];
+
             foreach ($product['hijos'] as $productHijo) {
                 $color = null;
                 if ($productHijo['color'] == null) {
@@ -128,6 +130,11 @@ class PromoOpcionController extends Controller
                         'slug' => 'printing_area',
                         'value' => $product['impresion']['areaImpresion'],
                     ],
+                    [
+                        'attribute' => 'Tipo Descuento',
+                        'slug' => 'discount_type',
+                        'value' => isset($product['hijos'][0]['tipo'])? $product['hijos'][0]['tipo'] : '' ,
+                    ],
                 ];
                 $data['price'] =  $productHijo['precio'];
                 $data['name'] = $productHijo['nombreHijo'];
@@ -169,6 +176,11 @@ class PromoOpcionController extends Controller
                             'attribute' => 'Piezas de la caja',
                             'slug' => 'piezas_caja',
                             'value' => $product['paquete']["PiezasCaja"],
+                        ],
+                        [
+                            'attribute' => 'Tipo Descuento',
+                            'slug' => 'discount_type',
+                            'value' => isset($product['hijos'][0]['tipo'])? $product['hijos'][0]['tipo'] : '' ,
                         ],
                     ];
 
