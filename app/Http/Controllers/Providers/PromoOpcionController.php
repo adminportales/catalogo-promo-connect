@@ -8,7 +8,6 @@ use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
 use App\Models\Subcategory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PromoOpcionController extends Controller
@@ -67,7 +66,7 @@ class PromoOpcionController extends Controller
             }
             // Verificar si la subcategoria existe y si no registrarla
             $subcategoria = Subcategory::find(1);
-
+            
             $data = [
                 'sku_parent' => $product['skuPadre'],
                 'description' => $product['descripcion'],
@@ -77,7 +76,9 @@ class PromoOpcionController extends Controller
                 'precio_unico' => true,
                 'type_id' => 1,
                 'provider_id' => 2,
+                'type' => 1
             ];
+
             foreach ($product['hijos'] as $productHijo) {
                 $color = null;
                 if ($productHijo['color'] == null) {
@@ -108,11 +109,11 @@ class PromoOpcionController extends Controller
                         'slug' => 'material',
                         'value' => $product['material'],
                     ],
-                    [
-                        'attribute' => 'Capacidad',
-                        'slug' => 'capacity',
-                        'value' => $product['capacidad'],
-                    ],
+                    // [
+                    //     'attribute' => 'Capacidad',
+                    //     'slug' => 'capacity',
+                    //     'value' => $product['capacidad'],
+                    // ],
                     // Medidas
                     [
                         'attribute' => 'Medidas',
@@ -128,6 +129,11 @@ class PromoOpcionController extends Controller
                         'attribute' => 'Area de impresion',
                         'slug' => 'printing_area',
                         'value' => $product['impresion']['areaImpresion'],
+                    ],
+                    [
+                        'attribute' => 'Tipo Descuento',
+                        'slug' => 'discount_type',
+                        'value' => isset($product['hijos'][0]['tipo'])? $product['hijos'][0]['tipo'] : '' ,
                     ],
                 ];
                 $data['price'] =  $productHijo['precio'];
@@ -157,25 +163,79 @@ class PromoOpcionController extends Controller
                     $idSku++;
                 } else {
                     // Actualizar el precio
-                    $productExist->price = $productHijo['precio'];
-                    $productExist->save();
-                }
-            }
-        }
+                    // Actualizar los atributos
 
-        $allProducts = Product::where('provider_id', 2)->get();
-        foreach ($allProducts as $key => $value) {
-            foreach ($productsWs as $product) {
-                foreach ($product['hijos'] as $productHijo) {
-                    if ($value->sku == $productHijo['skuHijo'] && $productHijo['estatus'] == '1') {
-                        unset($allProducts[$key]);
-                        break 2;
+                    //Create or update
+                    $atrr = [
+                        [
+                            'attribute' => 'Piezas Inner',
+                            'slug' => 'piezas_inner',
+                            'value' => $product['paquete']["PiezasInner"],
+                        ],
+                        [
+                            'attribute' => 'Piezas de la caja',
+                            'slug' => 'piezas_caja',
+                            'value' => $product['paquete']["PiezasCaja"],
+                        ],
+                        [
+                            'attribute' => 'Tipo Descuento',
+                            'slug' => 'discount_type',
+                            'value' => isset($product['hijos'][0]['tipo'])? $product['hijos'][0]['tipo'] : '' ,
+                        ],
+                    ];
+
+                    foreach ($atrr as $attribute) {
+                        // create or update
+                        $productExist->productAttributes()->updateOrCreate(
+                            [
+                                'slug' => $attribute['slug'],
+                            ],
+                            [
+                                'attribute' => $attribute['attribute'],
+                                'value' => $attribute['value'],
+                            ]
+                        );
+                    }
+
+
+                    $productExist->price = $productHijo['precio'];
+                    $productExist->visible = 1;
+                    $productExist->save();
+                    $imagenes =  count($productHijo['imagenesHijo']) <= 0 ? $product['imagenesPadre'] : $productHijo['imagenesHijo'];
+                    $productExist->images()->delete();
+                    foreach ($imagenes as $image) {
+                        $productExist->images()->create([
+                            'image_url' => $image
+                        ]);
                     }
                 }
             }
         }
 
-        foreach ($allProducts as  $value) {
+        // Obtener los productos que estan en la base de datos y no en el proveedor
+        $allProducts = Product::where('provider_id', 2)->get(['id', 'sku']);
+
+        $dataSkus = [];
+        foreach ($result['response'] as $value) {
+            foreach ($value['hijos'] as $hijo) {
+                if ($hijo['estatus'] == 0 || $hijo['estatus'] == '') {
+                    // Romper aqui y continuar con el siguiente ciclo del foreach
+                    continue;
+                }
+                array_push($dataSkus, ["sku" => $hijo['skuHijo']]);
+            }
+        }
+
+        // Buscar los productos que no estan en el proveedor
+        foreach ($allProducts as $key => $value) {
+            foreach ($dataSkus as $skuProvider) {
+                if ($value->sku == $skuProvider['sku']) {
+                    unset($allProducts[$key]);
+                    break;
+                }
+            }
+        }
+        foreach ($allProducts as $value) {
             $value->visible = 0;
             $value->save();
         }
@@ -226,12 +286,13 @@ class PromoOpcionController extends Controller
         foreach ($stocks as $stock) {
             $productCatalogo = Product::where('sku', $stock['Material'])->first();
             if ($productCatalogo) {
-                $productCatalogo->update(['stock' => $stock['Stock']]);
+                $productCatalogo->stock = $stock['Stock'];
+                $productCatalogo->save();
             } else {
                 array_push($errors, $stock['Material']);
             }
         }
-        return $errors;
+        return [$errors, $stocks];
 
         FailedJobsCron::create([
             'name' => 'Promo Opcion',

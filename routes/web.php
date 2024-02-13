@@ -62,6 +62,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::view('globalAttributes', 'livewire.globalAttributes.index');
 
     Route::view('roles-providers', 'livewire.roles-providers.index');
+    Route::get('/export-data', [HomeController::class, 'obtenerProductos']);
 });
 
 Route::middleware(['auth'])->group(function () {

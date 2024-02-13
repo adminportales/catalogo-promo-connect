@@ -77,6 +77,60 @@ class DobleVelaController extends Controller
                     ]);
                 }
 
+                // Atributos
+                $keysWS = [
+                    'Unidad Empaque',
+                    "Medida Caja Master",
+                    "Peso caja",
+                    "Material",
+                    "Medida Producto",
+                    "Peso Producto",
+                    "Tipo Empaque",
+                    "Tipo Impresion"
+                ];
+                $atributos = [
+                    [
+                        'attribute' => 'Unidad Empaque',
+                        'slug' => 'unidad_empaque',
+                        'value' => $product->{$keysWS[0]},
+                    ],
+                    [
+                        'attribute' => 'Medida Caja Master',
+                        'slug' => 'medida_caja_master',
+                        'value' => $product->{$keysWS[1]},
+                    ],
+                    [
+                        'attribute' => 'Peso caja',
+                        'slug' => 'peso_caja',
+                        'value' => $product->{$keysWS[2]},
+                    ],
+                    [
+                        'attribute' => 'Material',
+                        'slug' => 'material',
+                        'value' => $product->{$keysWS[3]},
+                    ],
+                    [
+                        'attribute' => 'Medida Producto',
+                        'slug' => 'medida_producto',
+                        'value' => $product->{$keysWS[4]},
+                    ],
+                    [
+                        'attribute' => 'Peso Producto',
+                        'slug' => 'peso_producto',
+                        'value' => $product->{$keysWS[5]},
+                    ],
+                    [
+                        'attribute' => 'Tipo Empaque',
+                        'slug' => 'tipo_empaque',
+                        'value' => $product->{$keysWS[6]},
+                    ],
+                    [
+                        'attribute' => 'Tipo Impresion',
+                        'slug' => 'tipo_impresion',
+                        'value' => $product->{$keysWS[7]},
+                    ]
+                ];
+
                 $productExist = Product::where('sku', trim($product->CLAVE))->where('provider_id', 5)->first();
                 if (!$productExist) {
                     $newProduct = Product::create([
@@ -95,6 +149,13 @@ class DobleVelaController extends Controller
                         'type_id' => 1,
                         'color_id' => $color->id,
                     ]);
+                    foreach ($atributos as $atributo) {
+                        $newProduct->attributes()->create([
+                            'attribute' => $atributo['attribute'],
+                            'slug' => $atributo['slug'],
+                            'value' => $atributo['value'],
+                        ]);
+                    }
                     /*
                     Registrar en la tabla product_category el producto, categoria y sub categoria
                     */
@@ -108,6 +169,18 @@ class DobleVelaController extends Controller
                         'price' => $product->Price,
                         'stock' => $product->EXISTENCIAS,
                     ]);
+                    foreach ($atributos as $atributo) {
+                        // Update or create
+                        $productExist->productAttributes()->updateOrCreate(
+                            [
+                                'slug' => $atributo['slug'],
+                            ],
+                            [
+                                'attribute' => $atributo['attribute'],
+                                'value' => $atributo['value'],
+                            ]
+                        );
+                    }
                 }
             }
             $allProducts = Product::where('provider_id', 5)->where('visible', 1)->get();
