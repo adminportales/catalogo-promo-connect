@@ -382,6 +382,8 @@
                         </form>
                     </div>
                     <div class="col-md-4">
+                        <h6>Filas del archivo</h6>
+                        <p style="color:red" >{{ $numeroMayorDeFila }}</p>
                         <h6>Columnas del Archivo</h6>
                         <ul class="list-group ">
                             <div class="row">
