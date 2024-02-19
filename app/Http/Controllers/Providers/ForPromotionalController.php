@@ -32,7 +32,7 @@ class ForPromotionalController extends Controller
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
-                "https://4promotional.net:9090/WsEstrategia/inventarioWeb"
+                "https://4promotional.net:9090/WsEstrategia/inventario"
             );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
