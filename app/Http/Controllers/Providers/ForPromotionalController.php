@@ -236,7 +236,7 @@ class ForPromotionalController extends Controller
                 }
             }
 
-            $allProducts = Product::where('provider_id', 1)->get();
+            /* $allProducts = Product::where('provider_id', 1)->get();
             foreach ($products as $product) {
                 foreach ($allProducts as $key => $value) {
                     if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
@@ -249,7 +249,7 @@ class ForPromotionalController extends Controller
             foreach ($allProducts as  $value) {
                 $value->visible = 0;
                 $value->save();
-            }
+            } */
 
             $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
             foreach ($allProducts as $key => $value) {
@@ -261,7 +261,7 @@ class ForPromotionalController extends Controller
                 }
             }
             foreach ($allProducts as  $value) {
-                $value->visible = 0;
+                $value->visible = 1;
                 $value->save();
             }
 
