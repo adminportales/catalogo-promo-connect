@@ -32,7 +32,7 @@ class ForPromotionalController extends Controller
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
-                "https://4promotional.net:9090/WsEstrategia/inventarioWeb"
+                "https://4promotional.net:9090/WsEstrategia/inventario"
             );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -77,11 +77,11 @@ class ForPromotionalController extends Controller
             foreach ($products as $product) {
                 // Verificar si el color existe y si no registrarla
                 $color = null;
-                $slug = mb_strtolower(str_replace(' ', '-', $product['modelo_color']));
+                $slug = mb_strtolower(str_replace(' ', '-', $product['color']));
                 $color = Color::where("slug", $slug)->first();
                 if (!$color) {
                     $color = Color::create([
-                        'color' => ucfirst($product['modelo_color']), 'slug' => $slug,
+                        'color' => ucfirst($product['color']), 'slug' => $slug,
                     ]);
                 }
 
@@ -107,17 +107,17 @@ class ForPromotionalController extends Controller
                     ]);
                 }
 
-                $discount = $product['producto_promocion'] == "SI" ? $product['descPromo'] : 0;
+                $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 0;
 
                 $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->first();
                 if (!$productExist) {
                     $newProduct = Product::create([
                         'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
                         'sku' => $product['id_articulo'],
-                        'name' => $product['nombre'],
+                        'name' => isset($product['nombre_articulo'])?$product['nombre_articulo']: '' ,
                         'price' =>  $product['precio'],
                         'description' => $product['descripcion'],
-                        'stock' => $product['cantidad_piezas'],
+                        'stock' => $product['inventario'],
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
                         'descuento' => $discount,
                         'producto_nuevo' => $product['producto_nuevo'] == "SI" ? true : false,
@@ -137,7 +137,7 @@ class ForPromotionalController extends Controller
                         }
                         $newPath = '';
                         if (!$errorGetImage) {
-                            $newPath = '/forpromotional/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre'] . '.jpg';
+                            $newPath = '/forpromotional/' . $newProduct->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
                             Storage::append('public' . $newPath, $fileImage);
                             $newProduct->images()->create([
                                 'image_url' => url('/storage' . $newPath)
@@ -180,17 +180,17 @@ class ForPromotionalController extends Controller
                         [
                             'attribute' => 'Alto de la caja',
                             'slug' => 'alto_caja',
-                            'value' => $product['alto'],
+                            'value' => $product['alto_caja'],
                         ],
                         [
                             'attribute' => 'Ancho de la caja',
                             'slug' => 'ancho_caja',
-                            'value' => $product['ancho'],
+                            'value' => $product['ancho_caja'],
                         ],
                         [
                             'attribute' => 'Largo de la caja',
                             'slug' => 'largo_caja',
-                            'value' => $product['profundidad'],
+                            'value' => $product['largo_caja'],
                         ],
                         [
                             'attribute' => 'Peso de la caja',
@@ -206,7 +206,7 @@ class ForPromotionalController extends Controller
                 } else {
                     $productExist->update([
                         'price' => $product['precio'],
-                        'stock' => $product['cantidad_piezas'],
+                        'stock' => $product['inventario'],
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
                         'descuento' => $discount,
                     ]);
@@ -221,7 +221,7 @@ class ForPromotionalController extends Controller
                             }
                             $newPath = '';
                             if (!$errorGetImage) {
-                                $newPath = '/forpromotional/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre'] . '.jpg';
+                                $newPath = '/forpromotional/' . $productExist->sku . 'type' . $key . $color->slug . ' ' . $product['nombre_articulo'] . '.jpg';
                                 Storage::append('public' . $newPath, $fileImage);
                                 $productExist->images()->create([
                                     'image_url' => url('/storage' . $newPath)
@@ -236,10 +236,10 @@ class ForPromotionalController extends Controller
                 }
             }
 
-            $allProducts = Product::where('provider_id', 1)->get();
+            /* $allProducts = Product::where('provider_id', 1)->get();
             foreach ($products as $product) {
                 foreach ($allProducts as $key => $value) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['modelo_color'])) {
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
                         break;
                     }
                 }
@@ -249,19 +249,19 @@ class ForPromotionalController extends Controller
             foreach ($allProducts as  $value) {
                 $value->visible = 0;
                 $value->save();
-            }
+            } */
 
             $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
             foreach ($allProducts as $key => $value) {
                 foreach ($products as $product) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['modelo_color'])) {
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
                         unset($allProducts[$key]);
                         break;
                     }
                 }
             }
             foreach ($allProducts as  $value) {
-                $value->visible = 0;
+                $value->visible = 1;
                 $value->save();
             }
 
