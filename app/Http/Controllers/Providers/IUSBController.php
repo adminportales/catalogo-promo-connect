@@ -42,7 +42,7 @@ class IUSBController extends Controller
             }
 
             foreach ($allProducts as  $value) {
-                $value->visible = 0;
+                $value->visible = 1;
                 $value->save();
             }
         }
