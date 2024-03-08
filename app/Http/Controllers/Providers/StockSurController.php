@@ -127,7 +127,7 @@ class StockSurController extends Controller
             }
 
             foreach ($allProducts as  $value) {
-                $value->visible = 0;
+                $value->visible = 1;
                 $value->save();
             }
             DB::table('images')->where('image_url', '=', null)->delete();
