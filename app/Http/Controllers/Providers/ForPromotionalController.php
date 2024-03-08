@@ -252,18 +252,33 @@ class ForPromotionalController extends Controller
             } */
 
             $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
+
             foreach ($allProducts as $key => $value) {
+                $found = false;
                 foreach ($products as $product) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-                        unset($allProducts[$key]);
+                    if ($value->sku == $product['id_articulo']) {
+                        if (strtolower($value->color->color) == strtolower($product['color'])) {
+                            unset($allProducts[$key]);
+                        }
+                        $found = true;
                         break;
                     }
                 }
+                if (!$found) {
+                    $value->visible = 0;
+                    $value->save();
+                } else {
+                    $value->visible = 1;
+                    $value->save();
+                }
             }
-            foreach ($allProducts as  $value) {
+            
+            /* foreach ($allProducts as  $value) {
+
+
                 $value->visible = 1;
                 $value->save();
-            }
+            } */
 
             DB::table('images')->where('image_url', '=', null)->delete();
         } catch (Exception $e) {
