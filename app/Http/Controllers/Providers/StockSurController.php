@@ -16,6 +16,7 @@ class StockSurController extends Controller
 {
     public function getAllProductsStockSur()
     {
+
         $result = null;
         try {
             $ch = curl_init();
@@ -80,8 +81,8 @@ class StockSurController extends Controller
                     $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
                     $data['color_id'] = $color->id;
                     $data['producto_nuevo'] = $variant->novedad;
-                    $data['stock'] =  $variant->stock_available;
-                    $data['price'] = $variant->list_price;
+                    $data['stock'] =  $variant->stock_existent;
+                    $data['price'] = $variant->net_price;
                     $data['producto_promocion'] = false;
                     $data['precio_unico'] = true;
                     $data['type_id'] = 1;
@@ -98,7 +99,7 @@ class StockSurController extends Controller
                         ]);
                         $idSku++;
                     } else {
-                        $productExist->stock =  $variant->stock_available;
+                        $productExist->stock =  $variant->stock_existent;
                         $productExist->price = $variant->net_price;
                         $productExist->save();
                         $productExist->images()->delete();
@@ -126,9 +127,27 @@ class StockSurController extends Controller
                 }
             }
 
-            foreach ($allProducts as  $value) {
-                $value->visible = 1;
-                $value->save();
+            $allProducts = Product::where('provider_id', null)->get();
+
+            foreach ($result as $product) {
+                foreach ($product->variants as $variant) {
+                    $slugNew = mb_strtolower(str_replace(' ', '-', $variant->color));
+                    $skuToCheck = $product->code . '_' . $slugNew;
+                    $found = false;
+
+                    foreach ($allProducts as $key => $value) {
+                        if ($value->sku == $skuToCheck) {
+                            $found = true;
+                            $value->provider_id = 6;
+                            break;
+                        }
+                    }
+
+                    if (!$found) {
+                        // Si no se encontró una coincidencia, establece visible en 0
+                        $value->visible = 0;
+                    }
+                }
             }
             DB::table('images')->where('image_url', '=', null)->delete();
             return ($result);

@@ -66,7 +66,7 @@ class PromoOpcionController extends Controller
             }
             // Verificar si la subcategoria existe y si no registrarla
             $subcategoria = Subcategory::find(1);
-            
+
             $data = [
                 'sku_parent' => $product['skuPadre'],
                 'description' => $product['descripcion'],
@@ -133,7 +133,7 @@ class PromoOpcionController extends Controller
                     [
                         'attribute' => 'Tipo Descuento',
                         'slug' => 'discount_type',
-                        'value' => isset($product['hijos'][0]['tipo'])? $product['hijos'][0]['tipo'] : '' ,
+                        'value' => isset($product['hijos'][0]['tipo']) ? $product['hijos'][0]['tipo'] : '',
                     ],
                 ];
                 $data['price'] =  $productHijo['precio'];
@@ -180,7 +180,7 @@ class PromoOpcionController extends Controller
                         [
                             'attribute' => 'Tipo Descuento',
                             'slug' => 'discount_type',
-                            'value' => isset($product['hijos'][0]['tipo'])? $product['hijos'][0]['tipo'] : '' ,
+                            'value' => isset($product['hijos'][0]['tipo']) ? $product['hijos'][0]['tipo'] : '',
                         ],
                     ];
 
@@ -227,18 +227,25 @@ class PromoOpcionController extends Controller
         }
 
         // Buscar los productos que no estan en el proveedor
+        $allProducts = Product::where('provider_id', null)->get(['id', 'sku']);
         foreach ($allProducts as $key => $value) {
+            $found = false;
             foreach ($dataSkus as $skuProvider) {
                 if ($value->sku == $skuProvider['sku']) {
-                    unset($allProducts[$key]);
+                    $found = true;
                     break;
                 }
             }
-        }
-        foreach ($allProducts as $value) {
-            $value->visible = 1;
+
+            if ($found) {
+                $value->provider_id = 2;
+                $value->visible = 1;
+            } else {
+                $value->visible = 0;
+            }
             $value->save();
         }
+
 
         DB::table('images')->where('image_url', '=', null)->delete();
 
@@ -281,7 +288,7 @@ class PromoOpcionController extends Controller
         }
         // Convertir en array
         $stocks = $result['Stocks'];
-    
+
         $coleccionDatos = collect($stocks);
 
         $newStocks = $coleccionDatos->groupBy('Material')->map(function ($items) {
