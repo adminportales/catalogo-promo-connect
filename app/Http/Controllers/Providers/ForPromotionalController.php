@@ -262,13 +262,14 @@ class ForPromotionalController extends Controller
                         break;
                     }
                 }
-
+              
                 if (!$found) {
                     $value->visible = 0;
                     $value->provider_id = null;
                     $value->save();
                 }
             }
+           
             DB::table('images')->where('image_url', '=', null)->delete();
         } catch (Exception $e) {
             FailedJobsCron::create([
