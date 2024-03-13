@@ -270,6 +270,7 @@ class ForPromotionalController extends Controller
                 }
             }
             DB::table('images')->where('image_url', '=', null)->delete();
+            return $result;
         } catch (Exception $e) {
             FailedJobsCron::create([
                 'name' => 'For Promotional',

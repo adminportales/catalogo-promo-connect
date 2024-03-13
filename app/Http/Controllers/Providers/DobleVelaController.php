@@ -193,10 +193,27 @@ class DobleVelaController extends Controller
                 }
             }
 
-            foreach ($allProducts as  $value) {
-                $value->visible = 1;
+            $allProducts = Product::where('provider_id', null)->get();
+            foreach ($allProducts as $key => $value) {
+                $found = false;
+                foreach ($products as $product) {
+                    if ($value->sku == trim($product->CLAVE)) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    $value->provider_id = 2;
+                    $value->visible = 1;
+                } else {
+                    $value->visible = 0;
+                }
                 $value->save();
             }
+            /*  foreach ($allProducts as  $value) {
+                $value->visible = 1;
+                $value->save();
+            } */
         }
         DB::table('images')->where('image_url', '=', null)->delete();
         return $products;
