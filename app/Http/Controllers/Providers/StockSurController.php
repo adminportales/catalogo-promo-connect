@@ -88,7 +88,10 @@ class StockSurController extends Controller
                     $data['type_id'] = 1;
                     $data['provider_id'] = 6;
 
-                    $productExist = Product::where('sku', $data['sku'])->first();
+                    $productExist = Product::where('sku_parent', $data['sku'])->first();
+                    /*    if (!$productExist) {
+                        $productExist = Product::where('sku_parent', $data['sku'])->first();
+                    } */
                     if (!$productExist) {
                         $newProduct = Product::create($data);
                         $newProduct->images()->create([
@@ -128,24 +131,21 @@ class StockSurController extends Controller
             }
 
             $allProducts = Product::where('provider_id', null)->get();
-
             foreach ($result as $product) {
                 foreach ($product->variants as $variant) {
                     $slugNew = mb_strtolower(str_replace(' ', '-', $variant->color));
-                    $skuToCheck = $product->code . '_' . $slugNew;
                     $found = false;
-
                     foreach ($allProducts as $key => $value) {
-                        if ($value->sku == $skuToCheck) {
+                        if ($value->sku == $product->code . '_' . $slugNew) {
                             $found = true;
                             $value->provider_id = 6;
                             break;
                         }
                     }
-
                     if (!$found) {
                         // Si no se encontró una coincidencia, establece visible en 0
                         $value->visible = 0;
+                        $value->provider_id = 6;
                     }
                 }
             }
