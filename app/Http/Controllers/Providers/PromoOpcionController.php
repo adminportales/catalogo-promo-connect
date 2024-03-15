@@ -227,7 +227,7 @@ class PromoOpcionController extends Controller
         }
 
         // Buscar los productos que no estan en el proveedor
-        $allProducts = Product::where('provider_id', null)->get(['id', 'sku']);
+        $allProducts = Product::where('provider_id', null)->get(['id', 'sku_parent']);
         foreach ($allProducts as $key => $value) {
             $found = false;
             foreach ($dataSkus as $skuProvider) {
@@ -236,7 +236,6 @@ class PromoOpcionController extends Controller
                     break;
                 }
             }
-
             if ($found) {
                 $value->provider_id = 2;
                 $value->visible = 1;
@@ -245,7 +244,23 @@ class PromoOpcionController extends Controller
             }
             $value->save();
         }
+        //buscar productos que estan en el provedor pero ya no estan disponibles y ponerle 0
+        $newProducts = Product::where('provider_id', 2)->get(['id', 'sku_parent']);
+        foreach ($newProducts as $key => $value) {
 
+            foreach ($dataSkus as $skuProvider) {
+                return $skuProvider;
+                if ($value->sku_parent == $skuProvider['sku']) {
+                    $value->provider_id = 2;
+                    $value->visible = 1;
+                    $value->save();
+                    break;
+                } else {
+                    $value->visible = 0;
+                    $value->save();
+                }
+            }
+        }
 
         DB::table('images')->where('image_url', '=', null)->delete();
 
