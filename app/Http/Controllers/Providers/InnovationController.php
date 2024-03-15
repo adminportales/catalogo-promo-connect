@@ -232,7 +232,6 @@ class InnovationController extends Controller
                 $found = false;
                 foreach ($dataSkus as $product) {
                     if ($value->sku == $product->sku) {
-                        unset($products[$key]);
                         $found = true;
                         break;
                     }
