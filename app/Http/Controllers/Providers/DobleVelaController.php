@@ -246,14 +246,20 @@ class DobleVelaController extends Controller
                 ]);
             }
             $imagesBD = isset($product->firstImage->image_url) ? $product->firstImage->image_url : null;
+
             $url = ('http://doblevela.com/images/large' . '/' .  $product->sku_parent . '_' . $product->color->slug . '_' . 'lrg' . '.' . 'jpg');
             if ($imagesBD !== $url || $imagesBD == null) {
+
                 $newImage = Image::create([
                     'image_url' => $url,
                     'product_id' => $product->id,
+
                 ]);
+                $newImage->save();
             }
         }
+
+     
         /*   foreach ($products  as $productInServer) {
             $sku_parent = $productInServer->sku_parent;
             $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'Codigo' => '{"CLAVES": ["' . $sku_parent . '"]}');
