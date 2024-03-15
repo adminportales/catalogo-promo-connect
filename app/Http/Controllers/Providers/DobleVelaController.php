@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Providers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Livewire\Images;
 use App\Models\Category;
 use App\Models\Color;
+use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use SebastianBergmann\Type\NullType;
 
 class DobleVelaController extends Controller
 {
@@ -21,7 +24,6 @@ class DobleVelaController extends Controller
         $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==');
         //hacemos el llamado del metodo
         $resultado = $cliente->call('GetExistenciaAll', $parametros);
-        $products = [];
         if ($error) {
             echo 'Fallo';
             return 0;
@@ -150,12 +152,13 @@ class DobleVelaController extends Controller
                         'color_id' => $color->id,
                     ]);
                     foreach ($atributos as $atributo) {
-                        $newProduct->attributes()->create([
+                        $newProduct->productAttributes()->create([
                             'attribute' => $atributo['attribute'],
                             'slug' => $atributo['slug'],
                             'value' => $atributo['value'],
                         ]);
                     }
+
                     /*
                     Registrar en la tabla product_category el producto, categoria y sub categoria
                     */
@@ -193,10 +196,27 @@ class DobleVelaController extends Controller
                 }
             }
 
-            foreach ($allProducts as  $value) {
-                $value->visible = 1;
+            $allProducts = Product::where('provider_id', null)->get();
+            foreach ($allProducts as $key => $value) {
+                $found = false;
+                foreach ($products as $product) {
+                    if ($value->sku == trim($product->CLAVE)) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    $value->provider_id = 2;
+                    $value->visible = 1;
+                } else {
+                    $value->visible = 0;
+                }
                 $value->save();
             }
+            /*  foreach ($allProducts as  $value) {
+                $value->visible = 1;
+                $value->save();
+            } */
         }
         DB::table('images')->where('image_url', '=', null)->delete();
         return $products;
@@ -213,8 +233,28 @@ class DobleVelaController extends Controller
         }
 
 
-        $products = Product::select(['sku_parent'])->where('provider_id', 5)->groupBy('sku_parent')->get();
-        foreach ($products  as $productInServer) {
+        // $products = Product::select(['sku_parent'])->where('provider_id', 5)->groupBy('sku_parent')->get();
+        $products = Product::where('provider_id', 5)->get();
+        /*     return $products; */
+        foreach ($products as $product) {
+            $color = null;
+            $slug = substr(mb_strtolower(str_replace(' ', '-', $product->COLOR)), 5);
+            $color = Color::where("slug", $slug)->first();
+            if (!$color) {
+                $color = Color::create([
+                    'color' => ucfirst(substr($product->COLOR, 5)), 'slug' => $slug,
+                ]);
+            }
+            $imagesBD = isset($product->firstImage->image_url) ? $product->firstImage->image_url : null;
+            $url = ('http://doblevela.com/images/large' . '/' .  $product->sku_parent . '_' . $product->color->slug . '_' . 'lrg' . '.' . 'jpg');
+            if ($imagesBD !== $url || $imagesBD == null) {
+                $newImage = Image::create([
+                    'image_url' => $url,
+                    'product_id' => $product->id,
+                ]);
+            }
+        }
+        /*   foreach ($products  as $productInServer) {
             $sku_parent = $productInServer->sku_parent;
             $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'Codigo' => '{"CLAVES": ["' . $sku_parent . '"]}');
             $resultado = $cliente->call('GetrProdImagenes', $parametros);
@@ -237,7 +277,7 @@ class DobleVelaController extends Controller
                     }
                 }
             }
-        }
+        } */
         //agregamos los parametros, en este caso solo es la llave de acceso
         //hacemos el llamado del metodo
 

@@ -114,7 +114,7 @@ class ForPromotionalController extends Controller
                     $newProduct = Product::create([
                         'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
                         'sku' => $product['id_articulo'],
-                        'name' => isset($product['nombre_articulo'])?$product['nombre_articulo']: '' ,
+                        'name' => isset($product['nombre_articulo']) ? $product['nombre_articulo'] : '',
                         'price' =>  $product['precio'],
                         'description' => $product['descripcion'],
                         'stock' => $product['inventario'],
@@ -236,51 +236,41 @@ class ForPromotionalController extends Controller
                 }
             }
 
-            /* $allProducts = Product::where('provider_id', 1)->get();
+            /*    $allProducts = Product::where('provider_id', 1)->get();
             foreach ($products as $product) {
                 foreach ($allProducts as $key => $value) {
                     if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
                         break;
                     }
                 }
-                unset($allProducts[$key]);
+                  unset($allProducts[$key]);
             }
 
-            foreach ($allProducts as  $value) {
+              foreach ($allProducts as  $value) {
+                return $value;
                 $value->visible = 0;
                 $value->save();
-            } */
-
+            }
+ */
             $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
+            foreach ($allProducts as $value) {
 
-            foreach ($allProducts as $key => $value) {
                 $found = false;
                 foreach ($products as $product) {
-                    if ($value->sku == $product['id_articulo']) {
-                        if (strtolower($value->color->color) == strtolower($product['color'])) {
-                            unset($allProducts[$key]);
-                        }
+                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
                         $found = true;
                         break;
                     }
                 }
+
                 if (!$found) {
                     $value->visible = 0;
-                    $value->save();
-                } else {
-                    $value->visible = 1;
+                    $value->provider_id = null;
                     $value->save();
                 }
             }
-            
-            /* foreach ($allProducts as  $value) {
-
-
-                $value->visible = 1;
-                $value->save();
-            } */
-
             DB::table('images')->where('image_url', '=', null)->delete();
+            return $result;
         } catch (Exception $e) {
             FailedJobsCron::create([
                 'name' => 'For Promotional',

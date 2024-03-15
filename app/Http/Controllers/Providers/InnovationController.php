@@ -227,11 +227,27 @@ class InnovationController extends Controller
                     }
                 }
             }
-
-            foreach ($allProducts as  $value) {
+            $products = Product::where('provider_id', 1)->where('visible', 0)->get();
+            foreach ($products as $key => $value) {
+                $found = false;
+                foreach ($dataSkus as $product) {
+                    if ($value->sku == $product->sku) {
+                        unset($products[$key]);
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $value->visible = 0;
+                    $value->save();
+                } else {
+                    $value->visible = 1;
+                    $value->save();
+                }
+            }
+            /*      foreach ($allProducts as  $value) {
                 $value->visible = 1;
                 $value->save();
-            }
+            } */
 
             DB::table('images')->where('image_url', '=', null)->delete();
             return $responseData;

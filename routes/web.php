@@ -4,6 +4,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BatchInputProducts;
 use App\Http\Controllers\ConsultSuppliers;
+use App\Http\Controllers\Providers\DKPSController;
 use App\Http\Controllers\HelperController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
@@ -83,6 +84,8 @@ Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromo
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
 // Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
 
+//DKSP
+Route::get('/getAllProductsDKSP', [DKPSController::class, 'getAllProductsDKSP']);
 // IUSB
 Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 

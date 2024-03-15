@@ -218,15 +218,32 @@ class EuroCottonController extends Controller
                     }
                 }
             }
-            foreach ($allProducts as  $value) {
+            $allProducts = Product::where('provider_id', null)->get();
+            foreach ($allProducts as $value) {
+                $found = false;
+                foreach ($products as $product) {
+                    if ($value->sku == $product['id_articulo']) {
+                        $found = true;
+                        break;
+                    }
+                }
+            }
+            if ($found) {
+                $value->provider_id = 9;
+                $value->visible = 1;
+            } else {
+                $value->visible = 0;
+            }
+            $value->save();
+            /*     foreach ($allProducts as  $value) {
                 $value->visible = 0;
                 $value->save();
-            }
-
+            } */
             DB::table('images')->where('image_url', '=', null)->delete();
+            return $result;
         } catch (Exception $e) {
             FailedJobsCron::create([
-                'name' => 'For Promotional',
+                'name' => 'EuroCotton',
                 'message' => $e->getMessage(),
                 'status' => 0,
                 'type' =>   1
