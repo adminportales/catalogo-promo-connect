@@ -226,7 +226,7 @@ class DobleVelaController extends Controller
     {
         //agregamos la libreria de nusoap del directorio donde se encuentre
 
-        $cliente = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?wsdl', 'wsdl');
+        $cliente = new \nusoap_client('https://srv-datos.dyndns.info/doblevela/service.asmx?wsdl', 'wsdl');
         $error = $cliente->getError();
         if ($error) {
             echo 'Error' . $error;
@@ -246,14 +246,20 @@ class DobleVelaController extends Controller
                 ]);
             }
             $imagesBD = isset($product->firstImage->image_url) ? $product->firstImage->image_url : null;
-            $url = ('http://doblevela.com/images/large' . '/' .  $product->sku_parent . '_' . $product->color->slug . '_' . 'lrg' . '.' . 'jpg');
+
+            $url = ('https://doblevela.com/images/large' . '/' .  $product->sku_parent . '_' . $product->color->slug . '_' . 'lrg' . '.' . 'jpg');
             if ($imagesBD !== $url || $imagesBD == null) {
+
                 $newImage = Image::create([
                     'image_url' => $url,
                     'product_id' => $product->id,
+
                 ]);
+                $newImage->save();
             }
         }
+
+
         /*   foreach ($products  as $productInServer) {
             $sku_parent = $productInServer->sku_parent;
             $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'Codigo' => '{"CLAVES": ["' . $sku_parent . '"]}');
