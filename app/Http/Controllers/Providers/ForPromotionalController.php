@@ -63,6 +63,7 @@ class ForPromotionalController extends Controller
             );
 
             // Convertir en array
+            //// inicio
             $products = json_decode($result, true);
 
             $maxSKU = Product::max('internal_sku');
@@ -106,9 +107,13 @@ class ForPromotionalController extends Controller
                         'slug' => $slugSub,
                     ]);
                 }
-
+                $newdiscount = $product['producto_promocion'] == "NO" ? $product['desc_promo'] : 0;
                 $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 0;
-
+                if ($newdiscount > 25) {
+                    $discount = $product['desc_promo'];
+                } else {
+                    $discount = 0;
+                }
                 $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->first();
                 if (!$productExist) {
                     $newProduct = Product::create([
