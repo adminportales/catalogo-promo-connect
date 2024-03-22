@@ -196,7 +196,7 @@ class DobleVelaController extends Controller
                 }
             }
 
-            $allProducts = Product::where('provider_id', null)->get();
+            $allProducts = Product::where('provider_id', 1983)->get();
             foreach ($allProducts as $key => $value) {
                 $found = false;
                 foreach ($products as $product) {
@@ -208,10 +208,11 @@ class DobleVelaController extends Controller
                 if ($found) {
                     $value->provider_id = 2;
                     $value->visible = 1;
+                    $value->save();
                 } else {
                     $value->visible = 0;
+                    $value->save();
                 }
-                $value->save();
             }
             /*  foreach ($allProducts as  $value) {
                 $value->visible = 1;

@@ -270,7 +270,7 @@ class ForPromotionalController extends Controller
 
                 if (!$found) {
                     $value->visible = 0;
-                    $value->provider_id = null;
+                    $value->provider_id = 1983;
                     $value->save();
                 }
             }
