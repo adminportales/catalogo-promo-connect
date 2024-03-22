@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Providers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Livewire\Images;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\FailedJobsCron;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\Subcategory;
 use Exception;
@@ -67,6 +69,7 @@ class StockSurController extends Controller
                     'name' => $product->name,
                     'description' => $product->description,
                 ];
+
 
                 foreach ($product->variants as $variant) {
                     $color = null;
@@ -139,6 +142,7 @@ class StockSurController extends Controller
                         if ($value->sku == $product->code . '_' . $slugNew) {
                             $found = true;
                             $value->provider_id = 6;
+                            $value->save();
                             break;
                         }
                     }
@@ -146,6 +150,7 @@ class StockSurController extends Controller
                         // Si no se encontró una coincidencia, establece visible en 0
                         $value->visible = 0;
                         $value->provider_id = 6;
+                        $value->save();
                     }
                 }
             }
