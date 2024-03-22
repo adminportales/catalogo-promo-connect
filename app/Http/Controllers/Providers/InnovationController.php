@@ -218,31 +218,34 @@ class InnovationController extends Controller
                 }
             }
 
-            $allProducts = Product::where('provider_id', 3)->get(['id', 'sku']);
+            $allProducts = Product::where('provider_id', 3)->get();
             foreach ($allProducts as $key => $value) {
-                foreach ($dataSkus as $product) {
-                    if ($value->sku == $product->sku) {
+                foreach ($dataSkus as $dataSku) {
+                    if ($value['sku'] == $dataSku['sku']) {
                         unset($allProducts[$key]);
                         break;
                     }
                 }
             }
-            $products = Product::where('provider_id', null)->get();
+
+            $products = Product::where('provider_id', 1983)->get();
             foreach ($products as $key => $value) {
                 $found = false;
                 foreach ($dataSkus as $product) {
-                    if ($value->sku == $product->sku) {
+                    if ($value['sku'] == $product['sku']) {
                         $found = true;
                         break;
                     }
                 }
                 if ($found) {
-                    $value->provider_id = 3;
-                    $value->visible = 1;
+                    $value['provider_id'] = 3;
+                    $value['visible'] = 1;
+                    $value->save();
                 } else {
-                    $value->visible = 0;
+                    $value['provider_id'] = 1983;
+                    $value['visible'] = 0;
+                    $value->save();
                 }
-                $value->save();
             }
             /*      foreach ($allProducts as  $value) {
                 $value->visible = 1;
