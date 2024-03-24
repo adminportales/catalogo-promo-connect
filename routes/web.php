@@ -96,6 +96,7 @@ Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDobleve
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
+Route::get('/cleanProductsStockSur', [StockSurController::class, 'cleanProductsStockSur']);
 
 // G4
 Route::get('/getProductsG4PL', [G4Controller::class, 'getProductsPL']);
