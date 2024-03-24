@@ -79,6 +79,7 @@ Route::get('/getStockInnova', [InnovationController::class, 'getStockInnova']);
 Route::get('/getAllProductsPromoOption', [PromoOpcionController::class, 'getAllProductsPromoOption']);
 Route::get('/getPricePromoOpcion', [PromoOpcionController::class, 'getPricePromoOpcion']);
 Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromoOpcion']);
+Route::get('/cleanStockPromoOpcion', [PromoOpcionController::class, 'cleanStockPromoOpcion']);
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);

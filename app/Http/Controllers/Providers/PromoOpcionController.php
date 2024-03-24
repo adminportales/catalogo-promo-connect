@@ -212,9 +212,6 @@ class PromoOpcionController extends Controller
             }
         }
 
-        // Obtener los productos que estan en la base de datos y no en el proveedor
-        $allProducts = Product::where('provider_id', 2)->get(['id', 'sku']);
-
         $dataSkus = [];
         foreach ($result['response'] as $value) {
             foreach ($value['hijos'] as $hijo) {
@@ -226,40 +223,25 @@ class PromoOpcionController extends Controller
             }
         }
 
-        // Buscar los productos que no estan en el proveedor
-        $allProducts = Product::where('provider_id', 1983)->get(['id', 'sku_parent']);
-        foreach ($allProducts as $key => $value) {
-            $found = false;
-            foreach ($dataSkus as $skuProvider) {
-                if ($value->sku == $skuProvider['sku']) {
-                    $found = true;
-                    break;
-                }
-            }
-            if ($found) {
-                $value->provider_id = 2;
-                $value->visible = 1;
-                $value->save();
-            } else {
-                $value->visible = 0;
-                $value->save();
-            }
+        $duplicateProducts = Product::where('provider_id', 2)
+            ->select('sku_parent')
+            ->groupBy('sku_parent')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('sku_parent')
+            ->toArray();
 
-        }
-        //buscar productos que estan en el provedor pero ya no estan disponibles y ponerle 0
-        $newProducts = Product::where('provider_id', 2)->get(['id', 'sku_parent']);
-        foreach ($newProducts as $key => $value) {
+        // Obtener todos los productos duplicados del proveedor 2 excepto el primero
+        $productsToUpdate = Product::whereIn('sku_parent', $duplicateProducts)
+            ->where('provider_id', 2) // Asegurar que sean del proveedor 2
+            ->orderBy('id') // Ordenar por ID para obtener el primero de cada grupo duplicado
+            ->get();
 
-            foreach ($dataSkus as $skuProvider) {
-                if ($value->sku_parent == $skuProvider['sku']) {
-                    $value->provider_id = 2;
-                    $value->visible = 1;
-                    $value->save();
-                    break;
-                } else {
-                    $value->visible = 0;
-                    $value->save();
-                }
+        // Actualizar los productos duplicados excepto el primero
+        foreach ($productsToUpdate as $key => $product) {
+            if ($key !== 0) { // Excluir el primer producto de cada grupo duplicado
+                $product->provider_id = 1983; // Cambiar el proveedor
+                $product->visible = 0; // Establecer visible a 0
+                $product->save();
             }
         }
 
@@ -338,5 +320,76 @@ class PromoOpcionController extends Controller
         ]);
 
         return $errors;
+    }
+
+    public function cleanStockPromoOpcion() {
+        $user = "DFE4516";
+        $passowrd = "5MrZtuzmiiuwSswLuONi";
+        $postFields = [
+            'user' => $user,
+            'password' => $passowrd,
+        ];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields); //Opcional
+        curl_setopt(
+            $ch,
+            CURLOPT_URL,
+            "https://promocionalesenlinea.net/api/all-products"
+        );
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $result = json_decode($result, true);
+        if (!isset($result['success'])) {
+            return $result;
+        }
+        if (!$result['success'] == true) {
+            return $result;
+        }
+
+        if (!isset($result['response'])) {
+            return $result;
+        }
+
+        $dataSkus = [];
+        foreach ($result['response'] as $value) {
+            foreach ($value['hijos'] as $hijo) {
+                if ($hijo['estatus'] == 0 || $hijo['estatus'] == '') {
+                    // Romper aqui y continuar con el siguiente ciclo del foreach
+                    continue;
+                }
+                array_push($dataSkus, ["sku" => $hijo['skuHijo']]);
+            }
+        }
+
+        $duplicateProducts = Product::where('provider_id', 2)
+            ->select('sku_parent')
+            ->groupBy('sku_parent')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('sku_parent')
+            ->toArray();
+
+        // Obtener todos los productos duplicados del proveedor 2 excepto el primero
+        $productsToUpdate = Product::whereIn('sku_parent', $duplicateProducts)
+            ->where('provider_id', 2) // Asegurar que sean del proveedor 2
+            ->orderBy('id') // Ordenar por ID para obtener el primero de cada grupo duplicado
+            ->get();
+
+        // Actualizar los productos duplicados excepto el primero
+        foreach ($productsToUpdate as $key => $product) {
+            if ($key !== 0) { // Excluir el primer producto de cada grupo duplicado
+                $product->provider_id = 1983; // Cambiar el proveedor
+                $product->visible = 0; // Establecer visible a 0
+                $product->save();
+            }
+        }
+
+        DB::table('images')->where('image_url', '=', null)->delete();
+
+        return $result;
+    
     }
 }
