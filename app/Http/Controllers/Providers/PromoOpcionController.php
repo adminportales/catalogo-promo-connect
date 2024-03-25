@@ -352,18 +352,39 @@ class PromoOpcionController extends Controller
         if (!isset($result['response'])) {
             return $result;
         }
-
-        $dataSkus = [];
-        foreach ($result['response'] as $value) {
-            foreach ($value['hijos'] as $hijo) {
-                if ($hijo['estatus'] == 0 || $hijo['estatus'] == '') {
-                    // Romper aqui y continuar con el siguiente ciclo del foreach
-                    continue;
-                }
-                array_push($dataSkus, ["sku" => $hijo['skuHijo']]);
-            }
+        $productsWs =  $result['response'];
+        $maxSKU = Product::max('internal_sku');
+        $idSku = null;
+        if (!$maxSKU) {
+            $idSku = 1;
+        } else {
+            $idSku = (int) explode('-', $maxSKU)[1];
+            $idSku++;
         }
 
+        return $productsWs;
+
+        //Todos los productos de la base de datos
+        $allProducts = Product::where('provider_id',2)->get();
+
+        foreach ($allProducts as $dbproduct){
+
+            foreach ($productsWs as $product) {
+
+                foreach ($product['hijos'] as $productHijo) {
+                   
+                    if($productHijo['skuHijo'] != $dbproduct->sku){
+                        $product->provider_id = 1983;
+                        $product->visible = 0; 
+                    }else{
+                        $product->visible = 1; 
+                    }
+                    $product->save();
+                }
+            }
+        }
+        
+        //Funcion para productos repetidos
         $duplicateProducts = Product::where('provider_id', 2)
             ->select('sku_parent')
             ->groupBy('sku_parent')
@@ -380,7 +401,7 @@ class PromoOpcionController extends Controller
         // Actualizar los productos duplicados excepto el primero
         foreach ($productsToUpdate as $key => $product) {
             if ($key !== 0) { // Excluir el primer producto de cada grupo duplicado
-                $product->provider_id = 1983; // Cambiar el proveedor
+                $product->provider_id = 2; // Cambiar el proveedor
                 $product->visible = 0; // Establecer visible a 0
                 $product->save();
             }
