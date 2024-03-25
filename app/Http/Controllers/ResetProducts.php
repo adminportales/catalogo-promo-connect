@@ -8,13 +8,13 @@ use Illuminate\Http\Request;
 class ResetProducts extends Controller
 {
     public function resetProducts() {
-        $allProducts = Product::where('provider_id', 1983)->get();
+        $allProducts = Product::where('provider_id', 1983)->take(10000)->get();
 
         foreach($allProducts as $product){
-            $findProvider = Product::where('sku', $product->sku)->whereNot('provider_id', 1983)->first();
+            $findProvider = Product::where('sku', $product->sku)->where('provider_id', '<>', 1983)->first();
 
             if(!$findProvider ){
-                $findProvider = Product::where('sku_parent', $product->sku_parent)->whereNot('provider_id', 1983)->first();
+                $findProvider = Product::where('sku_parent', $product->sku_parent)->where('provider_id', '<>', 1983)->first();
             }
 
             if($findProvider){
