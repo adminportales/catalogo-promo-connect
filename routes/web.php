@@ -74,14 +74,19 @@ Route::middleware(['auth'])->group(function () {
 // Innova
 Route::get('/getAllProductsInnova', [InnovationController::class, 'getAllProductsInnova']);
 Route::get('/getStockInnova', [InnovationController::class, 'getStockInnova']);
+Route::get('/cleanAllProductsInnova', [InnovationController::class, 'cleanAllProductsInnova']);
+
 
 // PromoOpcion
 Route::get('/getAllProductsPromoOption', [PromoOpcionController::class, 'getAllProductsPromoOption']);
 Route::get('/getPricePromoOpcion', [PromoOpcionController::class, 'getPricePromoOpcion']);
 Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromoOpcion']);
+Route::get('/cleanStockPromoOpcion', [PromoOpcionController::class, 'cleanStockPromoOpcion']);
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
+Route::get('/cleanAllProductsForPromotional', [ForPromotionalController::class, 'cleanAllProductsForPromotional']);
+
 // Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
 
 //DKSP
@@ -96,6 +101,7 @@ Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDobleve
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
+Route::get('/cleanProductsStockSur', [StockSurController::class, 'cleanProductsStockSur']);
 
 // G4
 Route::get('/getProductsG4PL', [G4Controller::class, 'getProductsPL']);
