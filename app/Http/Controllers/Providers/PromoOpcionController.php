@@ -361,9 +361,7 @@ class PromoOpcionController extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-
-        return $productsWs;
-
+        
         //Todos los productos de la base de datos
         $allProducts = Product::where('provider_id',2)->get();
 
