@@ -361,7 +361,7 @@ class PromoOpcionController extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-        
+
         //Todos los productos de la base de datos
         $allProducts = Product::where('provider_id',2)->get();
 
@@ -372,12 +372,12 @@ class PromoOpcionController extends Controller
                 foreach ($product['hijos'] as $productHijo) {
                    
                     if($productHijo['skuHijo'] != $dbproduct->sku){
-                        $product->provider_id = 1983;
-                        $product->visible = 0; 
+                        $dbproduct->provider_id = 1983;
+                        $dbproduct->visible = 0; 
                     }else{
-                        $product->visible = 1; 
+                        $dbproduct->visible = 1; 
                     }
-                    $product->save();
+                    $dbproduct->save();
                 }
             }
         }
