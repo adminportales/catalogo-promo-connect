@@ -56,7 +56,7 @@ class InnovationController extends Controller
                 $idSku++;
             }
             $dataSkus = [];
-            
+           
             foreach ($responseData as $product) {
 
                 foreach ($product->colores as $colorWS) {
@@ -172,7 +172,7 @@ class InnovationController extends Controller
                     if ($data['image'] != null) {
                         array_unshift($imagenes, ['image_url' => $imagenColor]);
                     }
-                    $productExist = Product::where('sku', $colorWS->clave)->whwere('provider_id', 3)->where('visible',1)->first();
+                    $productExist = Product::where('sku', $colorWS->clave)->where('provider_id', 3)->where('visible',1)->first();
                     if (!$productExist) {
                         $newProduct = Product::create($data);
                         $newProduct->productCategories()->create([
@@ -354,34 +354,36 @@ class InnovationController extends Controller
             // Crear un arreglo para almacenar los SKU de los productos y contarlos
             $skuCounts = [];
             
-            // Identificar productos repetidos y contarlos por SKU
-            foreach ($allProducts as $product) {
-                if (!isset($skuCounts[$product->sku])) {
-                    $skuCounts[$product->sku] = 1;
-                } else {
-                    $skuCounts[$product->sku]++;
-                }
+
+            // Obtener los SKU de los productos repetidos 3
+            $repeatedSkus = DB::select("
+            SELECT sku
+            FROM products
+            WHERE provider_id = 3 
+            GROUP BY sku
+            HAVING COUNT(*) > 1
+            ");
+
+            foreach ($repeatedSkus as $repeatedSku) {
+            $sku = $repeatedSku->sku;
+
+            // Obtener el primer producto de cada SKU repetido para el proveedor ID 3
+            $firstProductId = DB::selectOne("
+                SELECT MIN(id) AS first_id
+                FROM products
+                WHERE sku = ? AND provider_id = 3 AND visible = 1
+            ", [$sku])->first_id;
+
+            // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
+            DB::table('products')
+                ->where('sku', $sku)
+                ->where('provider_id', 3)
+                ->where('visible', 1)
+                ->where('id', '<>', $firstProductId)
+                ->update(['visible' => 0]);
             }
-            
-            // Identificar el SKU del producto original en caso de existir duplicados
-            $duplicateOriginalSkus = [];
-            foreach ($skuCounts as $sku => $count) {
-                if ($count > 1) {
-                    $duplicateOriginalSkus[] = $sku;
-                }
-            }
-            
-            // Cambiar a no visible los productos duplicados excepto el original
-            foreach ($allProducts as $product) {
-                if (in_array($product->sku, $duplicateOriginalSkus)) {
-                    // Mantener el producto original
-                    $duplicateOriginalSkus = array_diff($duplicateOriginalSkus, [$product->sku]);
-                } else {
-                    // Cambiar a no visible los productos duplicados excepto el original
-                    $product->visible = 0;
-                    $product->save();
-                }
-            }
+
+            DB::commit();
 
         } catch (Exception $e) {
             FailedJobsCron::create([
