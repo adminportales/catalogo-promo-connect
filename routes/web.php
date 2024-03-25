@@ -85,6 +85,8 @@ Route::get('/cleanStockPromoOpcion', [PromoOpcionController::class, 'cleanStockP
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
+Route::get('/cleanAllProductsForPromotional', [ForPromotionalController::class, 'cleanAllProductsForPromotional']);
+
 // Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
 
 //DKSP
