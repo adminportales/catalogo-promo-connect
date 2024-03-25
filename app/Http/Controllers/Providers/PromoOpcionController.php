@@ -140,7 +140,7 @@ class PromoOpcionController extends Controller
                 $data['name'] = $productHijo['nombreHijo'];
                 $data['sku'] = $productHijo['skuHijo'];
                 $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
-                $productExist = Product::where('sku', $productHijo['skuHijo'])->first();
+                $productExist = Product::where('sku', $productHijo['skuHijo'])->where('provider_id', 2)->first();
                 if (!$productExist) {
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         // Romper aqui y continuar con el siguiente ciclo del foreach
@@ -197,7 +197,6 @@ class PromoOpcionController extends Controller
                         );
                     }
 
-
                     $productExist->price = $productHijo['precio'];
                     $productExist->visible = 1;
                     $productExist->save();
@@ -239,7 +238,7 @@ class PromoOpcionController extends Controller
         // Actualizar los productos duplicados excepto el primero
         foreach ($productsToUpdate as $key => $product) {
             if ($key !== 0) { // Excluir el primer producto de cada grupo duplicado
-                $product->provider_id = 1983; // Cambiar el proveedor
+                $product->provider_id = 2; // Cambiar el proveedor
                 $product->visible = 0; // Establecer visible a 0
                 $product->save();
             }
