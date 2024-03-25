@@ -17,6 +17,7 @@ use App\Http\Controllers\Providers\InnovationController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
 use App\Http\Controllers\Providers\StockSurController;
+use App\Http\Controllers\ResetProducts;
 use App\Http\Controllers\SendProductsToEcommerce;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -119,3 +120,6 @@ Route::get('/getAllProductsEuroCotton', [EuroCottonController::class, 'getAllPro
 
 // Helpers
 Route::get('/changeProviderToInternalProducts', [HelperController::class, 'changeProviderToInternalProducts'])->name('companies');
+
+
+Route::get('/resetProducts', [ResetProducts::class, 'resetProducts']);
