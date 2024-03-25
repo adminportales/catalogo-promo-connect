@@ -366,44 +366,56 @@ class PromoOpcionController extends Controller
         $allProducts = Product::where('provider_id',2)->get();
 
         foreach ($allProducts as $dbproduct){
-
+            $found = false; // Variable para indicar si se encuentra el producto en los hijos
+        
             foreach ($productsWs as $product) {
-
                 foreach ($product['hijos'] as $productHijo) {
-                   
-                    if($productHijo['skuHijo'] != $dbproduct->sku){
-                        $dbproduct->provider_id = 1983;
-                        $dbproduct->visible = 0; 
-                    }else{
-                        $dbproduct->visible = 1; 
+                    if($productHijo['skuHijo'] == $dbproduct->sku){
+                        $found = true; // Se encontró el producto en los hijos
+                        break 2; // Salir de ambos bucles foreach
                     }
-                    $dbproduct->save();
                 }
             }
+        
+            if($found){
+                $dbproduct->visible = 1; // Si se encontró, marcar como visible
+            }else{
+                $dbproduct->provider_id = 1983;
+                $dbproduct->visible = 0; // Si no se encontró, marcar como no visible
+            }
+            
+            $dbproduct->save();
         }
         
-        //Funcion para productos repetidos
-        $duplicateProducts = Product::where('provider_id', 2)
-            ->select('sku_parent')
-            ->groupBy('sku_parent')
-            ->havingRaw('COUNT(*) > 1')
-            ->pluck('sku_parent')
-            ->toArray();
+        // Obtener los SKU de los productos repetidos para el proveedor ID 2
+        $repeatedSkus = DB::select("
+        SELECT sku
+        FROM products
+        WHERE provider_id = 2 
+        GROUP BY sku
+        HAVING COUNT(*) > 1
+        ");
 
-        // Obtener todos los productos duplicados del proveedor 2 excepto el primero
-        $productsToUpdate = Product::whereIn('sku_parent', $duplicateProducts)
-            ->where('provider_id', 2) // Asegurar que sean del proveedor 2
-            ->orderBy('id') // Ordenar por ID para obtener el primero de cada grupo duplicado
-            ->get();
+        foreach ($repeatedSkus as $repeatedSku) {
+        $sku = $repeatedSku->sku;
 
-        // Actualizar los productos duplicados excepto el primero
-        foreach ($productsToUpdate as $key => $product) {
-            if ($key !== 0) { // Excluir el primer producto de cada grupo duplicado
-                $product->provider_id = 2; // Cambiar el proveedor
-                $product->visible = 0; // Establecer visible a 0
-                $product->save();
-            }
+        // Obtener el primer producto de cada SKU repetido para el proveedor ID 2
+        $firstProductId = DB::selectOne("
+            SELECT MIN(id) AS first_id
+            FROM products
+            WHERE sku = ? AND provider_id = 2 AND visible = 1
+        ", [$sku])->first_id;
+
+        // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
+        DB::table('products')
+            ->where('sku', $sku)
+            ->where('provider_id', 2)
+            ->where('visible', 1)
+            ->where('id', '<>', $firstProductId)
+            ->update(['visible' => 0]);
         }
+
+        DB::commit();
 
         DB::table('images')->where('image_url', '=', null)->delete();
 
