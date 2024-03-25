@@ -74,6 +74,8 @@ Route::middleware(['auth'])->group(function () {
 // Innova
 Route::get('/getAllProductsInnova', [InnovationController::class, 'getAllProductsInnova']);
 Route::get('/getStockInnova', [InnovationController::class, 'getStockInnova']);
+Route::get('/cleanAllProductsInnova', [InnovationController::class, 'cleanAllProductsInnova']);
+
 
 // PromoOpcion
 Route::get('/getAllProductsPromoOption', [PromoOpcionController::class, 'getAllProductsPromoOption']);
