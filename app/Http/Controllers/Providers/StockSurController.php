@@ -83,7 +83,7 @@ class StockSurController extends Controller
             }
     
             // Obtener todos los productos existentes con las SKU de las variantes de este producto
-            $existingProducts = Product::whereIn('sku', $variantSKUs)->where('visible', 1)->get()->keyBy('sku');
+            $existingProducts = Product::whereIn('sku', $variantSKUs)->where('visible', 1)->where('provider_id', 6)->get()->keyBy('sku');
     
             foreach ($product->variants as $variant) {
                 $slug = mb_strtolower(str_replace(' ', '-', $variant->color));
@@ -94,6 +94,7 @@ class StockSurController extends Controller
                     // Actualizar los detalles del producto existente
                     $existingProduct->stock = $variant->stock_existent;
                     $existingProduct->price = $variant->net_price;
+                    $existingProduct->visible = 1; 
                     $existingProduct->save();
                     $existingProduct->images()->delete();
                     $existingProduct->images()->create([
