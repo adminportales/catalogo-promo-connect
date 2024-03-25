@@ -55,7 +55,14 @@ class InnovationController extends Controller
                 $idSku = (int) explode('-', $maxSKU)[1];
                 $idSku++;
             }
+            $dataSkus = [];
+           
             foreach ($responseData as $product) {
+
+                foreach ($product->colores as $colorWS) {
+                    array_push($dataSkus, ["sku" => $colorWS->clave]);
+                }
+
                 $categoria = null;
                 if (count($product->categorias->categorias) > 0) {
                     $slug = mb_strtolower(str_replace(' ', '-', $product->categorias->categorias[0]->codigo));
@@ -165,7 +172,7 @@ class InnovationController extends Controller
                     if ($data['image'] != null) {
                         array_unshift($imagenes, ['image_url' => $imagenColor]);
                     }
-                    $productExist = Product::where('sku', $colorWS->clave)->first();
+                    $productExist = Product::where('sku', $colorWS->clave)->where('provider_id', 3)->where('visible',1)->first();
                     if (!$productExist) {
                         $newProduct = Product::create($data);
                         $newProduct->productCategories()->create([
@@ -209,48 +216,7 @@ class InnovationController extends Controller
                         }
                     }
                 }
-            }
-
-            $dataSkus = [];
-            foreach ($responseData as $value) {
-                foreach ($value->colores as $colorWS) {
-                    array_push($dataSkus, ["sku" => $colorWS->clave]);
-                }
-            }
-
-            $allProducts = Product::where('provider_id', 3)->get();
-            foreach ($allProducts as $key => $value) {
-                foreach ($dataSkus as $dataSku) {
-                    if ($value['sku'] == $dataSku['sku']) {
-                        unset($allProducts[$key]);
-                        break;
-                    }
-                }
-            }
-
-            $products = Product::where('provider_id', 1983)->get();
-            foreach ($products as $key => $value) {
-                $found = false;
-                foreach ($dataSkus as $product) {
-                    if ($value['sku'] == $product['sku']) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if ($found) {
-                    $value['provider_id'] = 3;
-                    $value['visible'] = 1;
-                    $value->save();
-                } else {
-                    $value['provider_id'] = 1983;
-                    $value['visible'] = 0;
-                    $value->save();
-                }
-            }
-            /*      foreach ($allProducts as  $value) {
-                $value->visible = 1;
-                $value->save();
-            } */
+            } 
 
             DB::table('images')->where('image_url', '=', null)->delete();
             return $responseData;
@@ -315,5 +281,118 @@ class InnovationController extends Controller
             'status' => 0,
             'type' =>   1
         ]);
+    }
+
+    public function cleanAllProductsInnova() {
+
+        try {
+            $responseData = [];
+            $user_api = "frjrEhY602674c12ce2dm586";
+            $api_key = "OM5rkL-820602674c12ce3b6GNoUjiOvnZF8x";
+            $wsdl = "https://ws.innovation.com.mx/index.php?wsdl";
+            $client = new \nusoap_client($wsdl, 'wsdl');
+            $err = $client->getError();
+            if ($err) { //MOSTRAR ERRORES
+                echo '<h2>Constructor error</h2>' . $err;
+                FailedJobsCron::create([
+                    'name' => 'Innovation',
+                    'message' => $err,
+                    'status' => 0,
+                    'type' =>   1
+                ]);
+                exit();
+            }
+            $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON'); //PARAMETROS
+            $response = $client->call('Pages', $params); //MÉTODO PARA OBTENER EL NÚMERO DE PÁGINAS ACTIVAS
+            $response = json_decode($response, true);
+            if ($response['response'] === true) {
+                for ($i = 1; $i <= $response['pages']; $i++) {
+                    $params = array('user_api' => $user_api, 'api_key' => $api_key, 'format' => 'JSON', 'page' => $i); //PARAMETROS
+                    $responseProducts = json_decode($client->call('Products', $params));
+                    foreach ($responseProducts->data as $product) {
+                        array_push($responseData, $product);
+                    }
+                }
+            } else {
+                return $response;
+            }
+            $maxSKU = Product::max('internal_sku');
+            $idSku = null;
+            if (!$maxSKU) {
+                $idSku = 1;
+            } else {
+                $idSku = (int) explode('-', $maxSKU)[1];
+                $idSku++;
+            }
+
+
+            // Obtener todos los productos almacenados en la base de datos del proveedor 3
+            $allProducts = Product::where('provider_id', 3)->get();
+            
+            // Arreglo para almacenar los SKU de los productos recibidos del proveedor
+            $dataSkus = [];
+            
+            // Recopilar los SKU de los productos recibidos del proveedor
+            foreach ($responseData as $product) {
+                foreach ($product->colores as $colorWS) {
+                    $dataSkus[] = $colorWS->clave;
+                }
+            }
+            
+            // Identificar productos en la base de datos que no coinciden con los productos recibidos
+            $productsNotInData = $allProducts->reject(function ($product) use ($dataSkus) {
+                return in_array($product->sku, $dataSkus);
+            });
+            
+            // Mover los productos no coincidentes al proveedor 1983 y establecerlos como no visibles
+            foreach ($productsNotInData as $product) {
+                $product->provider_id = 1983;
+                $product->visible = 1; // Cambiar a 1 para hacerlos visibles
+                $product->save();
+            }
+            
+            // Crear un arreglo para almacenar los SKU de los productos y contarlos
+            $skuCounts = [];
+            
+
+            // Obtener los SKU de los productos repetidos 3
+            $repeatedSkus = DB::select("
+            SELECT sku
+            FROM products
+            WHERE provider_id = 3 
+            GROUP BY sku
+            HAVING COUNT(*) > 1
+            ");
+
+            foreach ($repeatedSkus as $repeatedSku) {
+            $sku = $repeatedSku->sku;
+
+            // Obtener el primer producto de cada SKU repetido para el proveedor ID 3
+            $firstProductId = DB::selectOne("
+                SELECT MIN(id) AS first_id
+                FROM products
+                WHERE sku = ? AND provider_id = 3 AND visible = 1
+            ", [$sku])->first_id;
+
+            // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
+            DB::table('products')
+                ->where('sku', $sku)
+                ->where('provider_id', 3)
+                ->where('visible', 1)
+                ->where('id', '<>', $firstProductId)
+                ->update(['visible' => 0]);
+            }
+
+            DB::commit();
+
+        } catch (Exception $e) {
+            FailedJobsCron::create([
+                'name' => 'Innovation',
+                'message' => $e->getMessage(),
+                'status' => 0,
+                'type' =>   1
+            ]);
+            return [$e->getMessage(), $e];
+        }
     }
 }

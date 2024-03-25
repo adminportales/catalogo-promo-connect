@@ -37,6 +37,9 @@ class DobleVelaController extends Controller
                 $products =  json_decode(utf8_encode($resultado['GetExistenciaAllResult']))->Resultado;
             }
         }
+
+        $productKeys = [];
+     
         if (count($products) > 0) {
             // Comenzar a registrar los productos
             $maxSKU = Product::max('internal_sku');
@@ -48,6 +51,9 @@ class DobleVelaController extends Controller
                 $idSku++;
             }
             foreach ($products as $product) {
+
+                $productKeys[] = $product->CLAVE;
+
                 // Verificar si el color existe y si no registrarla
                 $color = null;
                 $slug = substr(mb_strtolower(str_replace(' ', '-', $product->COLOR)), 5);
@@ -186,38 +192,25 @@ class DobleVelaController extends Controller
                     }
                 }
             }
-            $allProducts = Product::where('provider_id', 5)->where('visible', 1)->get();
-            foreach ($allProducts as $key => $value) {
-                foreach ($products as $product) {
-                    if ($value->sku == trim($product->CLAVE)) {
-                        unset($allProducts[$key]);
-                        break;
-                    }
+            
+            $allProducts = Product::where('provider_id', 1983)->get();
+            //Aqui primero busca productos que pudieran estar dentro del proveedor 1983 para ver si coinciden dentro del API de doble vela
+            foreach ($allProducts as $product) {
+                if (in_array(trim($product->sku), $productKeys)) {
+                    $product->provider_id = 2;
+                    $product->visible = 1;
+                } else {
+                    $product->visible = 0;
                 }
+                $product->save();
             }
 
-            $allProducts = Product::where('provider_id', 1983)->get();
-            foreach ($allProducts as $key => $value) {
-                $found = false;
-                foreach ($products as $product) {
-                    if ($value->sku == trim($product->CLAVE)) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if ($found) {
-                    $value->provider_id = 2;
-                    $value->visible = 1;
-                    $value->save();
-                } else {
-                    $value->visible = 0;
-                    $value->save();
-                }
-            }
-            /*  foreach ($allProducts as  $value) {
-                $value->visible = 1;
-                $value->save();
-            } */
+            //Aqui todos los productos de doble vela que no coincidan con el api, se mandan  al proveedor 1983
+            Product::where('provider_id', 5)
+            ->where('visible', 1)
+            ->whereNotIn('sku', $productKeys)
+            ->update(['provider_id' => 1983, 'visible' => 0]);
+
         }
         DB::table('images')->where('image_url', '=', null)->delete();
         return $products;
