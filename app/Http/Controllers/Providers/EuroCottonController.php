@@ -218,7 +218,7 @@ class EuroCottonController extends Controller
                     }
                 }
             }
-            $allProducts = Product::where('provider_id', null)->get();
+            $allProducts = Product::where('provider_id', 1983)->get();
             foreach ($allProducts as $value) {
                 $found = false;
                 foreach ($products as $product) {
