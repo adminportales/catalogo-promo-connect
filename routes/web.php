@@ -99,6 +99,8 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
 Route::get('/getProductProductosDoblevela/{sku}', [DobleVelaController::class, 'getProductProductosDoblevela']);
 Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
+Route::get('/cleanProductProductosDoblevela', [DobleVelaController::class, 'cleanProductProductosDoblevela']);
+
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);

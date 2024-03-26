@@ -11,6 +11,8 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use SebastianBergmann\Type\NullType;
 
+use function PHPUnit\Framework\returnSelf;
+
 class DobleVelaController extends Controller
 {
     public function getAllProductosDoblevela()
@@ -192,24 +194,6 @@ class DobleVelaController extends Controller
                     }
                 }
             }
-            
-            $allProducts = Product::where('provider_id', 1983)->get();
-            //Aqui primero busca productos que pudieran estar dentro del proveedor 1983 para ver si coinciden dentro del API de doble vela
-            foreach ($allProducts as $product) {
-                if (in_array(trim($product->sku), $productKeys)) {
-                    $product->provider_id = 2;
-                    $product->visible = 1;
-                } else {
-                    $product->visible = 0;
-                }
-                $product->save();
-            }
-
-            //Aqui todos los productos de doble vela que no coincidan con el api, se mandan  al proveedor 1983
-            Product::where('provider_id', 5)
-            ->where('visible', 1)
-            ->whereNotIn('sku', $productKeys)
-            ->update(['provider_id' => 1983, 'visible' => 0]);
 
         }
         DB::table('images')->where('image_url', '=', null)->delete();
@@ -282,7 +266,7 @@ class DobleVelaController extends Controller
         //hacemos el llamado del metodo
 
     }
-    public function getProductProductosDoblevela($sku)
+    public function cleanProductProductosDoblevela()
     {
         $cliente = new \nusoap_client('http://srv-datos.dyndns.info/doblevela/service.asmx?wsdl', 'wsdl');
         $error = $cliente->getError();
@@ -290,16 +274,76 @@ class DobleVelaController extends Controller
             echo 'Error' . $error;
         }
         //agregamos los parametros, en este caso solo es la llave de acceso
-        $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==', 'codigo' => $sku);
+        $parametros = array('Key' => 't5jRODOUUIoytCPPk2Nd6Q==');
         //hacemos el llamado del metodo
-        $resultado = $cliente->call('GetExistencia', $parametros);
-        $msg = '';
-        if (array_key_exists('GetExistenciaResult', $resultado)) {
-            $informacionExistencias = json_decode(utf8_encode($resultado['GetExistenciaResult']))->Resultado;
-            return $informacionExistencias;
+        $resultado = $cliente->call('GetExistenciaAll', $parametros);
+        if ($error) {
+            echo 'Fallo';
+            return 0;
         } else {
-            $msg = "No se obtuvo informacion acerca del Stock de este producto. Es posible que los datos sean incorrectos";
+            $error = $cliente->getError();
+            if ($error) {
+                echo 'Error' . $error;
+                return 0;
+            } else {
+                // imprimimos el resultado
+                $products =  json_decode(utf8_encode($resultado['GetExistenciaAllResult']))->Resultado;
+            }
         }
-        return $msg;
+
+        if (count($products) > 0) {
+
+            $DBproducts = Product::where('provider_id',5)->get();
+
+            foreach ($DBproducts as $DBproduct) {
+                $found = false; // Variable para indicar si se encuentra el producto
+
+                foreach ($products as $product) {
+                    if ($product->CLAVE == $DBproduct->sku) {
+                        $found = true; // Se encontró el producto
+                        break; // Salir del bucle
+                    }
+                }
+
+                if ($found) {
+                    // Si se encontró, no es necesario hacer nada, seguirá visible
+                } else {
+                    $DBproduct->provider_id = 1983;
+                    $DBproduct->visible = 0; // Si no se encontró, marcar como no visible y cambiar el proveedor
+                    $DBproduct->save(); // Guardar los cambios en la base de datos
+                }
+            }
+
+            // Obtener los SKU de los productos repetidos para el proveedor ID 2
+            $repeatedSkus = DB::select("
+            SELECT sku
+            FROM products
+            WHERE provider_id = 5 
+            GROUP BY sku
+            HAVING COUNT(*) > 1
+            ");
+
+            foreach ($repeatedSkus as $repeatedSku) {
+                $sku = $repeatedSku->sku;
+
+                // Obtener el primer producto de cada SKU repetido para el proveedor ID 2
+                $firstProductId = DB::selectOne("
+                    SELECT MIN(id) AS first_id
+                    FROM products
+                    WHERE sku = ? AND provider_id = 5 AND visible = 1
+                ", [$sku])->first_id;
+
+                // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
+                DB::table('products')
+                    ->where('sku', $sku)
+                    ->where('provider_id', 5)
+                    ->where('visible', 1)
+                    ->where('id', '<>', $firstProductId)
+                    ->update(['visible' => 0]);
+            }
+
+            DB::commit();
+
+        }
     }
 }
