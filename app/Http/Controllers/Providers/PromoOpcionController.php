@@ -211,39 +211,6 @@ class PromoOpcionController extends Controller
             }
         }
 
-        $dataSkus = [];
-        foreach ($result['response'] as $value) {
-            foreach ($value['hijos'] as $hijo) {
-                if ($hijo['estatus'] == 0 || $hijo['estatus'] == '') {
-                    // Romper aqui y continuar con el siguiente ciclo del foreach
-                    continue;
-                }
-                array_push($dataSkus, ["sku" => $hijo['skuHijo']]);
-            }
-        }
-
-        $duplicateProducts = Product::where('provider_id', 2)
-            ->select('sku_parent')
-            ->groupBy('sku_parent')
-            ->havingRaw('COUNT(*) > 1')
-            ->pluck('sku_parent')
-            ->toArray();
-
-        // Obtener todos los productos duplicados del proveedor 2 excepto el primero
-        $productsToUpdate = Product::whereIn('sku_parent', $duplicateProducts)
-            ->where('provider_id', 2) // Asegurar que sean del proveedor 2
-            ->orderBy('id') // Ordenar por ID para obtener el primero de cada grupo duplicado
-            ->get();
-
-        // Actualizar los productos duplicados excepto el primero
-        foreach ($productsToUpdate as $key => $product) {
-            if ($key !== 0) { // Excluir el primer producto de cada grupo duplicado
-                $product->provider_id = 2; // Cambiar el proveedor
-                $product->visible = 0; // Establecer visible a 0
-                $product->save();
-            }
-        }
-
         DB::table('images')->where('image_url', '=', null)->delete();
 
         return $result;
