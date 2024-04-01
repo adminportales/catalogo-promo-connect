@@ -16,6 +16,7 @@ class StockSurController extends Controller
         
         try {
             $result = $this->fetchStockSurProducts();
+
             if ($result === null) {
                 FailedJobsCron::create([
                     'name' => 'For Promotional',
@@ -72,25 +73,31 @@ class StockSurController extends Controller
     }
 
     private function processStockSurProducts($result, &$idSku){
+
         foreach ($result as $product) {
+            
             $dataArregloProductos = [];
     
             // Obtener todas las SKU de las variantes de este producto
             $variantSKUs = [];
             foreach ($product->variants as $variant) {
                 $slugNew = mb_strtolower(str_replace(' ', '-', $variant->color));
-                $variantSKUs[] = $product->code . '_' . $slugNew;
+                /* $variantSKUs[] = $product->code . '_' . $slugNew; */
+                array_push($variantSKUs,  $product->code . '_' . $slugNew);
+        
             }
     
             // Obtener todos los productos existentes con las SKU de las variantes de este producto
-            $existingProducts = Product::whereIn('sku', $variantSKUs)->where('visible', 1)->where('provider_id', 6)->get()->keyBy('sku');
-    
+/*             $existingProductsAll = Product::whereIn('sku', $variantSKUs)->where('provider_id', 6)->get()->keyBy('sku');
+ */        
             foreach ($product->variants as $variant) {
                 $slug = mb_strtolower(str_replace(' ', '-', $variant->color));
                 $productKey = $product->code . '_' . $slug;
-    
+                
+                $existingProduct = Product::where('sku', $productKey)->first();
+ 
                 // Verificar si el producto ya existe
-                if ($existingProduct = $existingProducts->get($productKey)) {
+                if ($existingProduct) {
                     // Actualizar los detalles del producto existente
                     $existingProduct->stock = $variant->stock_existent;
                     $existingProduct->price = $variant->net_price;
@@ -152,15 +159,39 @@ class StockSurController extends Controller
         }
     
         // Obtener todos los productos existentes
-        $allProducts = Product::where('provider_id', 6)->where('visible',0)->get();
+
+            $repeatedProducts = DB::select("
+                SELECT id, sku, color_id
+                FROM products
+                WHERE provider_id = 6 AND visible = 1 AND sku IN (
+                    SELECT sku
+                    FROM products
+                    WHERE provider_id = 6 AND visible = 1
+                    GROUP BY sku
+                    HAVING COUNT(*) > 1
+                )
+            ");
     
-        // Actualizar los productos según las SKU de la API
-        foreach ($allProducts as $product) {
-            $found = in_array($product->sku, $apiProductSKUs);
-            $product->provider_id = $found ? 1983 : 6;
-            $product->visible = $found ? 0 : 1;
-            $product->save();
-        }
+            foreach ($repeatedProducts as $product) {
+                $productId = $product->id;
+                $sku = $product->sku;
+                $colorId = $product->color_id;
+        
+                $firstProductId = DB::selectOne("
+                    SELECT MIN(id) AS first_id
+                    FROM products
+                    WHERE sku = ? AND color_id = ? AND provider_id = 6 AND visible = 1
+                ", [$sku, $colorId])->first_id;
+        
+                DB::table('products')
+                    ->where('sku', $sku)
+                    ->where('color_id', $colorId)
+                    ->where('provider_id', 6)
+                    ->where('id', '<>', $firstProductId)
+                    ->update(['visible' => 0]);
+            }
+
+            DB::commit();
     
         return 'actualización completa';
     }
