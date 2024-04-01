@@ -101,6 +101,7 @@ class StockSurController extends Controller
                     // Actualizar los detalles del producto existente
                     $existingProduct->stock = $variant->stock_existent;
                     $existingProduct->price = $variant->net_price;
+                    $existingProduct->provider_id = 6; 
                     $existingProduct->visible = 1; 
                     $existingProduct->save();
                     $existingProduct->images()->delete();
@@ -180,12 +181,11 @@ class StockSurController extends Controller
                 $firstProductId = DB::selectOne("
                     SELECT MIN(id) AS first_id
                     FROM products
-                    WHERE sku = ? AND color_id = ? AND provider_id = 6 AND visible = 1
+                    WHERE sku = ? AND provider_id = 6 AND visible = 1
                 ", [$sku, $colorId])->first_id;
         
                 DB::table('products')
                     ->where('sku', $sku)
-                    ->where('color_id', $colorId)
                     ->where('provider_id', 6)
                     ->where('id', '<>', $firstProductId)
                     ->update(['visible' => 0]);
