@@ -14,6 +14,7 @@ use App\Http\Controllers\Providers\EuroCottonController;
 use App\Http\Controllers\Providers\G4Controller;
 use App\Http\Controllers\Providers\ImpressLineController;
 use App\Http\Controllers\Providers\InnovationController;
+use App\Http\Controllers\Providers\IntuicionPublicitariaController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
 use App\Http\Controllers\Providers\StockSurController;
@@ -109,6 +110,9 @@ Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
 
 // EuroCotton
 Route::get('/getAllProductsEuroCotton', [EuroCottonController::class, 'getAllProductsEuroCotton']);
+
+// IntuicionPublicitaria
+Route::get('/getProductsIP', [IntuicionPublicitariaController::class, 'getProductsIP']);
 
 
 // Helpers
