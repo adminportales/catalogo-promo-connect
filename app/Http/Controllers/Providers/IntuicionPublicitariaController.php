@@ -110,16 +110,56 @@ class IntuicionPublicitariaController extends Controller
     
     private function createProductImages($product, $imageUrls)
     {
-        $defaultImageUrl = 'img/default_product_image.jpg';
+        // $defaultImageUrl = 'img/default_product_image.jpg';
         
+        // if (is_array($imageUrls)) {
+        //     foreach ($imageUrls as $imageUrl) {
+        //         $product->images()->create(['image_url' => $imageUrl]);
+        //     }
+        // } elseif (is_null($imageUrls)) {
+        //     $product->images()->create(['image_url' => $defaultImageUrl]);
+        // } else {
+        //     $product->images()->create(['image_url' => $defaultImageUrl]);
+        // }
+
+        $defaultImageUrl = 'img/default_product_image.jpg';
+
         if (is_array($imageUrls)) {
-            foreach ($imageUrls as $imageUrl) {
-                $product->images()->create(['image_url' => $imageUrl]);
+            foreach ($imageUrls as $key => $imageUrl) {
+                // Descargar la imagen solo si no existe
+                $errorGetImage = false;
+                $fileImage = "";
+                try {
+                    $fileImage = file_get_contents(str_replace(' ', '%20', $imageUrl), false);
+                } catch (Exception $th) {
+                    $errorGetImage = true;
+                }
+    
+                $newPath = '';
+                if (!$errorGetImage) {
+                    // Generar una ruta única para la imagen
+                    $newPath = '/intuicion/' . $product->sku . 'type' . $key  . $product['NombreImagen'];
+    
+                    // Guardar la imagen en el servidor
+                    Storage::append('public' . $newPath, $fileImage);
+    
+                    // Crear un registro en la base de datos con la URL de la imagen
+                    $product->images()->create([
+                        'image_url' => url('/storage' . $newPath)
+                    ]);
+                } else {
+                    // Si no se pudo descargar la imagen, usar la imagen por defecto
+                    $product->images()->create([
+                        'image_url' => $defaultImageUrl
+                    ]);
+                }
             }
         } elseif (is_null($imageUrls)) {
+            // Si no hay imágenes, usar la imagen por defecto
             $product->images()->create(['image_url' => $defaultImageUrl]);
         } else {
-            $product->images()->create(['image_url' => $defaultImageUrl]);
+            // Si hay un solo enlace de imagen, usarlo
+            $product->images()->create(['image_url' => $imageUrls]);
         }
     }
     
