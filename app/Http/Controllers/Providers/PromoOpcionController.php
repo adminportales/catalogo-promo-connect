@@ -53,7 +53,7 @@ class PromoOpcionController extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-        return $productsWs;
+  
         foreach ($productsWs as $product) {
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
