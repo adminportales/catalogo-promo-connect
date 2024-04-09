@@ -53,7 +53,7 @@ class PromoOpcionController extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-
+  
         foreach ($productsWs as $product) {
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
@@ -143,6 +143,7 @@ class PromoOpcionController extends Controller
                 $productExist = Product::where('sku', $productHijo['skuHijo'])->where('provider_id', 2)->first();
                 if (!$productExist) {
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
+                        $data['visible'] = 0;
                         // Romper aqui y continuar con el siguiente ciclo del foreach
                         continue;
                     }
@@ -197,8 +198,14 @@ class PromoOpcionController extends Controller
                         );
                     }
 
+                    $visible = 1;
+                    if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
+                        $visible = 0;
+                        continue;
+                    }  
+
                     $productExist->price = $productHijo['precio'];
-                    $productExist->visible = 1;
+                    $productExist->visible = $visible;
                     $productExist->save();
                     $imagenes =  count($productHijo['imagenesHijo']) <= 0 ? $product['imagenesPadre'] : $productHijo['imagenesHijo'];
                     $productExist->images()->delete();

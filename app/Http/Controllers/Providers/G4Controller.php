@@ -55,14 +55,10 @@ class G4Controller extends Controller
             $data['descriptores'] = (string) $atributos['descriptores'];
             $data['piezas_por_caja'] = (string) $atributos['piezas_por_caja'];
             $data['precio'] = (string) $atributos['precio'];
-            try {
-                $data['imagen'] = (string) $producto->imagenes->principal->attributes()['url'];
-            } catch (Exception $e) {
-                $data['imagen'] = 'default.jpg';
-            }
+            
             array_push($productos, $data);
         }
-
+        dd($productos);
         $maxSKU = Product::max('internal_sku');
         $idSku = null;
         if (!$maxSKU) {
@@ -71,7 +67,7 @@ class G4Controller extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-
+     
         foreach ($productos as $product) {
             // Verificar si el color existe y si no registrarla
             $color = null;
