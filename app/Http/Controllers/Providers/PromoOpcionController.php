@@ -144,8 +144,8 @@ class PromoOpcionController extends Controller
                 if (!$productExist) {
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         $data['visible'] = 0;
-                        // Romper aqui y continuar con el siguiente ciclo del foreach
-                        continue;
+                    }else{
+                        $data['visible'] = 1;
                     }
                     $newProduct = Product::create($data);
                     $imagenes =  count($productHijo['imagenesHijo']) <= 0 ? $product['imagenesPadre'] : $productHijo['imagenesHijo'];
@@ -201,7 +201,6 @@ class PromoOpcionController extends Controller
                     $visible = 1;
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         $visible = 0;
-                        continue;
                     }  
 
                     $productExist->price = $productHijo['precio'];
