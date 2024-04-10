@@ -258,9 +258,9 @@ class G4Controller extends Controller
         //llamada al método getProduct
         $response = $client->call('getProductStock', $params);
         $products = (new SimpleXMLElement(base64_decode($response)));
-
+        
         $productos = [];
-        foreach ($products as $producto) {
+        foreach ($products->producto as $producto) {
             $atributos = $producto->attributes();
             $data = [];
             $data['codigo_producto'] = (string) $atributos['codigo_producto'];
@@ -270,7 +270,7 @@ class G4Controller extends Controller
 
         $errors = [];
         foreach ($productos as $product) {
-            $productCatalogo = Product::where('sku',  $product['codigo_producto'])->first();
+            $productCatalogo = Product::where('provider_id', 7)->where('sku',  $product['codigo_producto'])->first();
             if ($productCatalogo) {
                 $productCatalogo->update(['stock' => (int)$product['existencias']]);
             } else {
