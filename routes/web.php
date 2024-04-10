@@ -14,9 +14,11 @@ use App\Http\Controllers\Providers\EuroCottonController;
 use App\Http\Controllers\Providers\G4Controller;
 use App\Http\Controllers\Providers\ImpressLineController;
 use App\Http\Controllers\Providers\InnovationController;
+use App\Http\Controllers\Providers\IntuicionPublicitariaController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
 use App\Http\Controllers\Providers\StockSurController;
+use App\Http\Controllers\ResetProducts;
 use App\Http\Controllers\SendProductsToEcommerce;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -74,14 +76,19 @@ Route::middleware(['auth'])->group(function () {
 // Innova
 Route::get('/getAllProductsInnova', [InnovationController::class, 'getAllProductsInnova']);
 Route::get('/getStockInnova', [InnovationController::class, 'getStockInnova']);
+Route::get('/cleanAllProductsInnova', [InnovationController::class, 'cleanAllProductsInnova']);
+
 
 // PromoOpcion
 Route::get('/getAllProductsPromoOption', [PromoOpcionController::class, 'getAllProductsPromoOption']);
 Route::get('/getPricePromoOpcion', [PromoOpcionController::class, 'getPricePromoOpcion']);
 Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromoOpcion']);
+Route::get('/cleanStockPromoOpcion', [PromoOpcionController::class, 'cleanStockPromoOpcion']);
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
+Route::get('/cleanAllProductsForPromotional', [ForPromotionalController::class, 'cleanAllProductsForPromotional']);
+
 // Route::get('/getAllProductsForPromotionalToOtherServer', [ForPromotionalController::class, 'getAllProductsForPromotionalToOtherServer']);
 
 //DKSP
@@ -93,9 +100,12 @@ Route::get('/getStockIUSB', [IUSBController::class, 'getStockIUSB']);
 Route::get('/getAllProductosDoblevela', [DobleVelaController::class, 'getAllProductosDoblevela']);
 Route::get('/getProductProductosDoblevela/{sku}', [DobleVelaController::class, 'getProductProductosDoblevela']);
 Route::get('/getImagesDoblevela', [DobleVelaController::class, 'getImagesDoblevela']);
+Route::get('/cleanProductProductosDoblevela', [DobleVelaController::class, 'cleanProductProductosDoblevela']);
+
 
 // StockSur
 Route::get('/getProductsStockSur', [StockSurController::class, 'getAllProductsStockSur']);
+Route::get('/cleanProductsStockSur', [StockSurController::class, 'cleanProductsStockSur']);
 
 // G4
 Route::get('/getProductsG4PL', [G4Controller::class, 'getProductsPL']);
@@ -110,6 +120,12 @@ Route::get('/getProductsIL', [ImpressLineController::class, 'getProductsIL']);
 // EuroCotton
 Route::get('/getAllProductsEuroCotton', [EuroCottonController::class, 'getAllProductsEuroCotton']);
 
+// IntuicionPublicitaria
+Route::get('/getProductsIP', [IntuicionPublicitariaController::class, 'getProductsIP']);
+
 
 // Helpers
 Route::get('/changeProviderToInternalProducts', [HelperController::class, 'changeProviderToInternalProducts'])->name('companies');
+
+
+Route::get('/resetProducts', [ResetProducts::class, 'resetProducts']);
