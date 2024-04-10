@@ -72,11 +72,13 @@ class G4Controller extends Controller
                     'precio' => (string) $escala['precio']
                 ];
                 array_push($precios,  $precio);
+                
             }
             $data['precios'] = $precios;
             if (count($data['precios']) > 0) {
                 array_push($productos, $data);
             }
+            
         }
 
         $maxSKU = Product::max('internal_sku');
@@ -122,7 +124,7 @@ class G4Controller extends Controller
                     'descuento' => 0,
                     'producto_promocion' => (int)$product['promocion'] == 0 ? false : true,
                     'producto_nuevo' => (int)$product['novedad'] == 0 ? false : true,
-                    'precio_unico' => true,
+                    'precio_unico' => false,
                     'provider_id' => 7,
                     'type_id' => 1,
                     'color_id' => $color->id,
