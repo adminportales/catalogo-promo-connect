@@ -74,30 +74,8 @@ class G4Controller extends Controller
             $data['area_impresion'] = (string) $atributos['area_impresion'];
             $data['descriptores'] = (string) $atributos['descriptores'];
             $data['piezas_por_caja'] = (string) $atributos['piezas_por_caja'];
-            try {
-                $data['imagenes'] = (string) $producto->imagenes->principal->attributes()['url'];
-            } catch (Exception $e) {
-                $data['imagenes'] = 'default.jpg';
-            }
-            $precios = [];
-            for ($i = 0; $i < count($producto->precios->escala); $i++) {
-                $escala = $producto->precios->escala[$i]->attributes();
-                $precio = [
-                    'escala_inicial' => (string) $escala['rango'],
-                    'escala_final' => $i < count($producto->precios->escala) - 1
-                        ? (string)((int) $producto->precios->escala[$i + 1]['rango'] - 1)
-                        : '',
-                    'precio' => (string) $escala['precio']
-                ];
-                array_push($precios,  $precio);
-            }
-            $data['precios'] = $precios;
-            if (count($data['precios']) > 0) {
-                array_push($productos, $data);
-            }
-            // }
         }
-
+        dd($productos);
         $maxSKU = Product::max('internal_sku');
         $idSku = null;
         if (!$maxSKU) {
@@ -106,7 +84,7 @@ class G4Controller extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-
+     
         foreach ($productos as $product) {
             // Verificar si el color existe y si no registrarla
             $color = null;
