@@ -35,25 +35,7 @@ class G4Controller extends Controller
         $products = (new SimpleXMLElement(base64_decode($response)));
         $productos = [];
 
-        // foreach ($products->producto as $producto) {
-
-        //     // Acceder a los atributos de cada producto
-        //     $attributes = $producto->attributes();
-
-
-        //     // Mostrar los atributos de cada producto
-        //     foreach ($attributes as $key => $value) {
-        //         echo "Attribute: $key - Value: $value <br>";
-        //         // dd($attributes);
-        //     }
-
-        // $imagenes = $producto->imagenes;
-        // $precios = $producto->precios;
-        // dd($imagenes);
-        // }
         foreach ($products->producto as $producto) {
-            // dd($products);
-            // if ($producto !== null && isset($producto->attributes)) {
 
             $atributos = $producto->attributes();
             $data = [];
@@ -95,7 +77,6 @@ class G4Controller extends Controller
             if (count($data['precios']) > 0) {
                 array_push($productos, $data);
             }
-            // }
         }
 
         $maxSKU = Product::max('internal_sku');
