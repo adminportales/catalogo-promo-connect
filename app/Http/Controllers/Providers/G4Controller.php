@@ -286,8 +286,8 @@ class G4Controller extends Controller
                 if ($value->sku == $product['codigo_producto']) {
                     break;
                 }
+                unset($allProducts[$key]);
             }
-            unset($allProducts[$key]);
         }
         foreach ($allProducts as  $value) {
             $value->visible = 0;
