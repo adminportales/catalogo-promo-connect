@@ -77,11 +77,8 @@ class G4Controller extends Controller
             if (count($data['precios']) > 0) {
                 array_push($productos, $data);
             }
-            $data['precio'] = (string) $atributos['precio'];
-            
-            array_push($productos, $data);
         }
-        dd($productos);
+
         $maxSKU = Product::max('internal_sku');
         $idSku = null;
         if (!$maxSKU) {
@@ -90,7 +87,7 @@ class G4Controller extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-     
+
         foreach ($productos as $product) {
             // Verificar si el color existe y si no registrarla
             $color = null;
@@ -141,7 +138,6 @@ class G4Controller extends Controller
                     ]);
                 }
 
-
                 /*
                 Registrar en la tabla product_category el producto, categoria y sub categoria
                 */
@@ -149,7 +145,6 @@ class G4Controller extends Controller
                     'category_id' => $categoria->id,
                     'subcategory_id' => $subcategoria->id,
                 ]);
-
 
                 $attributes = [
                     [
