@@ -114,6 +114,5 @@ Route::get('/getAllProductsEuroCotton', [EuroCottonController::class, 'getAllPro
 // IntuicionPublicitaria
 Route::get('/getProductsIP', [IntuicionPublicitariaController::class, 'getProductsIP']);
 
-
 // Helpers
 Route::get('/changeProviderToInternalProducts', [HelperController::class, 'changeProviderToInternalProducts'])->name('companies');
