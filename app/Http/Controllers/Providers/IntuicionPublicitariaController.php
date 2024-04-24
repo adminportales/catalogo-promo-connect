@@ -24,28 +24,57 @@ class IntuicionPublicitariaController extends Controller
 
     public function getProductsIP()
     {
+
+        $result = null;
         try {
-            $response = Http::post('http://138.118.8.25:8090/api/Inventario/Acceso', [
+            $ch = curl_init();
+            // Check if initialization had gone wrong*
+            if ($ch === false) {
+                FailedJobsCron::create([
+                    'name' => 'Intuicion Publicitaria',
+                    'message' => "'failed to initialize'",
+                    'status' => 0,
+                    'type' =>   1
+                ]);
+                throw new Exception('failed to initialize');
+            }
+            curl_setopt($ch, CURLOPT_URL, "http://138.118.8.25:8090/api/Inventario/Acceso");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
                 "Username" => "ITFACTORY",
-                "Password" => "123456",
-            ]);
+                "Password" => "123456"
+            ]));
 
-            $result = $response->body();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-            if ($response->status() === 404) {
+            $result = curl_exec($ch);
+
+            if (strpos($result, "HTTP Status 404 – Not Found") == true) {
                 FailedJobsCron::create([
                     'name' => 'Intuicion Publicitaria',
                     'message' => "HTTP Status 404 – Not Found Metodo No encontrado",
                     'status' => 0,
-                    'type' => 1
+                    'type' =>   1
                 ]);
                 return 'Error';
             }
 
-            // Convertir en array
-            // $products = json_decode($result, true);
-            $products = json_decode($result, true)['Data']['Productos'];
+            // Check the return value of curl_exec(), too
+            if ($result === false) {
+                throw new Exception(curl_error($ch), curl_errno($ch));
+            }
 
+            $arrContextOptions = array(
+                "ssl" => array(
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ),
+            );
+
+            // Convertir en array
+            //// inicio
+            $products = json_decode($result, true)['Data']['Productos'];
             // return $products;
 
             $maxSKU = Product::max('internal_sku');
@@ -58,18 +87,17 @@ class IntuicionPublicitariaController extends Controller
             }
 
             foreach ($products as $product) {
-
+                // Verificar si el color existe y si no registrarla
                 $color = null;
-                $product['Color'];
                 $slug = mb_strtolower(str_replace(' ', '-', $product['Color']));
                 $color = Color::where("slug", $slug)->first();
-
                 if (!$color) {
                     $color = Color::create([
                         'color' => ucfirst($product['Color']), 'slug' => $slug,
                     ]);
                 }
 
+                // Verificar si la categoria existe y si no registrarla
                 $categoria = null;
                 $slug = mb_strtolower(str_replace(' ', '-', $product['SubGrupo']));
                 $categoria = Category::where("slug", $slug)->first();
@@ -79,6 +107,7 @@ class IntuicionPublicitariaController extends Controller
                     ]);
                 }
 
+                // Verificar si la subcategoria existe y si no registrarla
                 $subcategoria = null;
                 $slugSub = mb_strtolower(str_replace(' ', '-', $product['SubGrupo']));
                 $subcategoria = $categoria->subcategories()->where("slug", $slugSub)->first();
@@ -89,14 +118,21 @@ class IntuicionPublicitariaController extends Controller
                         'slug' => $slugSub,
                     ]);
                 }
+                // $newdiscount = $product['producto_promocion'] == "NO" ? $product['desc_promo'] : 0;
+                // $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 0;
+                // if ($newdiscount > 25) {
+                //     $discount = $product['desc_promo'];
+                // } else {
+                //     $discount = 0;
+                // }
+                $productExist = Product::where('sku', $product['Codigo'])->where('color_id', $color->id)->where('provider_id', 1984)->first();
 
-                $productExist = Product::where('sku', $product['Codigo'])->where('color_id', $color->id)->first();
                 if (!$productExist) {
                     $newProduct = Product::create([
                         'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
                         'sku' => $product['Codigo'],
-                        'name' => $product['Marca'],
-                        'price' => floatval($product['Precio']),
+                        'name' => isset($product['Marca']) ? $product['Marca'] : '',
+                        'price' => floatval(str_replace(',', '', $product['Precio'])),
                         'description' => $product['Descripcion'],
                         'stock' => $product['Existencia'],
                         'producto_promocion' => false,
@@ -107,22 +143,22 @@ class IntuicionPublicitariaController extends Controller
                         'type_id' => 1,
                         'color_id' => $color->id,
                     ]);
-
-                    $imagenes = $product['Imagenes'];
-
-                    if (is_array($imagenes)) {
-                        foreach ($imagenes as $key => $imagen) {
-                            // Descargar Imagenes solo Si no existen
+                    if ($product['Imagenes'] != null) {
+                        foreach ($product['Imagenes'] as $key => $imagen) {
                             $errorGetImage = false;
                             $fileImage = "";
-                            try {
-                                $fileImage = file_get_contents(str_replace(' ', '%20', $imagen), false);
-                            } catch (Exception $th) {
+                            if ($imagen != null) {
+                                try {
+                                    $fileImage = file_get_contents(str_replace(' ', '%20', $imagen), false, stream_context_create($arrContextOptions));
+                                } catch (Exception $th) {
+                                    $errorGetImage = true;
+                                }
+                            } else {
                                 $errorGetImage = true;
                             }
                             $newPath = '';
                             if (!$errorGetImage) {
-                                $newPath = '/intuicion/' . $product['NombreImagen'];
+                                $newPath = '/intuicion/' . $newProduct->sku . 'type' . $key . $color->slug . '.jpg';
                                 Storage::append('public' . $newPath, $fileImage);
                                 $newProduct->images()->create([
                                     'image_url' => url('/storage' . $newPath)
@@ -133,12 +169,11 @@ class IntuicionPublicitariaController extends Controller
                                 ]);
                             }
                         }
-                    } elseif (is_null($imagenes)) {
-                        // Si no hay imágenes, usar la imagen por defecto
-                        $newProduct->images()->create(['image_url' => 'img/default_product_image.jpg']);
-                    } 
-
-                    // $imagenes = $product['Imagenes'];
+                    } else {
+                        $newProduct->images()->create([
+                            'image_url' => 'img/default_product_image.jpg'
+                        ]);
+                    }
 
                     // if ($imagenes != null) {
                     //     foreach ($imagenes as $imagen) {
@@ -148,6 +183,10 @@ class IntuicionPublicitariaController extends Controller
                     //     }
                     // }
 
+
+                    /*
+                        Registrar en la tabla product_category el producto, categoria y sub categoria
+                        */
                     $newProduct->productCategories()->create([
                         'category_id' => $categoria->id,
                         'subcategory_id' => $subcategoria->id,
@@ -165,70 +204,53 @@ class IntuicionPublicitariaController extends Controller
                         $newProduct->productAttributes()->create($attr);
                     }
                     $idSku++;
+                    // dd($newProduct);
                 } else {
                     $productExist->update([
-                        'price' => floatval($product['Precio']),
+                        'price' => floatval(str_replace(',', '', $product['Precio'])),
                         'stock' => $product['Existencia'],
+                        'producto_promocion' => false,
+                        'descuento' => 0,
+                        'visible' => 1,
                     ]);
-                    $productExist->images()->delete();
-                    $imagenes = $product['Imagenes'];
-
-                    if (is_array($imagenes)) {
-                        foreach ($imagenes as $key => $imagen) {
-                            // Descargar Imagenes solo Si no existen
-                            $errorGetImage = false;
-                            $fileImage = "";
-                            try {
-                                $fileImage = file_get_contents(str_replace(' ', '%20', $imagen), false);
-                            } catch (Exception $th) {
-                                $errorGetImage = true;
+                    if (count($productExist->images) <= 0) {
+                        if ($product['Imagenes'] != null) {
+                            foreach ($product['Imagenes'] as $key => $imagen) {
+                                // Descargar Imagenes solo Si no existen
+                                $errorGetImage = false;
+                                $fileImage = "";
+                                if ($imagen != null) {
+                                    try {
+                                        $fileImage = file_get_contents(str_replace(' ', '%20', $imagen), false, stream_context_create($arrContextOptions));
+                                    } catch (Exception $th) {
+                                        $errorGetImage = true;
+                                    }
+                                } else {
+                                    $errorGetImage = true;
+                                }
+                                $newPath = '';
+                                if (!$errorGetImage) {
+                                    $newPath = '/intuicion/' . $productExist->sku . 'type' . $key . $color->slug . '.jpg';
+                                    Storage::append('public' . $newPath, $fileImage);
+                                    $productExist->images()->create([
+                                        'image_url' => url('/storage' . $newPath)
+                                    ]);
+                                } else {
+                                    $productExist->images()->create([
+                                        'image_url' => 'img/default_product_image.jpg'
+                                    ]);
+                                }
                             }
-                            $newPath = '';
-                            if (!$errorGetImage) {
-                                $newPath = '/intuicion/' . $product['NombreImagen'];
-                                Storage::append('public' . $newPath, $fileImage);
-                                $productExist->images()->create([
-                                    'image_url' => url('/storage' . $newPath)
-                                ]);
-                            } else {
-                                $productExist->images()->create([
-                                    'image_url' => 'img/default_product_image.jpg'
-                                ]);
-                            }
+                        } else {
+                            $productExist->images()->create([
+                                'image_url' => 'img/default_product_image.jpg'
+                            ]);
                         }
-                    } elseif (is_null($imagenes)) {
-                        // Si no hay imágenes, usar la imagen por defecto
-                        $productExist->images()->create(['image_url' => 'img/default_product_image.jpg']);
-                    } 
-                }
-            }
-
-            $allProducts = Product::where('provider_id', 1984)->get();
-            foreach ($products as $product) {
-                foreach ($allProducts as $key => $value) {
-                    if ($value->sku == $product['Codigo'] && strtolower($value->color->color) == strtolower($product['Color'])) {
-                        break;
-                    }
-                }
-                unset($allProducts[$key]);
-            }
-
-            foreach ($allProducts as  $value) {
-                $value->visible = 1;
-                $value->save();
-            }
-
-            $allProducts = Product::where('provider_id', 1984)->where('visible', 1)->get();
-            foreach ($allProducts as $key => $value) {
-                foreach ($products as $product) {
-                    if ($value->sku == $product['Codigo'] && strtolower($value->color->color) == strtolower($product['Color'])) {
-                        unset($allProducts[$key]);
-                        break;
                     }
                 }
             }
 
-            DB::table('images')->where('image_url', '=', null)->delete();
+
             return $result;
         } catch (Exception $e) {
             FailedJobsCron::create([
