@@ -17,6 +17,7 @@ use App\Http\Controllers\Providers\InnovationController;
 use App\Http\Controllers\Providers\IntuicionPublicitariaController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
+use App\Http\Controllers\Providers\PromoOpcionGMTController;
 use App\Http\Controllers\Providers\StockSurController;
 use App\Http\Controllers\ResetProducts;
 use App\Http\Controllers\SendProductsToEcommerce;
@@ -84,6 +85,11 @@ Route::get('/getAllProductsPromoOption', [PromoOpcionController::class, 'getAllP
 Route::get('/getPricePromoOpcion', [PromoOpcionController::class, 'getPricePromoOpcion']);
 Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromoOpcion']);
 Route::get('/cleanStockPromoOpcion', [PromoOpcionController::class, 'cleanStockPromoOpcion']);
+
+// PromoOpcionGMT
+Route::get('/getAllProductsPromoOptionGMT', [PromoOpcionGMTController::class, 'getAllProductsPromoOption']);
+Route::get('/getStockPromoOpcionGMT', [PromoOpcionGMTController::class, 'getStockPromoOpcion']);
+Route::get('/cleanStockPromoOpcionGMT', [PromoOpcionGMTController::class, 'cleanStockPromoOpcion']);
 
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
