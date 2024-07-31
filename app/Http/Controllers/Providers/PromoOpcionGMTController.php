@@ -10,7 +10,7 @@ use App\Models\Product;
 use App\Models\Subcategory;
 use Illuminate\Support\Facades\DB;
 
-class PromoOpcionController extends Controller
+class PromoOpcionGMTController extends Controller
 {
     private $user;
     private $password;
