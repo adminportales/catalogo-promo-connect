@@ -17,8 +17,8 @@ class EuroCottonController extends Controller
 {
     public function getAllProductsEurocotton()
     {
+        $result = null;
         try {
-            $result = null;
             $ch = curl_init();
 
             curl_setopt(
@@ -109,7 +109,7 @@ class EuroCottonController extends Controller
 
                 $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 0;
 
-                $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->first();
+                $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->where('provider_id', 9)->first();
                 if (!$productExist) {
                     $newProduct = Product::create([
                         'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
@@ -125,6 +125,7 @@ class EuroCottonController extends Controller
                         'provider_id' => 9,
                         'type_id' => 1,
                         'color_id' => $color->id,
+                        'visible' => 1
                     ]);
                     $newProduct->productCategories()->create([
                         'category_id' => $categoria->id,
@@ -189,68 +190,26 @@ class EuroCottonController extends Controller
                         'stock' => $product['inventario'],
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
                         'descuento' => $discount,
+                        'visible' => 1
                     ]);
                 }
             }
 
-            // Status::create([
-            //     'name_provider' => 'Eurocotton',
-            //     'status' => 'Actualizacion Completa al servidor',
-            //     'update_sumary' => 'Actualizacion Completa de los productos de Eurocotton',
-            // ]);
 
+            /*     foreach ($allProducts as  $value) {
+                $value->visible = 0;
+                $value->save();
+            } */
             DB::table('images')->where('image_url', '=', null)->delete();
-
-            return $products;
-        } catch (Exception) {
-            Status::create([
-                'name_provider' => 'Eurocotton',
-                'status' => 'Actualización incompleta al servidor',
-                'update_sumary' => 'Actualización incompleta del productos del servidor de Eurocotton',
+            return $result;
+        } catch (Exception $e) {
+            FailedJobsCron::create([
+                'name' => 'EuroCotton',
+                'message' => $e->getMessage(),
+                'status' => 0,
+                'type' =>   1
             ]);
-
-            return ('Actualización incompleta de productos del servidor de Eurocotton');
+            return $e->getMessage();
         }
-
-        // $allProducts = Product::where('provider_id', 9)->get();
-        // foreach ($products as $product) {
-        //     foreach ($allProducts as $key => $value) {
-        //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-        //             break;
-        //         }
-        //     }
-        //     unset($allProducts[$key]);
-        // }
-
-        // foreach ($allProducts as  $value) {
-        //     $value->visible = 0;
-        //     $value->save();
-        // }
-
-        // $allProducts = Product::where('provider_id', 9)->where('visible', 1)->get();
-        // foreach ($allProducts as $key => $value) {
-        //     foreach ($products as $product) {
-        //         if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-        //             unset($allProducts[$key]);
-        //             break;
-        //         }
-        //     }
-        // }
-        // foreach ($allProducts as  $value) {
-        //     $value->visible = 0;
-        //     $value->save();
-        // }
-
-
-
-        // } catch (Exception $e) {
-        //     FailedJobsCron::create([
-        //         'name' => 'For Promotional',
-        //         'message' => $e->getMessage(),
-        //         'status' => 0,
-        //         'type' =>   1
-        //     ]);
-        //     return $e->getMessage();
-        // }
     }
 }

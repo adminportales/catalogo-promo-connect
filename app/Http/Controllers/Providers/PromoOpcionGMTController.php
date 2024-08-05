@@ -7,20 +7,27 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
-use App\Models\Status;
 use App\Models\Subcategory;
 use Illuminate\Support\Facades\DB;
-use LDAP\Result;
 
-class PromoOpcionController extends Controller
+class PromoOpcionGMTController extends Controller
 {
+    private $user;
+    private $password;
+    private $provider_id;
+
+    public function __construct()
+    {
+        $this->user = "GTM0316";
+        $this->password ="xQEmXL2QHNg5h9iiewA5";
+        $this->provider_id = 1987;
+    }
+    
     public function getAllProductsPromoOption()
     {
-        $user = "DFE4516";
-        $passowrd = "5MrZtuzmiiuwSswLuONi";
         $postFields = [
-            'user' => $user,
-            'password' => $passowrd,
+            'user' => $this->user,
+            'password' => $this->password,
         ];
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -55,7 +62,7 @@ class PromoOpcionController extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-
+  
         foreach ($productsWs as $product) {
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
@@ -77,7 +84,7 @@ class PromoOpcionController extends Controller
                 'producto_nuevo' => false,
                 'precio_unico' => true,
                 'type_id' => 1,
-                'provider_id' => 2,
+                'provider_id' => $this->provider_id,
                 'type' => 1
             ];
 
@@ -142,7 +149,7 @@ class PromoOpcionController extends Controller
                 $data['name'] = $productHijo['nombreHijo'];
                 $data['sku'] = $productHijo['skuHijo'];
                 $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
-                $productExist = Product::where('sku', $productHijo['skuHijo'])->where('provider_id', 2)->first();
+                $productExist = Product::where('sku', $productHijo['skuHijo'])->where('provider_id', $this->provider_id)->first();
                 if (!$productExist) {
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         $data['visible'] = 0;
@@ -203,7 +210,7 @@ class PromoOpcionController extends Controller
                     $visible = 1;
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         $visible = 0;
-                    }
+                    }  
 
                     $productExist->price = $productHijo['precio'];
                     $productExist->visible = $visible;
@@ -217,41 +224,6 @@ class PromoOpcionController extends Controller
                     }
                 }
             }
-
-            $allProducts = Product::where('provider_id', 2)->get();
-            foreach ($allProducts as $key => $value) {
-                foreach ($productsWs as $product) {
-                    foreach ($product['hijos'] as $productHijo) {
-                        if ($value->sku == $productHijo['skuHijo'] && $productHijo['estatus'] == '1') {
-                            unset($allProducts[$key]);
-                            break 2;
-                        }
-                    }
-                }
-            }
-
-            foreach ($allProducts as  $value) {
-                $value->visible = 0;
-                $value->save();
-            }
-
-            /*  Status::create([
-                'name_provider' => 'Promo Opcion',
-                'status' => 'Actualizacion Completa al servidor',
-                'update_sumary' => 'Actualizacion Completa de los productos de Promo Opcion',
-            ]); */
-
-            DB::table('images')->where('image_url', '=', null)->delete();
-
-            return $result;
-        } catch (\Exception $e) {
-            Status::create([
-                'name_provider' => 'Promo Opcion',
-                'status' => 'Actualización incompleta al servidor',
-                'update_sumary' => 'Actualización incompleta de productos del servidor Promo Opcion',
-            ]);
-
-            return ('Actualización incompleta de productos del servidor Promo Opcion');
         }
 
         DB::table('images')->where('image_url', '=', null)->delete();
@@ -261,11 +233,9 @@ class PromoOpcionController extends Controller
 
     public function getStockPromoOpcion()
     {
-        $user = "DFE4516";
-        $passowrd = "5MrZtuzmiiuwSswLuONi";
         $postFields = [
-            'user' => $user,
-            'password' => $passowrd,
+            'user' => $this->user,
+            'password' => $this->password,
         ];
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -318,42 +288,6 @@ class PromoOpcionController extends Controller
             } else {
                 array_push($errors, $stock['Material']);
             }
-            if (!$result['success'] == true) {
-                return $result;
-            }
-
-            if (!isset($result['Stocks'])) {
-                return $result;
-            }
-            // Convertir en array
-            $stocks = $result['Stocks'];
-
-            // return $response;
-            $errors = [];
-
-            foreach ($stocks as $stock) {
-                $productCatalogo = Product::where('sku', $stock['Material'])->first();
-                if ($productCatalogo) {
-                    $productCatalogo->update(['stock' => $stock['Stock']]);
-                    // Status::create([
-                    //     'name_provider' => 'Promo Opcion',
-                    //     'status' => 'Actualizacion Completa al servidor',
-                    //     'update_sumary' => 'Actualizacion Completa de stock de Promo Opcion',
-                    // ]);
-                } else {
-                    array_push($errors, $stock['Material']);
-                }
-            }
-
-            return $errors;
-        } catch (\Exception $e) {
-            Status::create([
-                'name_provider' => 'Promo Opcion',
-                'status' => 'Actualización incompleta al servidor',
-                'update_sumary' => 'Actualización incompleta de stock del servidor de Promo Opcion',
-            ]);
-
-            return ('Actualización incompleta de stock del servidor Promo Opcion');
         }
         return [$errors, $stocks];
 
@@ -368,11 +302,10 @@ class PromoOpcionController extends Controller
     }
 
     public function cleanStockPromoOpcion() {
-        $user = "DFE4516";
-        $passowrd = "5MrZtuzmiiuwSswLuONi";
+       
         $postFields = [
-            'user' => $user,
-            'password' => $passowrd,
+            'user' => $this->user,
+            'password' => $this->password,
         ];
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -409,11 +342,11 @@ class PromoOpcionController extends Controller
         }
 
         //Todos los productos de la base de datos
-        $allProducts = Product::where('provider_id',2)->get();
+        $allProducts = Product::where('provider_id',$this->provider_id)->get();
 
         foreach ($allProducts as $dbproduct){
             $found = false; // Variable para indicar si se encuentra el producto en los hijos
-
+        
             foreach ($productsWs as $product) {
                 foreach ($product['hijos'] as $productHijo) {
                     if($productHijo['skuHijo'] == $dbproduct->sku){
@@ -422,25 +355,25 @@ class PromoOpcionController extends Controller
                     }
                 }
             }
-
+        
             if($found){
                 $dbproduct->visible = 1; // Si se encontró, marcar como visible
             }else{
                 $dbproduct->provider_id = 1983;
                 $dbproduct->visible = 0; // Si no se encontró, marcar como no visible
             }
-
+            
             $dbproduct->save();
         }
-
+        
         // Obtener los SKU de los productos repetidos para el proveedor ID 2
         $repeatedSkus = DB::select("
         SELECT sku
         FROM products
-        WHERE provider_id = 2
+        WHERE provider_id = ?
         GROUP BY sku
         HAVING COUNT(*) > 1
-        ");
+        ", [$this->provider_id]);
 
         foreach ($repeatedSkus as $repeatedSku) {
         $sku = $repeatedSku->sku;
@@ -449,13 +382,13 @@ class PromoOpcionController extends Controller
         $firstProductId = DB::selectOne("
             SELECT MIN(id) AS first_id
             FROM products
-            WHERE sku = ? AND provider_id = 2 AND visible = 1
-        ", [$sku])->first_id;
+            WHERE sku = ? AND provider_id = ? AND visible = 1
+        ", [$sku, $this->provider_id])->first_id;
 
         // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
         DB::table('products')
             ->where('sku', $sku)
-            ->where('provider_id', 2)
+            ->where('provider_id', $this->provider_id)
             ->where('visible', 1)
             ->where('id', '<>', $firstProductId)
             ->update(['visible' => 0]);
@@ -466,6 +399,6 @@ class PromoOpcionController extends Controller
         DB::table('images')->where('image_url', '=', null)->delete();
 
         return $result;
-
+    
     }
 }

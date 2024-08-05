@@ -59,19 +59,10 @@ class IUSBController extends Controller
                 }
             }
 
-            /* Status::create([
-                'name_provider' => 'IUSB',
-                'status' => 'Actualizacion Completa al servidor',
-                'update_sumary' => 'Actualizacion Completa de los productos de IUSB',
-            ]); */
-        } catch (Exception $e) {
-            Status::create([
-                'name_provider' => 'IUSB',
-                'status' => 'Actualización incompleta al servidor',
-                'update_sumary' => 'Actualización incompleta de stock del servidor de IUSB',
-            ]);
-
-            return ('Actualización incompleta de stock del servidor IUSB');
+            foreach ($allProducts as  $value) {
+                $value->visible = 1;
+                $value->save();
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ class ForPromotionalController extends Controller
             curl_setopt(
                 $ch,
                 CURLOPT_URL,
-                "https://forpromotional.homelinux.com:9090/WsEstrategia/inventario"
+                "https://4promotional.net:9090/WsEstrategia/inventario"
             );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -67,6 +67,7 @@ class ForPromotionalController extends Controller
             );
 
             // Convertir en array
+            //// inicio
             $products = json_decode($result, true);
 
             $maxSKU = Product::max('internal_sku');
@@ -110,15 +111,20 @@ class ForPromotionalController extends Controller
                         'slug' => $slugSub,
                     ]);
                 }
-
+                $newdiscount = $product['producto_promocion'] == "NO" ? $product['desc_promo'] : 0;
                 $discount = $product['producto_promocion'] == "SI" ? $product['desc_promo'] : 0;
+                if ($newdiscount > 25) {
+                    $discount = $product['desc_promo'];
+                } else {
+                    $discount = 0;
+                }
+                $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->where('provider_id', 1)->first();
 
-                $productExist = Product::where('sku', $product['id_articulo'])->where('color_id', $color->id)->first();
                 if (!$productExist) {
                     $newProduct = Product::create([
                         'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
                         'sku' => $product['id_articulo'],
-                        'name' => $product['nombre_articulo'],
+                        'name' => isset($product['nombre_articulo']) ? $product['nombre_articulo'] : '',
                         'price' =>  $product['precio'],
                         'description' => $product['descripcion'],
                         'stock' => $product['inventario'],
@@ -200,12 +206,7 @@ class ForPromotionalController extends Controller
                             'attribute' => 'Peso de la caja',
                             'slug' => 'peso_caja',
                             'value' => $product['peso_caja'],
-                        ],
-                        [
-                            'attribute' => 'Piezas de la caja',
-                            'slug' => 'piezas_caja',
-                            'value' => $product['piezas_caja'],
-                        ],
+                        ]
                     ];
                     foreach ($attributes as $attr) {
                         $newProduct->productAttributes()->create($attr);
@@ -218,6 +219,7 @@ class ForPromotionalController extends Controller
                         'stock' => $product['inventario'],
                         'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
                         'descuento' => $discount,
+                        'visible' => 1,
                     ]);
                     if (count($productExist->images) <= 0) {
                         foreach (array_reverse($product['imagenes']) as $key => $imagen) {
@@ -245,44 +247,8 @@ class ForPromotionalController extends Controller
                 }
             }
 
-            $allProducts = Product::where('provider_id', 1)->get();
-            foreach ($products as $product) {
-                foreach ($allProducts as $key => $value) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-                        break;
-                    }
-                }
-                unset($allProducts[$key]);
-            }
 
-            foreach ($allProducts as  $value) {
-                $value->visible = 0;
-                $value->save();
-            }
-
-            $allProducts = Product::where('provider_id', 1)->where('visible', 1)->get();
-            foreach ($allProducts as $key => $value) {
-                foreach ($products as $product) {
-                    if ($value->sku == $product['id_articulo'] && strtolower($value->color->color) == strtolower($product['color'])) {
-                        unset($allProducts[$key]);
-                        break;
-                    }
-                }
-            }
-            foreach ($allProducts as  $value) {
-                $value->visible = 0;
-                $value->save();
-            }
-
-            /* Status::create([
-                'name_provider' => 'For Promotional',
-                'status' => 'Actualizaciónn completa al servidor',
-                'update_sumary' => 'Actualizacion completa de los productos de For Promotional',
-            ]); */
-
-            DB::table('images')->where('image_url', '=', null)->delete();
-
-            return $products;
+            return $result;
         } catch (Exception $e) {
             Status::create([
                 'name_provider' => 'For Promotional',
@@ -291,6 +257,129 @@ class ForPromotionalController extends Controller
             ]);
 
             return ('Actualización incompleta de productos del servidor de For Promotional ');
+        }
+    }
+
+
+    public function cleanAllProductsForPromotional()
+    {
+
+        $result = null;
+        try {
+            $ch = curl_init();
+            // Check if initialization had gone wrong*
+            if ($ch === false) {
+                FailedJobsCron::create([
+                    'name' => 'For Promotional',
+                    'message' => "'failed to initialize'",
+                    'status' => 0,
+                    'type' =>   1
+                ]);
+                throw new Exception('failed to initialize');
+            }
+            curl_setopt(
+                $ch,
+                CURLOPT_URL,
+                "https://4promotional.net:9090/WsEstrategia/inventario"
+            );
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+            $result = curl_exec($ch);
+
+            if (strpos($result, "HTTP Status 404 – Not Found") == true) {
+                FailedJobsCron::create([
+                    'name' => 'For Promotional',
+                    'message' => "HTTP Status 404 – Not Found Metodo No encontrado",
+                    'status' => 0,
+                    'type' =>   1
+                ]);
+                return 'Error';
+            }
+
+            // Check the return value of curl_exec(), too
+            if ($result === false) {
+                throw new Exception(curl_error($ch), curl_errno($ch));
+            }
+
+            // Convertir en array
+            //// inicio
+            $products = json_decode($result, true);
+
+            //Funcion para eliminar los productos que no pertenezcan al proveedor
+            $allProducts = Product::where('provider_id', 1)->get();
+
+            // Obtener los sku de los productos de la API
+            $apiSkus = array_map(function ($product) {
+                return $product['id_articulo'];
+            }, $products);
+
+            // Obtener los colores de los productos de la API
+            $apiColors = array_map(function ($product) {
+                return strtolower($product['color']);
+            }, $products);
+
+            // Iterar sobre los productos de la base de datos
+            foreach ($allProducts as $value) {
+                // Verificar si el sku y el color del producto de la base de datos están en los datos de la API
+                if (
+                    !in_array($value->sku, $apiSkus) ||
+                    !in_array(strtolower($value->color->color), $apiColors)
+                ) {
+                    // Si no se encuentra el producto en la API, cambiar provider_id y visible
+                    $value->visible = 0;
+                    $value->provider_id = 1983;
+                    $value->save();
+                }
+            }
+
+            //Cambia el visible a 0  de los productos repetidos, exceptuando el primero de ellos (el original)
+            $repeatedProducts = DB::select("
+                SELECT id, sku, color_id
+                FROM products
+                WHERE provider_id = 1 AND visible = 1 AND sku IN (
+                    SELECT sku
+                    FROM products
+                    WHERE provider_id = 1 AND visible = 1
+                    GROUP BY sku
+                    HAVING COUNT(*) > 1
+                )
+            ");
+
+            foreach ($repeatedProducts as $product) {
+                $productId = $product->id;
+                $sku = $product->sku;
+                $colorId = $product->color_id;
+
+                $firstProductId = DB::selectOne("
+                    SELECT MIN(id) AS first_id
+                    FROM products
+                    WHERE sku = ? AND color_id = ? AND provider_id = 1 AND visible = 1
+                ", [$sku, $colorId])->first_id;
+
+                DB::table('products')
+                    ->where('sku', $sku)
+                    ->where('color_id', $colorId)
+                    ->where('provider_id', 1)
+                    ->where('visible', 1)
+                    ->where('id', '<>', $firstProductId)
+                    ->update(['visible' => 0]);
+            }
+
+            DB::commit();
+
+            DB::table('images')->where('image_url', '=', null)->delete();
+
+            return 'actualizacion de productos finalizada';
+        } catch (Exception $e) {
+            FailedJobsCron::create([
+                'name' => 'For Promotional',
+                'message' => $e->getMessage(),
+                'status' => 0,
+                'type' =>   1
+            ]);
+            return $e->getMessage();
         }
     }
 
@@ -395,11 +484,11 @@ class ForPromotionalController extends Controller
     //         foreach ($products as $product) {
     //             // Verificar si el color existe y si no registrarla
     //             $color = null;
-    //             $slug = mb_strtolower(str_replace(' ', '-', $product['color']));
+    //             $slug = mb_strtolower(str_replace(' ', '-', $product['modelo_color']));
     //             $color = Color::where("slug", $slug)->first();
     //             if (!$color) {
     //                 $color = Color::create([
-    //                     'color' => ucfirst($product['color']), 'slug' => $slug,
+    //                     'modelo_color' => ucfirst($product['modelo_color']), 'slug' => $slug,
     //                 ]);
     //             }
 
@@ -432,10 +521,10 @@ class ForPromotionalController extends Controller
     //                 $newProduct = Product::create([
     //                     'internal_sku' => "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT),
     //                     'sku' => $product['id_articulo'],
-    //                     'name' => $product['nombre_articulo'],
+    //                     'name' => $product['nombre'],
     //                     'price' =>  $product['precio'],
     //                     'description' => $product['descripcion'],
-    //                     'stock' => $product['inventario'],
+    //                     'stock' => $product['cantidad_piezas'],
     //                     'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
     //                     'descuento' => $discount,
     //                     'producto_nuevo' => $product['producto_nuevo'] == "SI" ? true : false,
@@ -512,7 +601,7 @@ class ForPromotionalController extends Controller
     //             } else {
     //                 $productExist->update([
     //                     'price' => $product['precio'],
-    //                     'stock' => $product['inventario'],
+    //                     'stock' => $product['cantidad_piezas'],
     //                     'producto_promocion' => $product['producto_promocion'] == "SI" ? true : false,
     //                     'descuento' => $discount,
     //                 ]);

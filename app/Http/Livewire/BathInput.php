@@ -22,7 +22,7 @@ class BathInput extends Component
     public $rutaArchivo;
     public $archivo;
 
-    public $columns;
+    public $columns, $numeroMayorDeFila;
 
     // Datos despues del inicio de importacion
     public $SKU_interno, $SKU, $SKU_Padre, $Nombre, $Descripcion, $Precio, $Stock, $Promocion, $Descuento, $Nuevo_Producto, $Precio_Unico, $Tipo, $Color, $Proveedor, $Familia, $SubFamilia, $Imagenes, $Escalas, $Atributos;
@@ -54,6 +54,9 @@ class BathInput extends Component
         $hojaActual = $documento->getSheet(0);
         $letraMayorDeColumna = $hojaActual->getHighestColumn(); // Numérico
         $numeroMayorDeColumna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($letraMayorDeColumna);
+        // Numero de filas
+        $this->numeroMayorDeFila = $hojaActual->getHighestRow(); // Numérico
+
         $columns = [];
         for ($indiceCol = 1; $indiceCol <= $numeroMayorDeColumna; $indiceCol++) {
             array_push($columns, [$indiceCol, $hojaActual->getCellByColumnAndRow($indiceCol, 1)->getValue()]);
@@ -151,6 +154,14 @@ class BathInput extends Component
                             'family' => ucfirst($hojaActual->getCellByColumnAndRow($this->Familia, $indiceFila)->getValue()), 'slug' => $slug,
                         ]);
                     }
+                } else {
+                    $categoria = Category::where("slug", 'sin-categoria')->first();
+                    if (!$categoria) {
+                        $categoria = Category::create([
+                            'family' => 'Sin Categoria',
+                            'slug' => 'sin-categoria',
+                        ]);
+                    }
                 }
 
                 $subcategoria = null;
@@ -163,6 +174,14 @@ class BathInput extends Component
                         $subcategoria = $categoria->subcategories()->create([
                             'subfamily' => ucfirst($hojaActual->getCellByColumnAndRow($this->SubFamilia, $indiceFila)->getValue()),
                             'slug' => $slugSub,
+                        ]);
+                    }
+                } else {
+                    $subcategoria = $categoria->subcategories()->where("slug", 'sin-subcategoria')->first();
+                    if (!$subcategoria) {
+                        $subcategoria = $categoria->subcategories()->create([
+                            'subfamily' => 'Sin Subcategoria',
+                            'slug' => 'sin-subcategoria',
                         ]);
                     }
                 }
@@ -181,7 +200,7 @@ class BathInput extends Component
                         $dataProduct['sku_parent'] = $hojaActual->getCellByColumnAndRow($this->SKU_Padre, $indiceFila)->getValue();
                     }
                     $dataProduct['name'] = $hojaActual->getCellByColumnAndRow($this->Nombre, $indiceFila)->getValue();
-                    if ($this->SKU_Padre) {
+                    if ($this->Descripcion) {
                         $dataProduct['description'] = $hojaActual->getCellByColumnAndRow($this->Descripcion, $indiceFila)->getValue();
                     } else {
                         $dataProduct['description'] = 'Sin Descripcion';
@@ -254,8 +273,8 @@ class BathInput extends Component
                             foreach (explode(',', $hojaActual->getCellByColumnAndRow($this->Escalas, $indiceFila)->getValue()) as $esc) {
                                 $dataEscala = explode(':', $esc);
                                 array_push($escalas, [
-                                    'escala' => $dataEscala[0],
-                                    'price' => (int)(trim($dataEscala[1])),
+                                    'escala_inicial' => $dataEscala[0],
+                                    'price' => floatval(trim($dataEscala[1])),
                                 ]);
                                 /* $newProduct->precios()->create([
                                     'escala' => $dataEscala[0],
@@ -284,11 +303,17 @@ class BathInput extends Component
                             }
                         }
                     }
-                    dd($dataProduct, [
-                        $categoria, $subcategoria
-                    ], $categoria, $subcategoria, $imagenes, $escalas, $attributos);
-                    dd(1);
                     $newProduct = ModelProduct::create($dataProduct);
+                    if (count($imagenes) > 0) {
+                        $newProduct->images()->createMany($imagenes);
+                    }
+                    if ($newProduct->precio_unico == 0) {
+                        $newProduct->precios()->createMany($escalas);
+                    }
+                    if (count($attributos) > 0) {
+                        $newProduct->productAttributes()->createMany($attributos);
+                    }
+
                     /*
                     Registrar en la tabla product_category el producto, categoria y sub categoria
                     */
@@ -301,7 +326,6 @@ class BathInput extends Component
                     $idSku++;
                     array_push($productosImportados, $newProduct);
                 }
-                //code...
             } catch (Exception $th) {
                 $idSku++;
                 array_push($filasError, [$indiceFila, $th->getMessage()]);
