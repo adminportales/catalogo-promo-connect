@@ -17,11 +17,14 @@ use App\Http\Controllers\Providers\InnovationController;
 use App\Http\Controllers\Providers\IntuicionPublicitariaController;
 use App\Http\Controllers\Providers\IUSBController;
 use App\Http\Controllers\Providers\PromoOpcionController;
+use App\Http\Controllers\Providers\PromoOpcionGMTController;
 use App\Http\Controllers\Providers\StockSurController;
 use App\Http\Controllers\ResetProducts;
 use App\Http\Controllers\SendProductsToEcommerce;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ExchangeRateController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +88,11 @@ Route::get('/getPricePromoOpcion', [PromoOpcionController::class, 'getPricePromo
 Route::get('/getStockPromoOpcion', [PromoOpcionController::class, 'getStockPromoOpcion']);
 Route::get('/cleanStockPromoOpcion', [PromoOpcionController::class, 'cleanStockPromoOpcion']);
 
+// PromoOpcionGMT
+Route::get('/getAllProductsPromoOptionGMT', [PromoOpcionGMTController::class, 'getAllProductsPromoOption']);
+Route::get('/getStockPromoOpcionGMT', [PromoOpcionGMTController::class, 'getStockPromoOpcion']);
+Route::get('/cleanStockPromoOpcionGMT', [PromoOpcionGMTController::class, 'cleanStockPromoOpcion']);
+
 // ForPromotional
 Route::get('/getAllProductsForPromotional', [ForPromotionalController::class, 'getAllProductsForPromotional']);
 Route::get('/cleanAllProductsForPromotional', [ForPromotionalController::class, 'cleanAllProductsForPromotional']);
@@ -129,3 +137,7 @@ Route::get('/changeProviderToInternalProducts', [HelperController::class, 'chang
 
 
 Route::get('/resetProducts', [ResetProducts::class, 'resetProducts']);
+
+
+//Ruta de la tasa de cambio
+Route::get('/exchange_rate', [ExchangeRateController::class, 'getExchangeRate']);
