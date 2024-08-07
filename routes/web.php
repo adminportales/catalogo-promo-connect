@@ -23,6 +23,7 @@ use App\Http\Controllers\ResetProducts;
 use App\Http\Controllers\SendProductsToEcommerce;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ExchangeRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -135,3 +136,6 @@ Route::get('/changeProviderToInternalProducts', [HelperController::class, 'chang
 
 
 Route::get('/resetProducts', [ResetProducts::class, 'resetProducts']);
+
+//Ruta de la tasa de cambio
+Route::get('/exchange_rate', [ExchangeRateController::class, 'getExchangeRate']);

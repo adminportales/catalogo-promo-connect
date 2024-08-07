@@ -183,9 +183,15 @@
                                 @php
                                     $priceProduct = $row->price;
                                     if ($row->producto_promocion) {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->descuento / 100), 2);
+                                        $priceProduct = round(
+                                            $priceProduct - $priceProduct * ($row->descuento / 100),
+                                            2,
+                                        );
                                     } else {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->provider->discount / 100), 2);
+                                        $priceProduct = round(
+                                            $priceProduct - $priceProduct * ($row->provider->discount / 100),
+                                            2,
+                                        );
                                     }
                                 @endphp
                                 <img src="{{ $row->firstImage ? $row->firstImage->image_url : '' }}"
@@ -220,9 +226,15 @@
                                 @php
                                     $priceProduct = $row->price;
                                     if ($row->producto_promocion) {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->descuento / 100), 2);
+                                        $priceProduct = round(
+                                            $priceProduct - $priceProduct * ($row->descuento / 100),
+                                            2,
+                                        );
                                     } else {
-                                        $priceProduct = round($priceProduct - $priceProduct * ($row->provider->discount / 100), 2);
+                                        $priceProduct = round(
+                                            $priceProduct - $priceProduct * ($row->provider->discount / 100),
+                                            2,
+                                        );
                                     }
                                 @endphp
                                 <div style="width: 35%">
