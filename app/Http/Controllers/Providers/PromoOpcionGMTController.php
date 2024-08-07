@@ -8,6 +8,7 @@ use App\Models\Color;
 use App\Models\FailedJobsCron;
 use App\Models\Product;
 use App\Models\Subcategory;
+use App\Models\Exchange_Rate;
 use Illuminate\Support\Facades\DB;
 
 class PromoOpcionGMTController extends Controller
@@ -19,12 +20,18 @@ class PromoOpcionGMTController extends Controller
     public function __construct()
     {
         $this->user = "GTM0316";
-        $this->password ="xQEmXL2QHNg5h9iiewA5";
+        $this->password = "xQEmXL2QHNg5h9iiewA5";
         $this->provider_id = 1987;
     }
-    
+
     public function getAllProductsPromoOption()
     {
+
+        $exist_exchange_rate = Exchange_Rate::where('currency_from', 'GTQ')
+            ->where('currency_to', 'MXN')
+            ->first();
+        $rate = $exist_exchange_rate ? $exist_exchange_rate->rate : 1;
+
         $postFields = [
             'user' => $this->user,
             'password' => $this->password,
@@ -62,7 +69,7 @@ class PromoOpcionGMTController extends Controller
             $idSku = (int) explode('-', $maxSKU)[1];
             $idSku++;
         }
-  
+
         foreach ($productsWs as $product) {
             // Verificar si la categoria existe y si no registrarla
             $categoria = null;
@@ -145,7 +152,7 @@ class PromoOpcionGMTController extends Controller
                         'value' => isset($product['hijos'][0]['tipo']) ? $product['hijos'][0]['tipo'] : '',
                     ],
                 ];
-                $data['price'] =  $productHijo['precio'];
+                $data['price'] =  $productHijo['precio']  * $rate;
                 $data['name'] = $productHijo['nombreHijo'];
                 $data['sku'] = $productHijo['skuHijo'];
                 $data['internal_sku'] = "PROM-" . str_pad($idSku, 7, "0", STR_PAD_LEFT);
@@ -153,7 +160,7 @@ class PromoOpcionGMTController extends Controller
                 if (!$productExist) {
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         $data['visible'] = 0;
-                    }else{
+                    } else {
                         $data['visible'] = 1;
                     }
                     $newProduct = Product::create($data);
@@ -210,9 +217,9 @@ class PromoOpcionGMTController extends Controller
                     $visible = 1;
                     if ($productHijo['estatus'] == 0 || $productHijo['estatus'] == '') {
                         $visible = 0;
-                    }  
+                    }
 
-                    $productExist->price = $productHijo['precio'];
+                    $productExist->price = $productHijo['precio'] * $rate;
                     $productExist->visible = $visible;
                     $productExist->save();
                     $imagenes =  count($productHijo['imagenesHijo']) <= 0 ? $product['imagenesPadre'] : $productHijo['imagenesHijo'];
@@ -301,8 +308,9 @@ class PromoOpcionGMTController extends Controller
         return $errors;
     }
 
-    public function cleanStockPromoOpcion() {
-       
+    public function cleanStockPromoOpcion()
+    {
+
         $postFields = [
             'user' => $this->user,
             'password' => $this->password,
@@ -342,30 +350,30 @@ class PromoOpcionGMTController extends Controller
         }
 
         //Todos los productos de la base de datos
-        $allProducts = Product::where('provider_id',$this->provider_id)->get();
+        $allProducts = Product::where('provider_id', $this->provider_id)->get();
 
-        foreach ($allProducts as $dbproduct){
+        foreach ($allProducts as $dbproduct) {
             $found = false; // Variable para indicar si se encuentra el producto en los hijos
-        
+
             foreach ($productsWs as $product) {
                 foreach ($product['hijos'] as $productHijo) {
-                    if($productHijo['skuHijo'] == $dbproduct->sku){
+                    if ($productHijo['skuHijo'] == $dbproduct->sku) {
                         $found = true; // Se encontró el producto en los hijos
                         break 2; // Salir de ambos bucles foreach
                     }
                 }
             }
-        
-            if($found){
+
+            if ($found) {
                 $dbproduct->visible = 1; // Si se encontró, marcar como visible
-            }else{
+            } else {
                 $dbproduct->provider_id = 1983;
                 $dbproduct->visible = 0; // Si no se encontró, marcar como no visible
             }
-            
+
             $dbproduct->save();
         }
-        
+
         // Obtener los SKU de los productos repetidos para el proveedor ID 2
         $repeatedSkus = DB::select("
         SELECT sku
@@ -376,22 +384,22 @@ class PromoOpcionGMTController extends Controller
         ", [$this->provider_id]);
 
         foreach ($repeatedSkus as $repeatedSku) {
-        $sku = $repeatedSku->sku;
+            $sku = $repeatedSku->sku;
 
-        // Obtener el primer producto de cada SKU repetido para el proveedor ID 2
-        $firstProductId = DB::selectOne("
+            // Obtener el primer producto de cada SKU repetido para el proveedor ID 2
+            $firstProductId = DB::selectOne("
             SELECT MIN(id) AS first_id
             FROM products
             WHERE sku = ? AND provider_id = ? AND visible = 1
         ", [$sku, $this->provider_id])->first_id;
 
-        // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
-        DB::table('products')
-            ->where('sku', $sku)
-            ->where('provider_id', $this->provider_id)
-            ->where('visible', 1)
-            ->where('id', '<>', $firstProductId)
-            ->update(['visible' => 0]);
+            // Cambiar la visibilidad a 0 para los productos repetidos, excepto el primero
+            DB::table('products')
+                ->where('sku', $sku)
+                ->where('provider_id', $this->provider_id)
+                ->where('visible', 1)
+                ->where('id', '<>', $firstProductId)
+                ->update(['visible' => 0]);
         }
 
         DB::commit();
@@ -399,6 +407,5 @@ class PromoOpcionGMTController extends Controller
         DB::table('images')->where('image_url', '=', null)->delete();
 
         return $result;
-    
     }
 }
