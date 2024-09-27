@@ -24,7 +24,7 @@ use App\Http\Controllers\SendProductsToEcommerce;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExchangeRateController;
-
+use App\Http\Controllers\ScrapingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -141,3 +141,7 @@ Route::get('/resetProducts', [ResetProducts::class, 'resetProducts']);
 
 //Ruta de la tasa de cambio
 Route::get('/exchange_rate', [ExchangeRateController::class, 'getExchangeRate']);
+
+
+Route::get('/getCurrencyGTMtoMX', [ScrapingController::class, 'getCurrencyGTMtoMX']);
+
