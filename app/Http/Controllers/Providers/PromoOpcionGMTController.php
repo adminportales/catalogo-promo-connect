@@ -286,9 +286,10 @@ class PromoOpcionGMTController extends Controller
 
         // return $response;
         $errors = [];
-
+        
         foreach ($newStocks as $stock) {
-            $productCatalogo = Product::where('sku', $stock['Material'])->first();
+            $productCatalogo = Product::where('sku', $stock['Material'])->where('provider_id', $this->provider_id)->first();
+
             if ($productCatalogo) {
                 $productCatalogo->stock = $stock['Stock'];
                 $productCatalogo->save();
